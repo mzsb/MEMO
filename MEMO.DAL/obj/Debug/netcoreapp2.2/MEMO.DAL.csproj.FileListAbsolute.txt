@@ -6,3 +6,4 @@ C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp2.2\MEMO.DAL.Assem
 C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp2.2\MEMO.DAL.AssemblyInfo.cs
 C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp2.2\MEMO.DAL.dll
 C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp2.2\MEMO.DAL.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp2.2\MEMO.DAL.csprojAssemblyReference.cache

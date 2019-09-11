@@ -14,4 +14,10 @@
     <ProjectReference Include="..\MEMO.BLL\MEMO.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Dtos\" />
+    <Folder Include="Mapper\" />
+  </ItemGroup>
+
 </Project>
