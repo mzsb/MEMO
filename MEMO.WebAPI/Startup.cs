@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MEMO.BLL.Authentication;
+using MEMO.BLL.Interfaces;
+using MEMO.BLL.Services;
 using MEMO.DAL.Context;
 using MEMO.DAL.Entities;
 using MEMO.DAL.Seeds;
+using MEMO.WebAPI.Mapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,7 +38,7 @@ namespace MEMO.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MEMOContext>(o => o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<MEMOContext>(o => o.UseSqlServer(Configuration.GetConnectionString("AzureConnection")));
 
             services.AddIdentity<User, IdentityRole<Guid>>()
                     .AddEntityFrameworkStores<MEMOContext>()
@@ -55,11 +59,13 @@ namespace MEMO.WebAPI
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("AppSettings:Secret")))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenManager.Secret))
                 };
             });
 
-            services.AddSingleton(Configuration.GetSection("appSettings").Get<AppSettings>());
+            services.AddTransient<IUserService, UserService>();
+
+            services.AddSingleton(AutoMapperConfig.Configure());
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                              .AddJsonOptions(json =>

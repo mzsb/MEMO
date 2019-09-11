@@ -36,6 +36,12 @@ namespace MEMO.DAL.Seeds
 
                 await userManager.AddToRoleAsync(user, "Administrator");
             }
+
+            if (!await roleManager.RoleExistsAsync("User"))
+            {
+                var userRole = new IdentityRole<Guid>("User");
+                await roleManager.CreateAsync(userRole);
+            }
         }
     }
 }
