@@ -1,5 +1,4 @@
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI.csprojAssemblyReference.cache
-C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI.AssemblyInfoInputs.cache
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI.AssemblyInfo.cs
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Debug\netcoreapp3.0\appsettings.Development.json
@@ -51,3 +50,8 @@ C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI.pdb
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\staticwebassets\MEMO.WebAPI.StaticWebAssets.Manifest.cache
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\staticwebassets\MEMO.WebAPI.StaticWebAssets.xml
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Debug\netcoreapp3.0\Hellang.Middleware.ProblemDetails.dll
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Debug\netcoreapp3.0\Microsoft.DotNet.PlatformAbstractions.dll
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Debug\netcoreapp3.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp3.0\MEMO.WebAPI.MvcApplicationPartsAssemblyInfo.cache

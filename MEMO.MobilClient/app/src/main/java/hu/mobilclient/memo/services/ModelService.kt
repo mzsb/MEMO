@@ -19,6 +19,7 @@ import retrofit2.Response
 import java.net.SocketTimeoutException
 import java.util.*
 import hu.mobilclient.memo.helpers.EmotionToast
+import hu.mobilclient.memo.helpers.ProblemDetails
 import java.net.ConnectException
 
 
@@ -40,7 +41,7 @@ constructor(private val activity: Activity) {
                             (activity as LoginActivity).onLoginSuccess(response.body()!!)
                         }
                         else{
-                            (activity as LoginActivity).onLoginError(response.errorBody()?.string())
+                            (activity as LoginActivity).onLoginError(ProblemDetails.getDetail(response.errorBody()?.string()))
                         }
                     }
 
@@ -79,7 +80,7 @@ constructor(private val activity: Activity) {
                             (activity as RegistrationActivity).onRegistrationSuccess(response.body()!!)
                         }
                         else{
-                            (activity as RegistrationActivity).onRegistrationError(response.errorBody()?.string())
+                            (activity as RegistrationActivity).onRegistrationError(ProblemDetails.getDetail(response.errorBody()?.string()))
                         }
                     }
 
@@ -122,7 +123,7 @@ constructor(private val activity: Activity) {
                             if (response.code() == 401){
                                 refreshToken(this@ModelService::getUserById, id)
                             } else{
-                                (activity as HomeActivity).onGetUserByIdError(response.errorBody()?.string())
+                                (activity as HomeActivity).onGetUserByIdError(ProblemDetails.getDetail(response.errorBody()?.string()))
                             }
                         }
                     }

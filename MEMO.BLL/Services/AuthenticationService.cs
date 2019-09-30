@@ -1,4 +1,5 @@
 ﻿using MEMO.BLL.Authentication;
+using MEMO.BLL.Exceptions;
 using MEMO.BLL.Interfaces;
 using MEMO.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -33,8 +34,7 @@ namespace MEMO.BLL.Services
             }
             else
             {
-                //TODO: Sikertelen belepes
-                return null;
+                throw new LoginFailedException();
             }
         }
 
@@ -65,8 +65,7 @@ namespace MEMO.BLL.Services
             }
             else
             {
-                //TODO: Sikertelen regisztracio
-                return null;
+                throw new RegistrationFailedException();
             }
         }
 

@@ -243,6 +243,10 @@
               "target": "Package",
               "version": "[7.0.0, )"
             },
+            "Hellang.Middleware.ProblemDetails": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[3.0.0, )"

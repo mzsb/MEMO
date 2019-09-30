@@ -31,14 +31,8 @@ namespace MEMO.WebAPI.Controllers
         {
             var tokenHolder = await _authenticationService.LoginAsync(_mapper.Map<Login>(login));
 
-            if (tokenHolder != null)
-            {
-                return _mapper.Map<TokenHolderDto>(tokenHolder);
-            }
-            else
-            {
-                return NotFound("Helytelen felhasználónév vagy jelszó");
-            }
+            return _mapper.Map<TokenHolderDto>(tokenHolder);
+            
         }
 
         [HttpPost("autoLogin")]
@@ -52,14 +46,7 @@ namespace MEMO.WebAPI.Controllers
         {
             var tokenHolder = await _authenticationService.RegistrationAsync(_mapper.Map<Registration>(registration));
 
-            if (tokenHolder != null)
-            {
-                return _mapper.Map<TokenHolderDto>(tokenHolder);
-            }
-            else
-            {
-                return NotFound("A felhasználónév már foglalt");
-            }
+            return _mapper.Map<TokenHolderDto>(tokenHolder);
         }
 
         [HttpPost("refreshToken")]

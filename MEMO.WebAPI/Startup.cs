@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hellang.Middleware.ProblemDetails;
 using MEMO.BLL.Authentication;
+using MEMO.BLL.Exceptions;
 using MEMO.BLL.Interfaces;
 using MEMO.BLL.Services;
 using MEMO.DAL.Context;
@@ -13,6 +15,7 @@ using MEMO.WebAPI.Mapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -40,8 +43,7 @@ namespace MEMO.WebAPI
         {
             services.AddDbContext<MEMOContext>(o => o.UseSqlServer(Configuration.GetConnectionString("LocalConnection")));
 
-            services.AddMvcCore(o => o.EnableEndpointRouting = false);
-
+            #region Identity
             services.AddIdentity<User, IdentityRole<Guid>>(o => 
             {
                 o.Password.RequireDigit = false;
@@ -75,11 +77,44 @@ namespace MEMO.WebAPI
                 };
             });
 
+            #endregion
+
+            #region ProblemDetails
+            services.AddProblemDetails(options =>
+            {
+                options.IncludeExceptionDetails = ctx => false;
+                options.Map<EntityNotFoundException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
+                options.Map<LoginFailedException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
+                options.Map<RegistrationFailedException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
+
+            });
+            #endregion
+
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IUserService, UserService>();
 
             services.AddSingleton(AutoMapperConfig.Configure());
             services.AddSingleton(new TokenManager(secret));
+
+            services.AddMvcCore(o => o.EnableEndpointRouting = false);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                              .AddJsonOptions(json => json.JsonSerializerOptions.MaxDepth = 0);
@@ -102,6 +137,8 @@ namespace MEMO.WebAPI
                                    .GetRequiredService<IServiceScopeFactory>()
                                    .CreateScope()
                                    .ServiceProvider);
+
+            app.UseProblemDetails();
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
