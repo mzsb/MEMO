@@ -16,62 +16,32 @@ namespace MEMO.BLL.Services
     {
         private readonly UserManager<User> _userManager;
 
-        public UserService(MEMOContext context, 
-                           UserManager<User> userManager)
+        public UserService(UserManager<User> userManager)
         {
             _userManager = userManager;
         }
 
-        public async Task<User> LoginAsync(User user)
-        {
-            var appUser = await _userManager.FindByNameAsync(user.UserName);
-
-            if (appUser != null && await _userManager.CheckPasswordAsync(appUser, user.Password))
-            {
-                appUser.Role = (await _userManager.GetRolesAsync(appUser)).FirstOrDefault();
-
-                appUser.Token = TokenManager.GenerateToken(appUser);
-
-                return appUser;
-            }
-            else
-            {
-                //TODO: Sikertelen belepes
-                return null;
-            }
-        }
-
-        public async Task<User> AddAsync(User user)
-        {
-            var result = await _userManager.CreateAsync(user, user.Password);
-
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, "User");
-
-                user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-
-                user.Token = TokenManager.GenerateToken(user);
-
-                return user;
-            }
-            else
-            {
-                //TODO: Sikertelen regisztracio
-                return null;
-            }
-        }
-
         public async Task<IEnumerable<User>> GetAsync()
         {
-            return await _userManager.Users
-                                     .AsNoTracking()
-                                     .ToListAsync();
+            var users = await _userManager.Users
+                                          .AsNoTracking()
+                                          .ToListAsync();
+
+            foreach (var user in users)
+            {
+                user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            }
+
+            return users;
         }
 
         public async Task<User> GetByIdAsync(Guid id)
         {
-            return await _userManager.FindByIdAsync(id.ToString());
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+
+            return user;
         }
 
         public async Task UpdateAsync(User user)

@@ -1,0 +1,8 @@
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\bin\Release\netcoreapp3.0\MEMO.DAL.deps.json
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\bin\Release\netcoreapp3.0\MEMO.DAL.dll
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\bin\Release\netcoreapp3.0\MEMO.DAL.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Release\netcoreapp3.0\MEMO.DAL.csprojAssemblyReference.cache
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Release\netcoreapp3.0\MEMO.DAL.AssemblyInfoInputs.cache
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Release\netcoreapp3.0\MEMO.DAL.AssemblyInfo.cs
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Release\netcoreapp3.0\MEMO.DAL.dll
+C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Release\netcoreapp3.0\MEMO.DAL.pdb

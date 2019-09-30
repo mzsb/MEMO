@@ -7,12 +7,6 @@ namespace MEMO.DAL.Entities
     public class User : IdentityUser<Guid>
     {
         [NotMapped]
-        public string Password { get; set; }
-
-        [NotMapped]
-        public string Token { get; set; }
-
-        [NotMapped]
         public string Role { get; set; }
     }
 }

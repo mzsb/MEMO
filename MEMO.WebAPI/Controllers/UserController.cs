@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MEMO.BLL.Interfaces;
 using MEMO.DAL.Entities;
-using MEMO.WebAPI.Dtos;
+using MEMO.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace MEMO.WebAPI.Controllers
 {
+    [Authorize(Roles = "Administator,User")]
     [Route("api/User")]
     public class UserController : Controller
     {
@@ -25,27 +26,6 @@ namespace MEMO.WebAPI.Controllers
             _mapper = mapper;
         }
 
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> LoginAsync([FromBody] UserDto user)
-        {
-            var mapped = _mapper.Map<User>(user);
-
-            return _mapper.Map<UserDto>(await _userService.LoginAsync(mapped));
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<ActionResult<UserDto>> AddAsync([FromBody] UserDto user)
-        {
-            var mapped = _mapper.Map<User>(user);
-
-            await _userService.AddAsync(mapped);
-
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = mapped.Id }, mapped);
-        }
-
-        [Authorize(Roles = "Administator,User")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAsync()
         {
@@ -56,7 +36,6 @@ namespace MEMO.WebAPI.Controllers
             return mapped;
         }
 
-        [Authorize(Roles = "Administator")]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetByIdAsync(Guid id)
         {
@@ -67,7 +46,6 @@ namespace MEMO.WebAPI.Controllers
             return mapped;
         }
 
-        [Authorize(Roles = "Administator,User")]
         [HttpPut]
         public async Task<ActionResult> Update([FromBody] UserDto user)
         {
@@ -78,7 +56,6 @@ namespace MEMO.WebAPI.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "Administator,User")]
         [HttpDelete]
         public async Task<ActionResult> Delete([FromBody] UserDto user)
         {

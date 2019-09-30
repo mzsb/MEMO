@@ -8,8 +8,6 @@ namespace MEMO.BLL.Interfaces
 {
     public interface IUserService 
     {
-        Task<User> LoginAsync(User user);
-        Task<User> AddAsync(User user);
         Task<IEnumerable<User>> GetAsync();
         Task<User> GetByIdAsync(Guid id);
         Task UpdateAsync(User user);

@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">MEMO</string>
+    <string name="username">Felhasználónév</string>
+    <string name="password">Jelszó</string>
+    <string name="sign_in">Belépés</string>
+    <string name="required_field">A mező nem lehet üres!</string>
+    <string name="sign_up">Regisztráció</string>
+    <string name="password_again">Jelszó újra</string>
+    <string name="email">E-mail cím</string>
+    <string name="not_match">Nem egyezik!</string>
+    <string name="invalid_email">Nem érvényes e-mail cím</string>
+    <string name="too_short_password">A jelszó legalább hat karakter</string>
+    <string name="server_not_available">A kiszolgáló nem elérhető</string>
+    <string name="error_occurred">Hiba történt</string>
+    <string name="no_internet">Nincs internet</string>
+    <string name="network_error">Hálózati hiba történt</string>
+    <string name="check_internet">Ellenőrizd az internetkapcsolatot</string>
 </resources>

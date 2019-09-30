@@ -1,0 +1,11 @@
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Debug\netcoreapp3.0\MEMO.BLL.deps.json
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Debug\netcoreapp3.0\MEMO.BLL.dll
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Debug\netcoreapp3.0\MEMO.BLL.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Debug\netcoreapp3.0\MEMO.DAL.dll
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Debug\netcoreapp3.0\MEMO.DAL.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.csprojAssemblyReference.cache
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.AssemblyInfoInputs.cache
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.AssemblyInfo.cs
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.csproj.CopyComplete
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.dll
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.pdb

@@ -1,0 +1,8 @@
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\bin\Debug\netstandard2.1\MEMO.DTO.deps.json
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\bin\Debug\netstandard2.1\MEMO.DTO.dll
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\bin\Debug\netstandard2.1\MEMO.DTO.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\obj\Debug\netstandard2.1\MEMO.DTO.csprojAssemblyReference.cache
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\obj\Debug\netstandard2.1\MEMO.DTO.AssemblyInfoInputs.cache
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\obj\Debug\netstandard2.1\MEMO.DTO.AssemblyInfo.cs
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\obj\Debug\netstandard2.1\MEMO.DTO.dll
+C:\Users\barna\source\repos\MEMO\MEMO.DTO\obj\Debug\netstandard2.1\MEMO.DTO.pdb

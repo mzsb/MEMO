@@ -26,7 +26,7 @@ namespace MEMO.DAL.Seeds
                     UserName = "Admin"
                 };
 
-                await userManager.CreateAsync(user, "Password@123");
+                await userManager.CreateAsync(user, "qwertz");
 
                 if (!await roleManager.RoleExistsAsync("Administrator"))
                 {
@@ -35,12 +35,23 @@ namespace MEMO.DAL.Seeds
                 }
 
                 await userManager.AddToRoleAsync(user, "Administrator");
-            }
 
-            if (!await roleManager.RoleExistsAsync("User"))
-            {
-                var userRole = new IdentityRole<Guid>("User");
-                await roleManager.CreateAsync(userRole);
+                user = new User()
+                {
+                    Email = "user@user.xpl",
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = "User"
+                };
+
+                await userManager.CreateAsync(user, "123456");
+
+                if (!await roleManager.RoleExistsAsync("User"))
+                {
+                    var userRole = new IdentityRole<Guid>("User");
+                    await roleManager.CreateAsync(userRole);
+                }
+
+                await userManager.AddToRoleAsync(user, "User");
             }
         }
     }

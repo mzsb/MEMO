@@ -38,17 +38,27 @@ namespace MEMO.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MEMOContext>(o => o.UseSqlServer(Configuration.GetConnectionString("AzureConnection")));
+            services.AddDbContext<MEMOContext>(o => o.UseSqlServer(Configuration.GetConnectionString("LocalConnection")));
 
-            services.AddIdentity<User, IdentityRole<Guid>>()
-                    .AddEntityFrameworkStores<MEMOContext>()
-                    .AddDefaultTokenProviders();
+            services.AddMvcCore(o => o.EnableEndpointRouting = false);
+
+            services.AddIdentity<User, IdentityRole<Guid>>(o => 
+            {
+                o.Password.RequireDigit = false;
+                o.Password.RequireLowercase = false;
+                o.Password.RequireUppercase = false;
+                o.Password.RequireNonAlphanumeric = false;
+                o.Password.RequiredLength = 6;
+            })
+            .AddEntityFrameworkStores<MEMOContext>()
+            .AddDefaultTokenProviders();
+
+            string secret = Configuration.GetValue<string>("AppSettings:Secret");
 
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
             {
@@ -56,20 +66,23 @@ namespace MEMO.WebAPI
                 options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
+                    ValidateLifetime = true,
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TokenManager.Secret))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IUserService, UserService>();
 
             services.AddSingleton(AutoMapperConfig.Configure());
+            services.AddSingleton(new TokenManager(secret));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                             .AddJsonOptions(json =>
-                                json.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                             .AddJsonOptions(json => json.JsonSerializerOptions.MaxDepth = 0);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

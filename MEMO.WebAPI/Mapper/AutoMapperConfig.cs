@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using MEMO.BLL.Authentication;
 using MEMO.DAL.Entities;
-using MEMO.WebAPI.Dtos;
+using MEMO.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,11 @@ namespace MEMO.WebAPI.Mapper
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<UserDto, User>();
-                cfg.CreateMap<User, UserDto>().ForMember(dto => dto.Password, opt => opt.Ignore());
+                cfg.CreateMap<LoginDto, Login>().ReverseMap();
+                cfg.CreateMap<RegistrationDto, Registration>().ReverseMap();
+                cfg.CreateMap<TokenHolderDto, TokenHolder>().ReverseMap();
+
+                cfg.CreateMap<UserDto, User>().ReverseMap();
             });
 
             return config.CreateMapper();

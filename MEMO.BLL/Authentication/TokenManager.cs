@@ -3,39 +3,48 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
 namespace MEMO.BLL.Authentication
 {
-    public static class TokenManager
+    public class TokenManager
     {
-        public static string Secret { get; } = "pJGsYKDSZ6P5ez7pjBpPAuuRQnZQxa";
+        private readonly string _secret;
+        private readonly JwtSecurityTokenHandler _tokenHandler;
 
-        public static string GenerateToken(User user)
+        public TokenManager(String secret)
         {
-            var signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
-
-            var claims = GetClaims(user);
-
-            var token = new JwtSecurityToken(
-                    notBefore: DateTime.UtcNow,
-                    expires: DateTime.UtcNow.AddSeconds(1),
-                    claims: claims,
-                    signingCredentials: new SigningCredentials(signInKey, SecurityAlgorithms.HmacSha256)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            _secret = secret;
+            _tokenHandler = new JwtSecurityTokenHandler();
         }
 
-        private static List<Claim> GetClaims(User user)
+        public string GenerateToken(User user)
         {
-            return new List<Claim>
+            var signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
+
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
                     new Claim(ClaimTypes.Role, user.Role)
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(signInKey, SecurityAlgorithms.HmacSha256)
             };
+
+            var token = _tokenHandler.CreateToken(tokenDescriptor);
+
+            return _tokenHandler.WriteToken(token);
+        }
+
+        public string DecodeUserId(string token)
+        {
+            var decodedToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+            return decodedToken.Claims.FirstOrDefault(c => c.Type == "unique_name").Value;
         }
     }
 }

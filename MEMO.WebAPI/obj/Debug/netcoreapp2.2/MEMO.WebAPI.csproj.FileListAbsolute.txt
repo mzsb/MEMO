@@ -17,3 +17,5 @@ C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp2.2\MEMO.WebAPI
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp2.2\MEMO.WebAPI.csproj.CopyComplete
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp2.2\MEMO.WebAPI.dll
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Debug\netcoreapp2.2\MEMO.WebAPI.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Debug\netcoreapp2.2\MEMO.DTO.dll
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Debug\netcoreapp2.2\MEMO.DTO.pdb

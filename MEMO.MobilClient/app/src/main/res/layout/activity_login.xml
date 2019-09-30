@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout">
+
+    <data>
+
+        <variable
+            name="login"
+            type="hu.mobilclient.memo.model.Login" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activities.LoginActivity">
+
+        <ImageView
+            android:id="@+id/ac_login_img_logo"
+            android:layout_width="261dp"
+            android:layout_height="139dp"
+            app:layout_constraintBottom_toTopOf="@+id/ac_login_et_username_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/ac_login_et_username_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/ac_login_et_password_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ac_login_img_logo">
+
+            <EditText
+                android:id="@+id/ac_login_et_username"
+                android:layout_width="165dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/username"
+                android:inputType="textImeMultiLine"
+                android:text="@={login.UserName}"
+                android:textSize="20sp"
+                android:gravity="center_horizontal|center_vertical"
+                android:importantForAutofill="no" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/ac_login_et_password_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            app:layout_constraintBottom_toTopOf="@+id/ac_login_btn_login"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ac_login_et_username_layout" >
+
+            <EditText
+                android:id="@+id/ac_login_et_password"
+                android:layout_width="135dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:text="@={login.Password}"
+                android:textSize="18sp"
+                android:gravity="center_horizontal|center_vertical"
+                android:importantForAutofill="no" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton style="@style/AppButton"
+            android:id="@+id/ac_login_btn_login"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="loginClick"
+            android:text="@string/sign_in"
+            app:layout_constraintBottom_toTopOf="@+id/ac_login_tv_registration"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ac_login_et_password_layout" />
+
+        <TextView
+            android:id="@+id/ac_login_tv_registration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="registrationClick"
+            android:text="@string/sign_up"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ac_login_btn_login"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
