@@ -13,57 +13,45 @@ using System.Threading.Tasks;
 namespace MEMO.WebAPI.Controllers
 {
     [Authorize(Roles = "Administator,User")]
-    [Route("api/User")]
+    [Route("api/[Controller]")]
     public class UserController : Controller
     {
-        private readonly IUserService _userService;
+        private readonly IUserService _service;
         private readonly IMapper _mapper;
 
         public UserController(IUserService userService,
                               IMapper mapper)
         {
-            _userService = userService;
+            _service = userService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAsync()
         {
-            var users = await _userService.GetAsync();
-
-            List<UserDto> mapped = _mapper.Map<List<UserDto>>(users);
-
-            return mapped;
+            return _mapper.Map<List<UserDto>>(await _service.GetAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetByIdAsync(Guid id)
         {
-            var user = await _userService.GetByIdAsync(id);
-
-            UserDto mapped = _mapper.Map<UserDto>(user);
-
-            return mapped;
+            return _mapper.Map<UserDto>(await _service.GetByIdAsync(id));
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update([FromBody] UserDto user)
+        public async Task<ActionResult> UpdateAsync([FromBody] UserDto user)
         {
-            var mapped = _mapper.Map<User>(user);
+            await _service.UpdateAsync(_mapper.Map<User>(user));
 
-            await _userService.UpdateAsync(mapped);
-
-            return NoContent();
+            return Ok();
         }
 
-        [HttpDelete]
-        public async Task<ActionResult> Delete([FromBody] UserDto user)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAsync(Guid id)
         {
-            var mapped = _mapper.Map<User>(user);
+            await _service.DeleteAsync(id);
 
-            await _userService.DeleteAsync(mapped);
-
-            return NoContent();
+            return Ok();
         }
     }
 }

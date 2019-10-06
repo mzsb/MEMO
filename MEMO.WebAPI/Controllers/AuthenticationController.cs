@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace MEMO.WebAPI.Controllers
 {
     [AllowAnonymous]
-    [Route("api/Authentication")]
+    [Route("api/[Controller]")]
     public class AuthenticationController : Controller
     {
         private readonly BLL.Interfaces.IAuthenticationService _authenticationService;

@@ -18,7 +18,9 @@ import hu.mobilclient.memo.databinding.ActivityLoginBinding
 
 object EmotionToast {
 
-    var toastCount: Int = 0
+    private var toastCount: Int = 0
+
+    var maxToastCount: Int = 2
     var yOffset: Int = 100
 
     private fun show(activity: Activity, message: String, drawableId: Int, colorId: Int, duration: Int = Toast.LENGTH_SHORT){
@@ -35,7 +37,7 @@ object EmotionToast {
 
             toastCount++
             val toast = Toast(activity.applicationContext)
-            toast.setGravity(Gravity.BOTTOM, 0, 150 + if(toastCount > 1) { toastCount = 0; yOffset} else 0)
+            toast.setGravity(Gravity.BOTTOM, 0, 150 + if(toastCount == maxToastCount) { toastCount = 0; yOffset} else 0)
             toast.duration = duration
             toast.view = layout
             toast.show()

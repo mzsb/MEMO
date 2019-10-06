@@ -5,10 +5,8 @@ using System.Text;
 
 namespace MEMO.DTO
 {
-    public class UserDto
+    public class UserDto : DtoBase
     {
-        public Guid Id { get; set; }
-
         [Required(ErrorMessage = "Username is required", AllowEmptyStrings = false)]
         public string UserName { get; set; }
 
@@ -17,5 +15,7 @@ namespace MEMO.DTO
 
         [Required(ErrorMessage = "Role is required", AllowEmptyStrings = false)]
         public string Role { get; set; }
+
+        public ICollection<DictionaryDto> Dictionaries { get; set; } = new List<DictionaryDto>();
     }
 }

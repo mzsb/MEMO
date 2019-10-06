@@ -1,19 +1,14 @@
 package hu.mobilclient.memo.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
 import android.text.method.PasswordTransformationMethod
 import android.text.method.TransformationMethod
 import android.util.Patterns
 import android.view.MotionEvent
 import android.view.View
 import android.view.Window
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import hu.mobilclient.memo.App
 import hu.mobilclient.memo.BR
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
@@ -21,14 +16,11 @@ import hu.mobilclient.memo.databinding.ActivityRegistrationBinding
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.model.Registration
 import hu.mobilclient.memo.model.TokenHolder
-import hu.mobilclient.memo.network.callbacks.IRegistrationCallBack
+import hu.mobilclient.memo.network.callbacks.Authentication.IRegistrationCallBack
 import hu.mobilclient.memo.network.interfaces.IInternetConnectionListener
-import hu.mobilclient.memo.services.ModelService
 import kotlinx.android.synthetic.main.activity_registration.*
 
 class RegistrationActivity : NetworkActivityBase(), IRegistrationCallBack, IInternetConnectionListener {
-
-    private var modelService: ModelService? = null
 
     var registration = Registration()
 
@@ -39,8 +31,6 @@ class RegistrationActivity : NetworkActivityBase(), IRegistrationCallBack, IInte
 
         binding.setVariable(BR.registration, registration)
         binding.executePendingBindings()
-
-        modelService = ModelService(this)
 
         ac_registration_et_password_image.setOnTouchListener { view, motionEvent ->
             when (motionEvent.action) {
@@ -57,8 +47,6 @@ class RegistrationActivity : NetworkActivityBase(), IRegistrationCallBack, IInte
                 else -> false
             }
         }
-
-        (application as App).setInternetConnectionListener(this)
     }
 
     private fun setTransformationMethod(method: TransformationMethod?) {
@@ -75,7 +63,7 @@ class RegistrationActivity : NetworkActivityBase(), IRegistrationCallBack, IInte
 
     fun registrationClick(view: View){
         if(isValid()){
-            modelService?.registration(registration)
+            serviceManager.authentication?.registration(registration)
         }
     }
 
@@ -131,8 +119,9 @@ class RegistrationActivity : NetworkActivityBase(), IRegistrationCallBack, IInte
 
     override fun onRegistrationSuccess(tokenHolder: TokenHolder) {
         intent = Intent(this, HomeActivity::class.java)
-        intent.putExtra("userId", tokenHolder.UserId)
+        intent.putExtra("userId", tokenHolder.UserId.toString())
         startActivity(intent)
+        finish()
     }
 
     override fun onRegistrationError(errorMessage: String?) {

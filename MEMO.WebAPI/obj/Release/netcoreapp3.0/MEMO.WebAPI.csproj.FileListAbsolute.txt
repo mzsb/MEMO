@@ -51,3 +51,7 @@ C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Release\netcoreapp3.0\MEMO.WebA
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Release\netcoreapp3.0\MEMO.WebAPI.csproj.CopyComplete
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Release\netcoreapp3.0\MEMO.WebAPI.dll
 C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Release\netcoreapp3.0\MEMO.WebAPI.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Release\netcoreapp3.0\Hellang.Middleware.ProblemDetails.dll
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Release\netcoreapp3.0\Microsoft.DotNet.PlatformAbstractions.dll
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\bin\Release\netcoreapp3.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\barna\source\repos\MEMO\MEMO.WebAPI\obj\Release\netcoreapp3.0\MEMO.WebAPI.MvcApplicationPartsAssemblyInfo.cs

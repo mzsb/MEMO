@@ -40,7 +40,7 @@ namespace MEMO.BLL.Services
 
         public async Task<TokenHolder> AutoLoginAsync(string token)
         {
-            User user = await _userManager.FindByIdAsync(_tokenManager.DecodeUserId(token));
+            User user = await _userManager.FindByIdAsync(_tokenManager.DecodeUserId(token)) ?? throw new EntityNotFoundException(typeof(User));
 
             return new TokenHolder { UserId = user.Id, Token = token };
         }

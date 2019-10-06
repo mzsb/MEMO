@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MEMO.DAL.Entities
@@ -8,5 +9,7 @@ namespace MEMO.DAL.Entities
     {
         [NotMapped]
         public string Role { get; set; }
+
+        public ICollection<UserDictionary> UserDictionaries { get; set; } = new List<UserDictionary>();
     }
 }

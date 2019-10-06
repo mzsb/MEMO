@@ -9,3 +9,5 @@ C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.Assem
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.csproj.CopyComplete
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.dll
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Debug\netcoreapp3.0\MEMO.BLL.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Debug\netcoreapp3.0\MEMO.DTO.dll
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Debug\netcoreapp3.0\MEMO.DTO.pdb

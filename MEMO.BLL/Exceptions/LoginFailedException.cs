@@ -8,6 +8,8 @@ namespace MEMO.BLL.Exceptions
     {
         private const string message = "Helytelen felhasználónév vagy jelszó";
 
+        public LoginFailedException(string message) : base(message) { }
+
         public LoginFailedException() : base(message) { }
     }
 }

@@ -1,15 +1,21 @@
 package hu.mobilclient.memo.helpers
 
-object ProblemDetails {
-    fun getDetail(problem: String?): String?{
-        return problem?.split("detail")?.get(1)?.split('"')?.get(2)
-    }
+import com.google.gson.Gson
+import hu.mobilclient.memo.App
+import hu.mobilclient.memo.R
 
-    fun getTitle(problem: String?): String?{
-        return problem?.split("title")?.get(1)?.split('"')?.get(2)
-    }
+class ProblemDetails(Json: String?) {
 
-    fun getStatus(problem: String?): String?{
-        return problem?.split("status")?.get(1)?.split('"')?.get(2)
+    val title: String
+
+    val status: String
+
+    val detail: String
+
+    init{
+        var instance: ProblemDetails? = Gson().fromJson(Json, ProblemDetails::class.java)
+            title = instance?.title ?: "Unknown"
+            status = instance?.status ?: "Unknown"
+            detail = instance?.detail ?: App.instance.getString(R.string.error_occurred)
     }
 }

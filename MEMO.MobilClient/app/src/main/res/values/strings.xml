@@ -15,4 +15,5 @@
     <string name="no_internet">Nincs internet</string>
     <string name="network_error">Hálózati hiba történt</string>
     <string name="check_internet">Ellenőrizd az internetkapcsolatot</string>
+    <string name="invalid_activity_type">Invalid activity type</string>
 </resources>

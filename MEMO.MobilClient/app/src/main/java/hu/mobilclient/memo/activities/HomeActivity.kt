@@ -1,24 +1,19 @@
 package hu.mobilclient.memo.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import hu.mobilclient.memo.BR
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.ActivityHomeBinding
 import hu.mobilclient.memo.helpers.EmotionToast
-import hu.mobilclient.memo.model.User
-import hu.mobilclient.memo.network.callbacks.IGetUserByIdCallBack
-import hu.mobilclient.memo.services.ModelService
+import hu.mobilclient.memo.model.*
+import hu.mobilclient.memo.network.callbacks.User.IGetUserByIdCallBack
 import java.util.*
 
 class HomeActivity : NetworkActivityBase(), IGetUserByIdCallBack {
-
-    private var modelService: ModelService? = null
 
     var user = User()
 
@@ -30,16 +25,14 @@ class HomeActivity : NetworkActivityBase(), IGetUserByIdCallBack {
         binding.executePendingBindings()
 
         val userId = intent.getStringExtra("userId")
-
-        modelService = ModelService(this)
-        modelService?.getUserById(UUID.fromString(userId))
+        serviceManager.user?.get(UUID.fromString(userId))
     }
 
     fun click(view: View){
-        modelService?.getUserById(user.Id)
+        serviceManager.user?.get(user.Id ?: UUID.randomUUID())
     }
 
-    fun logoutclick(view: View){
+    fun logoutClick(view: View){
         getSharedPreferences("authData", 0).edit().clear().apply()
         intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
@@ -47,7 +40,9 @@ class HomeActivity : NetworkActivityBase(), IGetUserByIdCallBack {
     }
 
     override fun onGetUserByIdSuccess(user: User) {
-        this.user = user;
+        this.user = user
+
+        serviceManager.language?.get()
     }
 
     override fun onGetUserByIdError(errorMessage: String?) {
