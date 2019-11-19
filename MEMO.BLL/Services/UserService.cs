@@ -1,25 +1,34 @@
 ﻿using MEMO.BLL.Authentication;
+using MEMO.BLL.Authorization;
 using MEMO.BLL.Exceptions;
 using MEMO.BLL.Interfaces;
 using MEMO.DAL.Context;
 using MEMO.DAL.Entities;
+using MEMO.DAL.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MEMO.BLL.Services
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<User> _userManager;
+        public string Token { private get; set; }
 
-        public UserService(UserManager<User> userManager)
+        private readonly MEMOContext _context;
+        private readonly UserManager<User> _userManager;
+        public readonly AuthorizationManager _authorizationManager;
+
+        public UserService(MEMOContext context,
+                           UserManager<User> userManager,
+                           AuthorizationManager authorizationManager)
         {
+            _context = context;
             _userManager = userManager;
+            _authorizationManager = authorizationManager;
         }
 
         public async Task<IEnumerable<User>> GetAsync()
@@ -42,32 +51,73 @@ namespace MEMO.BLL.Services
 
             user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
+            user.Attributes = await _context.Attributes.Include(a => a.AttributeParameters)
+                                                       .Where(a => a.UserId == id)
+                                                       .ToListAsync();
+
             return user;
         }
 
         public async Task UpdateAsync(User user)
         {
-            var identityUser = await _userManager.FindByIdAsync(user.Id.ToString()) ?? throw new EntityNotFoundException(typeof(User));
-
-            identityUser.UserName = user.UserName;
-            identityUser.Email = user.Email;
-            identityUser.Role = user.Role;
-
-            var result = (await _userManager.UpdateAsync(identityUser));
-
-            if (!result.Succeeded)
+            if (_authorizationManager.authorizeByUserId(user.Id, Token))
             {
-                throw new EntityUpdateException(typeof(User), result.Errors.ToString());
+                var identityUser = await _userManager.FindByIdAsync(user.Id.ToString()) 
+                                                     ?? throw new EntityNotFoundException(typeof(User));
+
+                identityUser.UserName = user.UserName;
+                identityUser.Email = user.Email;
+                identityUser.Role = user.Role;
+
+                var result = (await _userManager.UpdateAsync(identityUser));
+
+                if (!result.Succeeded)
+                {
+                    throw new EntityUpdateException("A felhasználónév már foglalt");
+                }
+            }
+            else
+            {
+                throw new AuthorizationException(typeof(User));
             }
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var result = await _userManager.DeleteAsync(await _userManager.FindByIdAsync(id.ToString()));
-
-            if (!result.Succeeded)
+            if (_authorizationManager.authorizeByUserId(id, Token))
             {
-                throw new EntityDeleteException(typeof(User), result.Errors.ToString());
+                foreach (var attribute in _context.Attributes.Where(a => a.UserId == id))
+                {
+                    _context.Attributes.Remove(attribute);
+                }
+
+                foreach(var dictionary in _context.UserDictionaries.Include(ud => ud.Dictionary)
+                                                                   .Where(ud => ud.Type == UserType.owner &&
+                                                                          ud.UserId == id)
+                                                                   .Select(ud => ud.Dictionary))
+                {
+                    _context.Dictionaries.Remove(dictionary);
+                }
+
+                try 
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException e)
+                {
+                    throw new EntityDeleteException(typeof(User), e.Message);
+                }
+
+                var result = await _userManager.DeleteAsync(await _userManager.FindByIdAsync(id.ToString()));
+
+                if (!result.Succeeded)
+                {
+                    throw new EntityDeleteException(typeof(User), result.Errors.ToString());
+                }
+            }
+            else
+            {
+                throw new AuthorizationException(typeof(User));
             }
         }
     }

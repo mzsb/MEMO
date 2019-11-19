@@ -10,7 +10,7 @@ using MEMO.BLL.Interfaces;
 using MEMO.BLL.Services;
 using MEMO.DAL.Context;
 using MEMO.DAL.Entities;
-using MEMO.DAL.Initializer;
+using MEMO.DAL.DataSeed;
 using MEMO.BLL.Mapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +27,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using MEMO.BLL.Authorization;
 
 namespace MEMO.WebAPI
 {
@@ -92,6 +93,34 @@ namespace MEMO.WebAPI
             services.AddProblemDetails(options =>
             {
                 options.IncludeExceptionDetails = ctx => false;
+                options.Map<EntityInsertException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
+                options.Map<EntityUpdateException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
+                options.Map<EntityDeleteException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
+                options.Map<AuthorizationException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
                 options.Map<EntityNotFoundException>(ex =>
                     new ProblemDetails
                     {
@@ -125,13 +154,17 @@ namespace MEMO.WebAPI
             services.AddTransient<IDictionaryService, DictionaryService>();
             services.AddTransient<ITranslationService, TranslationService>();
             services.AddTransient<ILanguageService, LanguageService>();
+            services.AddTransient<IAttributeService, AttributeService>();
 
             #endregion
 
             #region Singletons
 
             services.AddSingleton(AutoMapperConfig.Configure());
-            services.AddSingleton(new TokenManager(secret));
+
+            var tokenManager = new TokenManager(secret);
+            services.AddSingleton(tokenManager);
+            services.AddSingleton(new AuthorizationManager(tokenManager));
 
             #endregion
 
@@ -145,17 +178,17 @@ namespace MEMO.WebAPI
             #endregion
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
 
-            MEMODBInitializer.Initialize(app.ApplicationServices
-                                            .GetRequiredService<IServiceScopeFactory>()
-                                            .CreateScope()
-                                            .ServiceProvider);
+                DevelopmentDataSeed.Initialize(app.ApplicationServices
+                   .GetRequiredService<IServiceScopeFactory>()
+                   .CreateScope()
+                   .ServiceProvider);
+            }
 
             app.UseProblemDetails();
 

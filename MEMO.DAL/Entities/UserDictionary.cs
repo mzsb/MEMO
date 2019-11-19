@@ -1,4 +1,4 @@
-﻿using MEMO.DTO.Enums;
+﻿using MEMO.DAL.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;

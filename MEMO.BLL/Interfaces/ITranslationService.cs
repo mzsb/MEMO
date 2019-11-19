@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MEMO.BLL.Interfaces
 {
-    public interface ITranslationService
+    public interface ITranslationService : IAuthorizable
     {
         Task<IEnumerable<Translation>> GetAsync();
         Task<Translation> GetByIdAsync(Guid id);

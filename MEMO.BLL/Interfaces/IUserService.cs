@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MEMO.BLL.Interfaces
 {
-    public interface IUserService 
+    public interface IUserService : IAuthorizable
     {
         Task<IEnumerable<User>> GetAsync();
         Task<User> GetByIdAsync(Guid id);

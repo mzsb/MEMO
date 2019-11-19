@@ -1,10 +1,14 @@
 ﻿using MEMO.DAL.Entities;
-using MEMO.DTO.Enums;
+using MEMO.DAL.Interfaces;
+using MEMO.DAL.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace MEMO.DAL.Context
 {
@@ -13,10 +17,9 @@ namespace MEMO.DAL.Context
         public DbSet<Dictionary> Dictionaries { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Translation> Translations { get; set; }
-        public DbSet<TranslationMeta> TranslationMetas { get; set; }
-        public DbSet<MetaDefinition> MetaDefinitions { get; set; }
-        public DbSet<MetaDefinitionParameter> MetaDefinitionParameters { get; set; }
-
+        public DbSet<AttributeValue> AttributeValues { get; set; }
+        public DbSet<Entities.Attribute> Attributes { get; set; }
+        public DbSet<AttributeParameter> AttributeParameters { get; set; }
         public DbSet<DictionaryLanguage> DictionaryLanguages { get; set; }
         public DbSet<UserDictionary> UserDictionaries { get; set; }
 
@@ -26,24 +29,44 @@ namespace MEMO.DAL.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            const string AdministratorRoleName = "Administrator";
+
+            modelBuilder.Entity<IdentityRole<Guid>>().HasData(new IdentityRole<Guid> 
+            { 
+                Id = Guid.NewGuid(),
+                Name = AdministratorRoleName, 
+                NormalizedName = AdministratorRoleName.ToUpper() 
+            });
+
+            const string UserRoleName = "User";
+
+            modelBuilder.Entity<IdentityRole<Guid>>().HasData(new IdentityRole<Guid>
+            {
+                Id = Guid.NewGuid(),
+                Name = UserRoleName,
+                NormalizedName = UserRoleName.ToUpper()
+            });
+
+            var languageCodes = Enum.GetValues(typeof(LanguageCode)).Cast<LanguageCode>();
+
+            foreach (var languageCode in languageCodes) 
+            {
+                modelBuilder.Entity<Language>().HasData(new Language
+                {
+                    Id = Guid.NewGuid(),
+                    LanguageCode = languageCode
+                });
+            }
+
             modelBuilder.Entity<Language>()
                         .HasMany(l => l.DictionaryLanguages)
                         .WithOne(dl => dl.Language)
-                        .HasForeignKey(dl => dl.LanguageId)
                         .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Translation>()
-                        .HasMany(t => t.TranslationMetas)
-                        .WithOne(tm => tm.Translation)
-                        .HasForeignKey(dl => dl.TranslationId)
-                        .OnDelete(DeleteBehavior.Cascade);
-
-
-            modelBuilder.Entity<TranslationMeta>()
-                        .HasOne(tm => tm.MetaDefinition)
-                        .WithMany(md => md.TranslationMetas)
-                        .HasForeignKey(tm => tm.MetaDefinitionId)
-                        .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Entities.Attribute>()
+                        .HasMany(a => a.AttributeValues)
+                        .WithOne(av => av.Attribute)
+                        .OnDelete(DeleteBehavior.Cascade);           
 
             var userTypeConverter = new EnumToStringConverter<UserType>();
 
@@ -51,17 +74,59 @@ namespace MEMO.DAL.Context
                         .Property(ud => ud.Type)
                         .HasConversion(userTypeConverter);
 
-            var metaTypeConverter = new EnumToStringConverter<MetaType>();
 
-            modelBuilder.Entity<MetaDefinition>()
-                        .Property(md => md.Type)
-                        .HasConversion(metaTypeConverter);
+            var attributeTypeConverter = new EnumToStringConverter<AttributeType>();
+
+            modelBuilder.Entity<Entities.Attribute>()
+                        .Property(a => a.Type)
+                        .HasConversion(attributeTypeConverter);
 
             var languageTypeConverter = new EnumToStringConverter<LanguageType>();
 
             modelBuilder.Entity<DictionaryLanguage>()
                         .Property(dl => dl.Type)
                         .HasConversion(languageTypeConverter);
+
+            var languageCodeConverter = new EnumToStringConverter<LanguageCode>();
+
+            modelBuilder.Entity<Language>()
+                        .Property(l => l.LanguageCode)
+                        .HasConversion(languageCodeConverter);
+        }
+
+        private void SetCreationDate()
+        {
+            foreach (var e in this.ChangeTracker.Entries<IAuditable>())
+            {
+                if (e.State.Equals(EntityState.Added))
+                {
+                    e.Entity.CreationDate = DateTime.Now;
+                }
+            }
+        }
+
+        public override int SaveChanges()
+        {
+            SetCreationDate();
+            return base.SaveChanges();
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            SetCreationDate();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            SetCreationDate();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            SetCreationDate();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
 }

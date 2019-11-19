@@ -4,72 +4,81 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import androidx.databinding.DataBindingUtil
 import hu.mobilclient.memo.BR
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.ActivityLoginBinding
+import hu.mobilclient.memo.fragments.NetworkSettingFragment
+import hu.mobilclient.memo.fragments.RegistrationFragment
+import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.model.Login
 import hu.mobilclient.memo.model.TokenHolder
-import hu.mobilclient.memo.network.callbacks.Authentication.ILoginCallBack
 import kotlinx.android.synthetic.main.activity_login.*
 
-class LoginActivity : NetworkActivityBase(), ILoginCallBack {
 
-    var login = Login(UserName = "User", Password = "123456")
+class LoginActivity : NetworkActivityBase() {
+
+    private val login = Login(UserName = "User1", Password = "123456")
+    private var checkLoginError = false
+    private var registrationFragment: RegistrationFragment? = null
+    private var networkFragment: NetworkSettingFragment? = null
 
     @SuppressLint("CommitPrefEdits")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        serviceManager.connection?.connect(::autoLogin) { checkLoginError = true}
+
         val binding: ActivityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
         binding.setVariable(BR.login, login)
-        binding.executePendingBindings()
+    }
 
-        val token = getSharedPreferences("authData", 0).getString("token", null)
+    private fun autoLogin(){
+        val token = getSharedPreferences(Constants.AUTHDATA, 0).getString(Constants.TOKEN, null)
 
         if(!token.isNullOrEmpty()){
-            serviceManager.authentication?.autoLogin(token)
+            serviceManager.authentication?.autoLogin(token, callback = ::loginSuccess)
         }
     }
 
     fun loginClick(view: View){
         if(isValid()){
-            serviceManager.authentication?.login(login)
+            serviceManager.authentication?.login(login, callback = ::loginSuccess, checkError = checkLoginError, errorCallback = {EmotionToast.showError(it)})
         }
     }
 
     fun registrationClick(view: View){
-        startActivity(Intent(this, RegistrationActivity::class.java))
+        val fragment = registrationFragment?: RegistrationFragment()
+        registrationFragment = fragment
+        fragment.show(supportFragmentManager, "TAG")
     }
 
-    private fun isValid(): Boolean {
+    fun settingsClick(view: View){
+        val fragment = networkFragment?: NetworkSettingFragment()
+        networkFragment = fragment
+        fragment.show(supportFragmentManager, "TAG")
+    }
 
-        if(login.UserName == "") {
-            ac_login_et_username.requestFocus()
-            ac_login_et_username.error = getString(R.string.required_field)
+    private fun EditText.isNotEmpty(): Boolean{
+        if(this.text.isEmpty()){
+            this.requestFocus()
+            this.error = getString(R.string.required_field)
             return false
         }
-
-        if(login.Password == "") {
-            ac_login_et_password.requestFocus()
-            ac_login_et_password.error = getString(R.string.required_field)
-            return false
-        }
-
         return true
     }
 
-    override fun onLoginSuccess(tokenHolder: TokenHolder) {
-        intent = Intent(this, HomeActivity::class.java)
-        intent.putExtra("userId", tokenHolder.UserId.toString())
+    private fun isValid() = ac_login_et_username.isNotEmpty() && ac_login_et_password.isNotEmpty()
+
+    private fun loginSuccess(tokenHolder: TokenHolder) {
+        intent = Intent(this, NavigationActivity::class.java)
+        intent.putExtra(Constants.USERID, tokenHolder.UserId.toString())
         startActivity(intent)
         finish()
-    }
-
-    override fun onLoginError(errorMessage: String?) {
-        EmotionToast.showError(this, errorMessage)
     }
 
     override fun onBackPressed() {

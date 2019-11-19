@@ -6,7 +6,7 @@ namespace MEMO.BLL.Exceptions
 {
     public class RegistrationFailedException : ExceptionBase
     {
-        private const string message = "A felhasználónév már foglalt";
+        private const string message = "Sikertelen regisztráció";
 
         public RegistrationFailedException(string message) : base(message) { }
 

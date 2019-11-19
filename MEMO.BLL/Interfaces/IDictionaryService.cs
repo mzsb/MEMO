@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MEMO.BLL.Interfaces
 {
-    public interface IDictionaryService
+    public interface IDictionaryService : IAuthorizable
     {
         Task<IEnumerable<Dictionary>> GetAsync();
         Task<Dictionary> GetByIdAsync(Guid id);
@@ -16,6 +16,10 @@ namespace MEMO.BLL.Interfaces
         Task DeleteAsync(Guid id);
 
         Task<IEnumerable<Dictionary>> GetByUserIdAsync(Guid id);
-        Task<IEnumerable<Dictionary>> GetPublicAsync(Guid id);
+        Task<IEnumerable<Dictionary>> GetPublicAsync(Guid userId);
+        Task<IEnumerable<Dictionary>> GetFastAccessibleAsync(Guid id);
+
+        Task SubscribeAsync(Guid userId, Dictionary dictionary);
+        Task UnsubscribeAsync(Guid userId, Dictionary dictionary);
     }
 }

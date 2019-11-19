@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="dictionary"
+            type="hu.mobilclient.memo.model.Dictionary" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@{dictionary.isOwn() ? @drawable/bg_rounded_white_2 : @drawable/bg_rounded_white_1}"
+        android:padding="15dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="2">
+
+                <TextView
+                    android:id="@+id/fg_dictionary_list_tv_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="-10dp"
+                    android:layout_marginStart="2dp"
+                    android:textSize="18sp"
+                    android:textColor="@color/accent"
+                    android:text="@{dictionary.owner.userName}" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="35sp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="-3dp"
+                    android:textColor="@color/primary_dark"
+                    android:text="@{dictionary.name}"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primary_dark"
+                        android:textSize="20sp"
+                        android:text="@string/phrases_dd"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primary_dark"
+                        android:textSize="20sp"
+                        android:text="@{` ` + dictionary.translationCount}"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primary_dark"
+                        android:textSize="20sp"
+                        android:text="@string/viewers_users_dd"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primary_dark"
+                        android:textSize="20sp"
+                        android:text="@{` ` + dictionary.viewerCount}"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:src="@{dictionary.icon}"
+                    android:gravity="center"
+                    tools:ignore="NestedWeights" />
+
+                <TextView
+                    android:id="@+id/fg_dictionary_list_tv_publicity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/primary_dark"
+                    android:text="@{dictionary.isPublic ? @string/Public : @string/Private}"
+                    android:textSize="16sp"
+                    android:textAlignment="center"/>
+
+                <TextView
+                    android:id="@+id/fg_dictionary_list_tv_creation_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary_dark"
+                    android:layout_marginTop="2dp"
+                    android:textSize="16sp"
+                    android:textAlignment="center"
+                    android:visibility="invisible"
+                    android:text="@{dictionary.parsedCreationDate()}"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="-8dp"
+            android:gravity="center_vertical"
+            android:visibility="@{dictionary.description.empty ? View.GONE : View.VISIBLE}">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/primary_dark"
+                android:text="@string/description" />
+
+            <ImageView
+                android:id="@+id/fg_dictionary_list_iv_description_hider"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/ic_drop_down_24dp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/fg_dictionary_list_tv_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary_dark"
+            android:textSize="20sp"
+            android:layout_marginTop="-8dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:text="@{dictionary.description}"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</layout>
+

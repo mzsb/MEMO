@@ -3,16 +3,14 @@ using MEMO.BLL.Interfaces;
 using MEMO.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MEMO.WebAPI.Controllers
 {
-    [Authorize(Roles = "Administator,User")]
+    [Authorize(Roles = "Administrator,User")]
     [Route("api/[Controller]")]
-    public class LanguageController : Controller
+    public class LanguageController : ControllerBase
     {
         private readonly ILanguageService _service;
         private readonly IMapper _mapper;

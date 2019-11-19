@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <item name="android:windowBackground">@color/primary</item>
@@ -17,21 +17,13 @@
         <item name="android:textSelectHandle">@drawable/ic_selecthand_48dp</item>
     </style>
 
-    <style name="AppThemeDialog" parent="Theme.MaterialComponents.Light.Dialog.Bridge">
-        <item name="android:windowBackground">@color/primary</item>
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:textViewStyle">@style/TextView</item>
-        <item name="android:textColorHint">@color/primary_light</item>
-        <item name="android:editTextColor">@color/primary_light</item>
-        <item name="android:fontFamily">@font/aldrich</item>
-        <item name="colorControlNormal">@color/primary_light</item>
-        <item name="colorControlActivated">@color/primary_light</item>
-        <item name="android:textCursorDrawable">@drawable/cursor</item>
-        <item name="android:textSelectHandleLeft">@drawable/ic_selecthand_left_48dp</item>
-        <item name="android:textSelectHandleRight">@drawable/ic_selecthand_right_48dp</item>
-        <item name="android:textSelectHandle">@drawable/ic_selecthand_48dp</item>
+    <style name="BlueEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textSelectHandle">@drawable/ic_selecthand_accent_48dp</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_accent</item>
+        <item name="android:textSelectHandleLeft">@drawable/ic_selecthand_left_accent_48dp</item>
+        <item name="android:textSelectHandleRight">@drawable/ic_selecthand_right_accent_48dp</item>
+        <item name="android:backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/primary</item>
     </style>
 
     <style name="TextView" parent="Widget.AppCompat.TextView">
@@ -42,5 +34,20 @@
         <item name="backgroundTint">@color/primary_light</item>
         <item name="android:textColor">@color/primary_dark</item>
     </style>
+
+    <style name="AppButtonBlue" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/primary_light</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

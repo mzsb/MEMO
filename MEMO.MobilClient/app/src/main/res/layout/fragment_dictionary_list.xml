@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout">
+
+    <data>
+        <variable
+            name="fragment"
+            type="hu.mobilclient.memo.fragments.DictionaryListFragment" />
+    </data>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fg_dictionary_list_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <ProgressBar
+        android:id="@+id/fg_dictionary_list_pb"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/accent"
+        android:indeterminateTintMode="src_in"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

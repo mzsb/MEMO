@@ -1,67 +1,59 @@
 package hu.mobilclient.memo.helpers
 
-import android.app.Activity
-import android.graphics.Color
-import android.graphics.ColorFilter
-import android.os.Build
+import android.annotation.SuppressLint
 import android.view.Gravity
-import android.view.ViewGroup
+import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
-import hu.mobilclient.memo.BR
+import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
-import hu.mobilclient.memo.databinding.ActivityLoginBinding
 
 object EmotionToast {
 
-    private var toastCount: Int = 0
+    private var toastCount: Int = Constants.ZERO
 
     var maxToastCount: Int = 2
     var yOffset: Int = 100
 
-    private fun show(activity: Activity, message: String, drawableId: Int, colorId: Int, duration: Int = Toast.LENGTH_SHORT){
-        activity.runOnUiThread {
-            val inflater = activity.layoutInflater
-            val layout = inflater.inflate(R.layout.emotion_toast, activity.findViewById(R.id.toast_layout_root))
+    @SuppressLint("InflateParams")
+    private fun show(message: String, drawableId: Int, colorId: Int, duration: Int = Toast.LENGTH_SHORT){
+        App.runOnUiThread(Runnable {
+            val inflater = LayoutInflater.from(App.instance.applicationContext)
+            val layout = inflater.inflate(R.layout.emotion_toast, null)
 
             val image = layout.findViewById(R.id.image) as ImageView
             image.setImageResource(drawableId)
 
             val text = layout.findViewById(R.id.text) as TextView
             text.text = message
-            text.setTextColor(ContextCompat.getColor(activity, colorId))
+            text.setTextColor(ContextCompat.getColor(App.instance, colorId))
 
             toastCount++
-            val toast = Toast(activity.applicationContext)
-            toast.setGravity(Gravity.BOTTOM, 0, 150 + if(toastCount == maxToastCount) { toastCount = 0; yOffset} else 0)
+            val toast = Toast(App.instance)
+            toast.setGravity(Gravity.BOTTOM, Constants.ZERO, 150 + if(toastCount == maxToastCount) { toastCount = Constants.ZERO; yOffset} else Constants.ZERO)
             toast.duration = duration
             toast.view = layout
             toast.show()
-        }
+        })
     }
 
-    fun showError(activity: Activity, message: String?){
-        show(activity, message?: activity.getString(
-                R.string.error_occurred),
-                R.drawable.ic_error_outline_48dp,
+    fun showError(message: String?){
+        show(message?: App.instance.getString(
+                R.string.error_occurred), R.drawable.ic_error_outline_48dp,
                 R.color.design_default_color_error)
     }
 
-    fun showSad(activity: Activity, message: String?){
-        show(activity, message?: activity.getString(
-                R.string.error_occurred),
-                R.drawable.ic_bad_mood_48dp,
+    fun showSad(message: String?){
+        show(message?: App.instance.getString(
+                R.string.error_occurred), R.drawable.ic_bad_mood_48dp,
                 R.color.design_default_color_error)
     }
 
-    fun showHelp(activity: Activity, message: String?){
-        show(activity, message?: activity.getString(
-                R.string.error_occurred),
-                R.drawable.ic_lightbulb_outline_48dp,
+    fun showHelp(message: String?){
+        show(message?: App.instance.getString(
+                R.string.error_occurred), R.drawable.ic_lightbulb_outline_48dp,
                 R.color.accent,
                 Toast.LENGTH_LONG)
     }

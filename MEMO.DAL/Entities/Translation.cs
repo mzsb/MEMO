@@ -1,15 +1,19 @@
-﻿using System;
+﻿using MEMO.DAL.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace MEMO.DAL.Entities
 {
-    public class Translation : EntityBase
+    public class Translation : IAuditable
     {
-        public String Value { get; set; }
+        public Guid Id { get; set; } 
+        public string Original { get; set; }
+        public string Translated { get; set; }
         public Guid DictionaryId { get; set; }
         public Dictionary Dictionary { get; set; }
+        public DateTime CreationDate { get; set; }
 
-        public ICollection<TranslationMeta> TranslationMetas { get; set; } = new List<TranslationMeta>();
+        public ICollection<AttributeValue> AttributeValues { get; set; } = new List<AttributeValue>();
     }
 }

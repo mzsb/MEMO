@@ -2,7 +2,9 @@ C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Release\netcoreapp3.0\MEMO.BLL.dep
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Release\netcoreapp3.0\MEMO.BLL.dll
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Release\netcoreapp3.0\MEMO.BLL.pdb
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Release\netcoreapp3.0\MEMO.DAL.dll
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Release\netcoreapp3.0\MEMO.DTO.dll
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Release\netcoreapp3.0\MEMO.DAL.pdb
+C:\Users\barna\source\repos\MEMO\MEMO.BLL\bin\Release\netcoreapp3.0\MEMO.DTO.pdb
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Release\netcoreapp3.0\MEMO.BLL.csprojAssemblyReference.cache
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Release\netcoreapp3.0\MEMO.BLL.AssemblyInfoInputs.cache
 C:\Users\barna\source\repos\MEMO\MEMO.BLL\obj\Release\netcoreapp3.0\MEMO.BLL.AssemblyInfo.cs

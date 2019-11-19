@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="fragment"
+            type="hu.mobilclient.memo.fragments.AccountFragment" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/primary_light">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary"
+                android:textSize="60sp"
+                android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
+                android:text="@{fragment.user.userName}"/>
+
+            <EditText
+                android:id="@+id/fg_account_et_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/BlueEditText"
+                android:textSize="60sp"
+                android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
+                android:text="@={fragment.user.userName}"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onClick="@{fragment.updateUserNameClick}"
+                android:src="@drawable/ic_update_48dp"
+                android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
+                android:layout_gravity="top"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onClick="@{fragment.updateUserNameCancelClick}"
+                android:src="@drawable/ic_cancel_accent_24dp"
+                android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
+                android:layout_gravity="top"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary"
+                android:textSize="40sp"
+                android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
+                android:text="@{fragment.user.email}"/>
+
+            <EditText
+                android:id="@+id/fg_account_et_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/BlueEditText"
+                android:textSize="40sp"
+                android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
+                android:text="@={fragment.user.email}"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onClick="@{fragment.updateEmailClick}"
+                android:src="@drawable/ic_update_48dp"
+                android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
+                android:layout_gravity="top"/>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onClick="@{fragment.updateEmailCancelClick}"
+                android:src="@drawable/ic_cancel_accent_24dp"
+                android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
+                android:layout_gravity="top"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton style="@style/AppButtonBlue"
+            android:id="@+id/ac_login_btn_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="end"
+            android:onClick="@{fragment.updateClick}"
+            android:text="@string/save"
+            android:visibility="@{fragment.isUpdateEmail | fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"/>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fg_account_rv_attribute_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <ProgressBar
+                android:id="@+id/fg_account_list_pb"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/accent"
+                android:indeterminateTintMode="src_in"/>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </LinearLayout>
+
+</layout>

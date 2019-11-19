@@ -1,32 +1,28 @@
 package hu.mobilclient.memo.services
 
 import android.app.Activity
-import hu.mobilclient.memo.R
+import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
 import hu.mobilclient.memo.model.Language
-import hu.mobilclient.memo.network.callbacks.Language.IGetLanguagesCallBack
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 
-class LanguageService(private val activity: Activity) : ServiceBase(activity) {
+class LanguageService(activity: Activity, private val errorCallback: (String) -> Unit) : ServiceBase(activity) {
 
-    fun get() {
+    fun get(callback: (List<Language>) -> Unit,
+            errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+            checkError: Boolean = false) =
         createRequest(
                 request = apiService::getLanguages,
                 onSuccess =
                 fun(response: Response<List<Language>>) {
-
-                    if (activity is IGetLanguagesCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onGetLanguagesSuccess(response.body()
-                                    ?: return activity.onGetLanguagesError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onGetLanguagesError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
-
-                })
-    }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 }

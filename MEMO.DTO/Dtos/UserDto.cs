@@ -1,21 +1,27 @@
-﻿using System;
+﻿using MEMO.DTO.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MEMO.DTO
 {
-    public class UserDto : DtoBase
+    public class UserDto : IAuditable
     {
-        [Required(ErrorMessage = "Username is required", AllowEmptyStrings = false)]
+        public Guid Id { get; set; }
+
+        [Required(ErrorMessage = "Username is required", AllowEmptyStrings = false), MaxLength(15)]
         public string UserName { get; set; }
 
-        [Required(ErrorMessage = "Email is required", AllowEmptyStrings = false)]
+        [Required(ErrorMessage = "Email is required", AllowEmptyStrings = false), MaxLength(50)]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Role is required", AllowEmptyStrings = false)]
         public string Role { get; set; }
 
+        public ICollection<AttributeDto> Attributes { get; set; } = new List<AttributeDto>();
+
         public ICollection<DictionaryDto> Dictionaries { get; set; } = new List<DictionaryDto>();
+        public String CreationDate { get; set; }
     }
 }

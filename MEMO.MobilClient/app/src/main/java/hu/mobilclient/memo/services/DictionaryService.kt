@@ -1,157 +1,200 @@
 package hu.mobilclient.memo.services
 
 import android.app.Activity
-import hu.mobilclient.memo.R
+import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
 import hu.mobilclient.memo.model.Dictionary
-import hu.mobilclient.memo.network.callbacks.Dictionary.*
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 import java.util.*
 
-class DictionaryService(private val activity: Activity) : ServiceBase(activity) {
+class DictionaryService(activity: Activity, private val errorCallback: (String) -> Unit) : ServiceBase(activity) {
 
-    fun get() {
+    fun get(callback: (List<Dictionary>) -> Unit,
+            errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+            checkError: Boolean = false) =
         createRequest(
                 request = apiService::getDictionaries,
                 onSuccess =
                 fun(response: Response<List<Dictionary>>) {
-
-                    if (activity is IGetDictionariesCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onGetDictionariesSuccess(response.body()
-                                    ?: return activity.onGetDictionariesError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onGetDictionariesError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun get(id: UUID) {
+    fun get(id: UUID,
+            callback: (Dictionary) -> Unit,
+            errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+            checkError: Boolean = false) =
         createRequest(
                 request = apiService::getDictionaryById,
                 requestParameter = id,
                 onSuccess =
                 fun(response: Response<Dictionary>) {
-
-                    if (activity is IGetDictionaryByIdCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onGetDictionaryByIdSuccess(response.body()
-                                    ?: return activity.onGetDictionaryByIdError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onGetDictionaryByIdError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun insert(dictionary: Dictionary) {
+    fun insert(dictionary: Dictionary,
+               callback: (Dictionary) -> Unit,
+               errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+               checkError: Boolean = false) =
         createRequest(
                 request = apiService::insertDictionary,
                 requestParameter = dictionary,
                 onSuccess =
                 fun(response: Response<Dictionary>) {
-
-                    if (activity is IInsertDictionaryCallBack) {
-                        if (response.isSuccessful && response.code() == 201) {
-                            activity.onInsertDictionarySuccess(response.body()
-                                    ?: return activity.onInsertDictionaryError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onInsertDictionaryError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 201) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun update(dictionary: Dictionary) {
+    fun update(dictionary: Dictionary,
+               callback: () -> Unit,
+               errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+               checkError: Boolean = false) =
         createRequest(
                 request = apiService::updateDictionary,
                 requestParameter = dictionary,
                 onSuccess =
                 fun(response: Response<Void>) {
-
-                    if (activity is IUpdateDictionaryCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onUpdateDictionarySuccess()
-                        } else {
-                            activity.onUpdateDictionaryError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback()
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun delete(id: UUID) {
+    fun delete(id: UUID,
+               callback: () -> Unit,
+               errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+               checkError: Boolean = false) =
         createRequest(
                 request = apiService::deleteDictionary,
                 requestParameter = id,
                 onSuccess =
                 fun(response: Response<Void>) {
-
-                    if (activity is IDeleteDictionaryCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onDeleteDictionarySuccess()
-                        } else {
-                            activity.onDeleteDictionaryError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback()
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun getByUserId(id: UUID) {
+    fun getByUserId(id: UUID,
+                    callback: (List<Dictionary>) -> Unit,
+                    errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                    checkError: Boolean = false)  =
         createRequest(
                 request = apiService::getDictionariesByUserId,
                 requestParameter = id,
                 onSuccess =
                 fun(response: Response<List<Dictionary>>) {
-
-                    if (activity is IGetDictionariesByUserIdCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onGetDictionariesByUserIdSuccess(response.body()
-                                    ?: return activity.onGetDictionariesByUserIdError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onGetDictionariesByUserIdError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun getPublic(id: UUID) {
+    fun getPublic(userId: UUID,
+                  callback: (List<Dictionary>) -> Unit,
+                  errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                  checkError: Boolean = false) =
         createRequest(
                 request = apiService::getDictionariesPublic,
-                requestParameter = id,
+                requestParameter = userId,
                 onSuccess =
                 fun(response: Response<List<Dictionary>>) {
-
-                    if (activity is IGetDictionariesPublicCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onGetDictionariesPublicSuccess(response.body()
-                                    ?: return activity.onGetDictionariesPublicError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onGetDictionariesPublicError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
+    fun getFastAccessible(id: UUID,
+                  callback: (List<Dictionary>) -> Unit,
+                  errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                          checkError: Boolean = false) =
+            createRequest(
+                    request = apiService::getDictionariesFastAccessible,
+                    requestParameter = id,
+                    onSuccess =
+                    fun(response: Response<List<Dictionary>>) {
+                        if (response.isSuccessful && response.code() == 200) {
+                            callback(response.body()
+                                    ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
+                        } else {
+                            errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
+                        }
+                    },
+                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    checkError = checkError)
+
+    fun subscribe(userId: UUID,
+               dictionary: Dictionary,
+               callback: () -> Unit,
+               errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                  checkError: Boolean = false) =
+            createRequest(
+                    request = apiService::subscribe,
+                    pathRequestParameter = userId,
+                    bodyRequestParameter = dictionary,
+                    onSuccess =
+                    fun(response: Response<Void>) {
+                        if (response.isSuccessful && response.code() == 200) {
+                            callback()
+                        } else {
+                            errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
+                        }
+                    },
+                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    checkError = checkError)
+
+    fun unsubscribe(userId: UUID,
+                  dictionary: Dictionary,
+                  callback: () -> Unit,
+                  errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                    checkError: Boolean = false) =
+            createRequest(
+                    request = apiService::unsubscribe,
+                    pathRequestParameter = userId,
+                    bodyRequestParameter = dictionary,
+                    onSuccess =
+                    fun(response: Response<Void>) {
+                        if (response.isSuccessful && response.code() == 200) {
+                            callback()
+                        } else {
+                            errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
+                        }
+                    },
+                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    checkError = checkError)
 }

@@ -13,8 +13,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MEMO.DTO\MEMO.DTO.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -8,6 +8,3 @@ C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp3.0\MEMO.DAL.dll
 C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp3.0\MEMO.DAL.pdb
 C:\Users\barna\source\repos\MEMO\MEMO.DAL\bin\Debug\netcoreapp3.0\MEMO.DAL.runtimeconfig.json
 C:\Users\barna\source\repos\MEMO\MEMO.DAL\bin\Debug\netcoreapp3.0\MEMO.DAL.runtimeconfig.dev.json
-C:\Users\barna\source\repos\MEMO\MEMO.DAL\bin\Debug\netcoreapp3.0\MEMO.DTO.dll
-C:\Users\barna\source\repos\MEMO\MEMO.DAL\bin\Debug\netcoreapp3.0\MEMO.DTO.pdb
-C:\Users\barna\source\repos\MEMO\MEMO.DAL\obj\Debug\netcoreapp3.0\MEMO.DAL.csproj.CopyComplete

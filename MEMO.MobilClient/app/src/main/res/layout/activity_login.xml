@@ -5,7 +5,6 @@
     android:id="@+id/layout">
 
     <data>
-
         <variable
             name="login"
             type="hu.mobilclient.memo.model.Login" />
@@ -20,6 +19,7 @@
             android:id="@+id/ac_login_img_logo"
             android:layout_width="261dp"
             android:layout_height="139dp"
+            android:src="@drawable/logo_memo_white"
             app:layout_constraintBottom_toTopOf="@+id/ac_login_et_username_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/username"
                 android:inputType="textImeMultiLine"
-                android:text="@={login.UserName}"
+                android:text="@={login.userName}"
                 android:textSize="20sp"
                 android:gravity="center_horizontal|center_vertical"
                 android:importantForAutofill="no" />
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/password"
                 android:inputType="textPassword"
-                android:text="@={login.Password}"
+                android:text="@={login.password}"
                 android:textSize="18sp"
                 android:gravity="center_horizontal|center_vertical"
                 android:importantForAutofill="no" />
@@ -77,8 +77,8 @@
             android:layout_marginBottom="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="loginClick"
             android:text="@string/sign_in"
+            android:onClick="loginClick"
             app:layout_constraintBottom_toTopOf="@+id/ac_login_tv_registration"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -88,12 +88,52 @@
             android:id="@+id/ac_login_tv_registration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="registrationClick"
             android:text="@string/sign_up"
+            android:onClick="registrationClick"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ac_login_btn_login"/>
 
+        <LinearLayout
+            android:id="@+id/ac_login_ll_network_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/ac_login_tv_registration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="Kapcsolódás a szerverhez"/>
+
+            <ProgressBar
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:indeterminateTint="@color/primary_light"
+                android:indeterminateTintMode="src_in"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ac_login_iv_settings"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:src="@drawable/ic_settings_24dp"
+            android:onClick="settingsClick"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </layout>

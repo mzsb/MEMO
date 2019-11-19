@@ -3,6 +3,7 @@ using MEMO.BLL.Exceptions;
 using MEMO.BLL.Interfaces;
 using MEMO.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,15 +27,22 @@ namespace MEMO.BLL.Services
         {
             var user = await _userManager.FindByNameAsync(login.UserName);
 
-            if (user != null && await _userManager.CheckPasswordAsync(user, login.Password))
+            if (user != null)
             {
-                user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                if (await _userManager.CheckPasswordAsync(user, login.Password))
+                {
+                    user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
-                return new TokenHolder { UserId = user.Id, Token = _tokenManager.GenerateToken(user) };
+                    return new TokenHolder { UserId = user.Id, Token = _tokenManager.GenerateToken(user) };
+                }
+                else
+                {
+                    throw new LoginFailedException("Helytelen jelszó");
+                }
             }
             else
             {
-                throw new LoginFailedException();
+                throw new LoginFailedException("Helytelen felhasználónév");
             }
         }
 
@@ -53,19 +61,33 @@ namespace MEMO.BLL.Services
                 Email = registration.Email
             };
 
-            var result = await _userManager.CreateAsync(user, registration.Password);
-
-            if (result.Succeeded)
+            try
             {
-                await _userManager.AddToRoleAsync(user, "User");
+                var result = await _userManager.CreateAsync(user, registration.Password);
 
-                user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "User");
 
-                return new TokenHolder { UserId = user.Id, Token = _tokenManager.GenerateToken(user) };
+                    user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+
+                    return new TokenHolder { UserId = user.Id, Token = _tokenManager.GenerateToken(user) };
+                }
+                else
+                {
+                    throw new RegistrationFailedException();
+                }
             }
-            else
+            catch(SqlException e)
             {
-                throw new RegistrationFailedException();
+                if (e.Message.Contains("duplicate key"))
+                {
+                    throw new RegistrationFailedException("A felhasználónév már foglalt");
+                }
+                else 
+                {
+                    throw e;
+                }
             }
         }
 

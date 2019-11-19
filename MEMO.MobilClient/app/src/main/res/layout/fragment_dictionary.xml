@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="dictionary"
+            type="hu.mobilclient.memo.model.Dictionary" />
+        <variable
+            name="fragment"
+            type="hu.mobilclient.memo.fragments.DictionaryFragment" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_blue"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="-5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@{fragment.isUpdate ? @string/update_dictionary : @string/create_dictionary}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/fg_dictionary_tv_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_cancel_24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColorHint="@color/primary_light">
+
+                <EditText
+                    android:id="@+id/fg_dictionary_et_dictionary_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="@{fragment.isEnabled}"
+                    android:hint="@string/name"
+                    android:inputType="textImeMultiLine"
+                    android:text="@={dictionary.Name}"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColorHint="@color/primary_light">
+
+                <EditText
+                    android:id="@+id/fg_dictionary_et_dictionary_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="@{fragment.isEnabled}"
+                    android:hint="@string/description"
+                    android:text="@={dictionary.Description}"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="@string/source_language_dd"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp" />
+
+                <Spinner
+                    android:id="@+id/fg_dictionary_sp_source_language"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:enabled="@{fragment.isEnabled}"
+                    android:foregroundTint="@color/primary_light" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="@string/destination_language_dd"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp" />
+
+                <Spinner
+                    android:id="@+id/fg_dictionary_sp_destination_language"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:enabled="@{fragment.isEnabled}"
+                    android:foregroundTint="@color/primary_light" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:weightSum="5"
+                android:visibility="@{dictionary.viewerCount > 0 ? View.VISIBLE : View.GONE}">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:text="@string/viewers_dd"
+                    android:layout_weight="3"/>
+
+                <TextView
+                    android:id="@+id/fg_dictionary_tv_viewer_count"
+                    android:layout_width="0dp"
+                    android:textSize="20sp"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/fg_dictionary_iv_viewers_hider"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_drop_down_white_24dp"
+                    android:visibility="@{fragment.isEnabled ? View.VISIBLE : View.GONE}"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fg_dictionary_lv_viewers_holder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:orientation="vertical"
+                android:visibility="@{fragment.IsViewersVisible ? View.VISIBLE : View.GONE}"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="@string/shared_dd"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp" />
+
+                <Switch
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="2"
+                    android:checked="@={dictionary.IsPublic}"
+                    android:enabled="@{fragment.isEnabled}"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="5"
+                android:visibility="@{fragment.isEnabled ? View.GONE : View.VISIBLE}">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="@string/viewing_dd"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp"/>
+
+                <Switch
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="2"
+                    android:checked="@={fragment.IsViewed}" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="5"
+                android:visibility="@{fragment.isEnabled ? View.VISIBLE : View.GONE}">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="@string/fast_access_dd"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp"/>
+
+                <Switch
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="2"
+                    android:checked="@={dictionary.IsFastAccessible}" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="5"
+                android:visibility="@{fragment.isEnabled &amp; fragment.isUpdate ? View.VISIBLE : View.GONE}">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical"
+                    android:text="@string/delete_dd"
+                    android:textColor="@color/primary_light"
+                    android:textSize="18sp"/>
+
+                <Switch
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="2"
+                    android:checked="@={fragment.IsDelete}" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:onClick="@{fragment::saveClick}"
+                android:layout_gravity="end"
+                android:text="@string/save" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</layout>

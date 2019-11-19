@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="582.000000dp"
+    android:height="181.000000dp"
+    android:viewportWidth="582.000000"
+    android:viewportHeight="181.000000">
+
+    <group
+        android:translateY="181.000000"
+        android:scaleX="0.100000"
+        android:scaleY="-0.100000">
+        <path
+            android:fillColor="@color/primary_light"
+            android:strokeWidth="1"
+            android:pathData="M4845 1676 c-74 -19 -101 -32 -167 -78 -55 -39 -131 -127 -164 -189 -7 -15 -26 -67 -41 -116 -25 -83 -27 -100 -27 -283 0 -214 13 -288 71 -406 42 -85 140 -186 223 -228 217 -108 501 -51 640 128 86 113 126 241 136 436 11 211 -21 387 -93 509 -35 61 -127 149 -189 183 -100 54 -273 73 -389 44z m280 -165 c162 -72 233 -248 222 -551 -8 -203 -40 -307 -124 -392 -57 -58 -127 -89 -214 -96 -120 -8 -226 37 -298 128 -74 94 -101 204 -101 415 0 293 83 451 265 512 60 19 189 12 250 -16z" />
+        <path
+            android:fillColor="@color/primary_light"
+            android:strokeWidth="1"
+            android:pathData="M130 1005 l0 -665 85 0 85 0 2 538 3 537 32 -85 c18 -47 114 -287 212 -535 l180 -450 68 -3 68 -3 77 193 c42 106 136 342 208 523 72 182 136 334 141 339 5 6 9 -193 9 -522 l0 -532 85 0 85 0 0 665 0 665 -117 0 -118 0 -214 -536 c-118 -294 -217 -537 -221 -539 -4 -2 -103 238 -222 533 l-215 537 -117 3 -116 3 0 -666z" />
+        <path
+            android:fillColor="@color/primary_light"
+            android:strokeWidth="1"
+            android:pathData="M1770 1005 l0 -665 425 0 425 0 0 70 0 70 -335 0 -335 0 0 240 0 240 290 0 290 0 0 70 0 70 -290 0 -290 0 2 218 3 217 333 3 332 2 0 65 0 65 -425 0 -425 0 0 -665z" />
+        <path
+            android:fillColor="@color/primary_light"
+            android:strokeWidth="1"
+            android:pathData="M2840 1005 l0 -665 85 0 85 0 2 537 3 537 26 -65 c14 -35 111 -277 214 -536 l188 -473 67 0 67 0 214 536 214 537 3 -537 2 -536 85 0 85 0 0 665 0 666 -117 -3 -117 -3 -215 -537 c-119 -296 -218 -538 -221 -538 -3 0 -102 242 -220 538 l-215 537 -118 3 -117 3 0 -666z" />
+    </group>
+</vector>

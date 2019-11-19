@@ -19,17 +19,94 @@ namespace MEMO.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("MEMO.DAL.Entities.Attribute", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Attributes");
+                });
+
+            modelBuilder.Entity("MEMO.DAL.Entities.AttributeParameter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AttributeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttributeId");
+
+                    b.ToTable("AttributeParameters");
+                });
+
+            modelBuilder.Entity("MEMO.DAL.Entities.AttributeValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AttributeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TranslationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttributeId");
+
+                    b.HasIndex("TranslationId");
+
+                    b.ToTable("AttributeValues");
+                });
+
             modelBuilder.Entity("MEMO.DAL.Entities.Dictionary", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
+
+                    b.Property<bool>("IsFastAccessible")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
 
                     b.HasKey("Id");
 
@@ -67,57 +144,25 @@ namespace MEMO.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Languages");
-                });
-
-            modelBuilder.Entity("MEMO.DAL.Entities.MetaDefinition", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DictionaryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
+                    b.Property<string>("LanguageCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DictionaryId");
+                    b.ToTable("Languages");
 
-                    b.ToTable("MetaDefinitions");
-                });
-
-            modelBuilder.Entity("MEMO.DAL.Entities.MetaDefinitionParameter", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MetaDefinitionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MetaDefinitionId");
-
-                    b.ToTable("MetaDefinitionParameters");
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1ac8f05b-411a-463a-aed0-c6f530d5539b"),
+                            LanguageCode = "hu"
+                        },
+                        new
+                        {
+                            Id = new Guid("93c79d95-b09e-4659-81f5-0436cb3d2ca2"),
+                            LanguageCode = "en"
+                        });
                 });
 
             modelBuilder.Entity("MEMO.DAL.Entities.Translation", b =>
@@ -126,10 +171,16 @@ namespace MEMO.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("DictionaryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Value")
+                    b.Property<string>("Original")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Translated")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -137,30 +188,6 @@ namespace MEMO.DAL.Migrations
                     b.HasIndex("DictionaryId");
 
                     b.ToTable("Translations");
-                });
-
-            modelBuilder.Entity("MEMO.DAL.Entities.TranslationMeta", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MetaDefinitionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TranslationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MetaDefinitionId");
-
-                    b.HasIndex("TranslationId");
-
-                    b.ToTable("TranslationMetas");
                 });
 
             modelBuilder.Entity("MEMO.DAL.Entities.User", b =>
@@ -175,6 +202,9 @@ namespace MEMO.DAL.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(256)")
@@ -280,6 +310,22 @@ namespace MEMO.DAL.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("cc47ee54-c583-47dd-9377-02e5e29d4359"),
+                            ConcurrencyStamp = "0f174be3-429a-4e06-a902-337face006a1",
+                            Name = "Administrator",
+                            NormalizedName = "ADMINISTRATOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("e10d43c0-d9e2-41c5-baba-7996907f3d39"),
+                            ConcurrencyStamp = "f0f1e01b-6bfe-4a16-be98-28aa6e8935bb",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -383,6 +429,39 @@ namespace MEMO.DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("MEMO.DAL.Entities.Attribute", b =>
+                {
+                    b.HasOne("MEMO.DAL.Entities.User", "User")
+                        .WithMany("Attributes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MEMO.DAL.Entities.AttributeParameter", b =>
+                {
+                    b.HasOne("MEMO.DAL.Entities.Attribute", "Attribute")
+                        .WithMany("AttributeParameters")
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MEMO.DAL.Entities.AttributeValue", b =>
+                {
+                    b.HasOne("MEMO.DAL.Entities.Attribute", "Attribute")
+                        .WithMany("AttributeValues")
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MEMO.DAL.Entities.Translation", "Translation")
+                        .WithMany("AttributeValues")
+                        .HasForeignKey("TranslationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MEMO.DAL.Entities.DictionaryLanguage", b =>
                 {
                     b.HasOne("MEMO.DAL.Entities.Dictionary", "Dictionary")
@@ -398,44 +477,11 @@ namespace MEMO.DAL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MEMO.DAL.Entities.MetaDefinition", b =>
-                {
-                    b.HasOne("MEMO.DAL.Entities.Dictionary", "Dictionary")
-                        .WithMany("MetaDefinitions")
-                        .HasForeignKey("DictionaryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MEMO.DAL.Entities.MetaDefinitionParameter", b =>
-                {
-                    b.HasOne("MEMO.DAL.Entities.MetaDefinition", "MetaDefinition")
-                        .WithMany("MetaDefinitionParameters")
-                        .HasForeignKey("MetaDefinitionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MEMO.DAL.Entities.Translation", b =>
                 {
                     b.HasOne("MEMO.DAL.Entities.Dictionary", "Dictionary")
                         .WithMany("Translations")
                         .HasForeignKey("DictionaryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MEMO.DAL.Entities.TranslationMeta", b =>
-                {
-                    b.HasOne("MEMO.DAL.Entities.MetaDefinition", "MetaDefinition")
-                        .WithMany("TranslationMetas")
-                        .HasForeignKey("MetaDefinitionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MEMO.DAL.Entities.Translation", "Translation")
-                        .WithMany("TranslationMetas")
-                        .HasForeignKey("TranslationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

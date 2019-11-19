@@ -46,5 +46,12 @@ namespace MEMO.BLL.Authentication
 
             return decodedToken.Claims.FirstOrDefault(c => c.Type == "unique_name").Value;
         }
+
+        public string DecodeUserRole(string token)
+        {
+            var decodedToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+            return decodedToken.Claims.FirstOrDefault(c => c.Type == "role").Value;
+        }
     }
 }

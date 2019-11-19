@@ -1,10 +1,8 @@
 package hu.mobilclient.memo.network
 
 import hu.mobilclient.memo.model.*
-import hu.mobilclient.memo.model.Login
-import hu.mobilclient.memo.model.Registration
-import hu.mobilclient.memo.model.TokenHolder
 import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.services.ConnectionService
 import retrofit2.Call
 import retrofit2.http.*
 import java.util.*
@@ -13,8 +11,18 @@ import java.util.*
 interface ApiService {
 
     companion object {
-        const val BaseURL = "https://10.0.2.2:5001/api/"
+        const val DEFAULTSERVERIP = "10.0.2.2"
+        const val DEFAULTSERVERPORT = "5001"
+        var ServerIP = DEFAULTSERVERIP
+        var ServerPort = DEFAULTSERVERPORT
+        val BaseURL: String
+            get(){
+                return "https://${ServerIP}:${ServerPort}/api/"
+            }
     }
+
+    @GET
+    fun getConnect(@Url url: String): Call<ConnectionService.Connection>
 
     /* Authentication */
 
@@ -64,8 +72,17 @@ interface ApiService {
     @GET("dictionary/user/{id}")
     fun getDictionariesByUserId(@Path("id") id: UUID): Call<List<Dictionary>>
 
-    @GET("dictionary/public/{id}")
-    fun getDictionariesPublic(@Path("id") id: UUID): Call<List<Dictionary>>
+    @GET("dictionary/public/{userId}")
+    fun getDictionariesPublic(@Path("userId") userId: UUID): Call<List<Dictionary>>
+
+    @GET("dictionary/fastaccessible/{id}")
+    fun getDictionariesFastAccessible(@Path("id") id: UUID): Call<List<Dictionary>>
+
+    @POST("dictionary/subscribe/{userId}")
+    fun subscribe(@Path("userId") userId: UUID, @Body dictionary: Dictionary): Call<Void>
+
+    @POST("dictionary/unsubscribe/{userId}")
+    fun unsubscribe(@Path("userId") userId: UUID, @Body dictionary: Dictionary): Call<Void>
 
     /* Translation */
 
@@ -86,6 +103,26 @@ interface ApiService {
 
     @GET("translation/dictionary/{id}")
     fun getTranslationsByDictionaryId(@Path("id") id: UUID): Call<List<Translation>>
+
+    /* Attribute */
+
+    @GET("attribute")
+    fun getAttributes(): Call<List<Attribute>>
+
+    @GET("attribute/{id}")
+    fun getAttributeById(@Path("id") id: UUID): Call<Attribute>
+
+    @POST("attribute")
+    fun insertAttribute(@Body attribute: Attribute): Call<Attribute>
+
+    @PUT("attribute")
+    fun updateAttribute(@Body attribute: Attribute): Call<Void>
+
+    @DELETE("attribute/{id}")
+    fun deleteAttribute(@Path("id") id: UUID): Call<Void>
+
+    @GET("attribute/user/{id}")
+    fun getAttributesByUserId(@Path("id") id: UUID): Call<List<Attribute>>
 
     /* Language */
 

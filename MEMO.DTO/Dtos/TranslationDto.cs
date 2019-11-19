@@ -1,18 +1,25 @@
-﻿using System;
+﻿using MEMO.DTO.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MEMO.DTO
 {
-    public class TranslationDto : DtoBase
+    public class TranslationDto : IAuditable
     {
-        [Required(ErrorMessage = "Translation value is required", AllowEmptyStrings = false)]
-        public String Value { get; set; }
+        public Guid Id { get; set; }
+
+        [Required(ErrorMessage = "Translation origin is required", AllowEmptyStrings = false)]
+        public string Original { get; set; }
+        public string Translated { get; set; }
 
         [Required(ErrorMessage = "Translation dictionaryId is required")]
         public Guid DictionaryId { get; set; }
 
-        public ICollection<TranslationMetaDto> TranslationMetas { get; set; } = new List<TranslationMetaDto>();
+        public ICollection<AttributeValueDto> TranslationMetas { get; set; } = new List<AttributeValueDto>();
+        public String CreationDate { get; set; }
+
+        public ICollection<AttributeValueDto> AttributeValues { get; set; } = new List<AttributeValueDto>();
     }
 }

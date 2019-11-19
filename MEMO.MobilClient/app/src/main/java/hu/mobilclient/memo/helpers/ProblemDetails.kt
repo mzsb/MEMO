@@ -13,9 +13,9 @@ class ProblemDetails(Json: String?) {
     val detail: String
 
     init{
-        var instance: ProblemDetails? = Gson().fromJson(Json, ProblemDetails::class.java)
-            title = instance?.title ?: "Unknown"
-            status = instance?.status ?: "Unknown"
+        val instance: ProblemDetails? = Gson().fromJson(Json, ProblemDetails::class.java)
+            title = instance?.title ?: App.instance.getString(R.string.Unkown)
+            status = instance?.status ?: App.instance.getString(R.string.Unkown)
             detail = instance?.detail ?: App.instance.getString(R.string.error_occurred)
     }
 }

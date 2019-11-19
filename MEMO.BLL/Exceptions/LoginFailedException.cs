@@ -6,7 +6,7 @@ namespace MEMO.BLL.Exceptions
 {
     public class LoginFailedException : ExceptionBase
     {
-        private const string message = "Helytelen felhasználónév vagy jelszó";
+        private const string message = "Sikertelen bejelentkezés";
 
         public LoginFailedException(string message) : base(message) { }
 

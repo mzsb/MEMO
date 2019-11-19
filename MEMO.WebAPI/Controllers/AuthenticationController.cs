@@ -1,20 +1,15 @@
 ﻿using AutoMapper;
 using MEMO.BLL.Authentication;
-using MEMO.BLL.Interfaces;
 using MEMO.DTO;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MEMO.WebAPI.Controllers
 {
     [AllowAnonymous]
     [Route("api/[Controller]")]
-    public class AuthenticationController : Controller
+    public class AuthenticationController : ControllerBase
     {
         private readonly BLL.Interfaces.IAuthenticationService _authenticationService;
         private readonly IMapper _mapper;

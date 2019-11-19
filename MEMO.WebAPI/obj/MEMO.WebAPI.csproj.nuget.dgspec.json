@@ -32,6 +32,9 @@
             "projectReferences": {
               "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DAL\\MEMO.DAL.csproj": {
                 "projectPath": "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DAL\\MEMO.DAL.csproj"
+              },
+              "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DTO\\MEMO.DTO.csproj": {
+                "projectPath": "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DTO\\MEMO.DTO.csproj"
               }
             }
           }
@@ -98,11 +101,7 @@
         },
         "frameworks": {
           "netcoreapp3.0": {
-            "projectReferences": {
-              "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DTO\\MEMO.DTO.csproj": {
-                "projectPath": "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DTO\\MEMO.DTO.csproj"
-              }
-            }
+            "projectReferences": {}
           }
         },
         "warningProperties": {

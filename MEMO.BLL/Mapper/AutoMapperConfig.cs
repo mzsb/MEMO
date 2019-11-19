@@ -2,8 +2,7 @@
 using MEMO.BLL.Authentication;
 using MEMO.DAL.Entities;
 using MEMO.DTO;
-using MEMO.DTO.Enums;
-using System;
+using MEMO.DAL.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,9 +22,9 @@ namespace MEMO.BLL.Mapper
                 cfg.CreateMap<UserDto, User>().ReverseMap();
                 cfg.CreateMap<LanguageDto, Language>().ReverseMap();
                 cfg.CreateMap<TranslationDto, Translation>().ReverseMap();
-                cfg.CreateMap<TranslationMetaDto, TranslationMeta>().ReverseMap();
-                cfg.CreateMap<MetaDefinitionDto, MetaDefinition>().ReverseMap();
-                cfg.CreateMap<MetaDefinitionParameterDto, MetaDefinitionParameter>().ReverseMap();
+                cfg.CreateMap<AttributeValueDto, AttributeValue>().ReverseMap();
+                cfg.CreateMap<AttributeDto, Attribute>().ReverseMap();
+                cfg.CreateMap<AttributeParameterDto, AttributeParameter>().ReverseMap();
                 #region Dictionary
 
                 cfg.CreateMap<Dictionary, DictionaryDto>()
@@ -39,17 +38,20 @@ namespace MEMO.BLL.Mapper
                         dto.Source = ctx.Mapper.Map<LanguageDto>(
                             d.DictionaryLanguages
                              .Where(dl => dl.Type.Equals(LanguageType.source))
-                             .Select(dl => dl.Language).SingleOrDefault());
+                             .Select(dl => dl.Language)
+                             .SingleOrDefault());
 
                         dto.Destination = ctx.Mapper.Map<LanguageDto>(
                             d.DictionaryLanguages
                              .Where(dl => dl.Type.Equals(LanguageType.destination))
-                             .Select(dl => dl.Language).SingleOrDefault());
+                             .Select(dl => dl.Language)
+                             .SingleOrDefault());
 
                         dto.Owner = ctx.Mapper.Map<UserDto>(
                             d.UserDictionaries
-                             .Where(dl => dl.Type.Equals(UserType.owner))
-                             .Select(dl => dl.User).SingleOrDefault());
+                             .Where(dl => dl.Type == UserType.owner)
+                             .Select(dl => dl.User)
+                             .SingleOrDefault());
 
                         foreach (var viewer in d.UserDictionaries
                                                 .Where(ud => ud.Type == UserType.viewer)

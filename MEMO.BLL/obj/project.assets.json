@@ -1500,7 +1500,6 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.0",
         "dependencies": {
-          "MEMO.DTO": "1.0.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "3.0.0"
         },
@@ -5706,6 +5705,7 @@
     ".NETCoreApp,Version=v3.0": [
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 7.0.0",
       "MEMO.DAL >= 1.0.0",
+      "MEMO.DTO >= 1.0.0",
       "System.IdentityModel.Tokens.Jwt >= 5.5.0"
     ]
   },
@@ -5741,6 +5741,9 @@
           "projectReferences": {
             "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DAL\\MEMO.DAL.csproj": {
               "projectPath": "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DAL\\MEMO.DAL.csproj"
+            },
+            "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DTO\\MEMO.DTO.csproj": {
+              "projectPath": "C:\\Users\\barna\\source\\repos\\MEMO\\MEMO.DTO\\MEMO.DTO.csproj"
             }
           }
         }

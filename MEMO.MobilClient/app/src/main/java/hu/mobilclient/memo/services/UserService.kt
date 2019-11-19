@@ -2,99 +2,84 @@ package hu.mobilclient.memo.services
 
 import android.app.Activity
 import hu.mobilclient.memo.R
+import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
 import hu.mobilclient.memo.model.User
-import hu.mobilclient.memo.network.callbacks.User.IDeleteUserCallBack
-import hu.mobilclient.memo.network.callbacks.User.IGetUserByIdCallBack
-import hu.mobilclient.memo.network.callbacks.User.IGetUsersCallBack
-import hu.mobilclient.memo.network.callbacks.User.IUpdateUserCallBack
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 import java.util.*
 
-class UserService(private val activity: Activity) : ServiceBase(activity) {
+class UserService(activity: Activity, private val errorCallback: (String) -> Unit) : ServiceBase(activity) {
 
-    fun get() {
+    fun get(callback: (List<User>) -> Unit,
+            errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+            checkError: Boolean = false) =
         createRequest(
                 request = apiService::getUsers,
                 onSuccess =
                 fun (response: Response<List<User>>) {
-
-                    if (activity is IGetUsersCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onGetUsersSuccess(response.body()
-                                    ?: return activity.onGetUsersError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onGetUsersError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
+                    } else {
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
-                    else{
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
-                    }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun get(id: UUID) {
+    fun get(id: UUID,
+            callback: (User) -> Unit,
+            errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+            checkError: Boolean = false) =
         createRequest(
                 request = apiService::getUserById,
                 requestParameter = id,
                 onSuccess =
                 fun (response: Response<User>) {
-
-                    if (activity is IGetUserByIdCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onGetUserByIdSuccess(response.body()
-                                    ?: return activity.onGetUserByIdError(ProblemDetails(response.errorBody()?.string()).detail))
-                        } else {
-                            activity.onGetUserByIdError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback(response.body()
+                                ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
+                    } else {
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
-                    else{
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
-                    }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun update(user: User) {
+    fun update(user: User,
+               callback: () -> Unit,
+               errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+               checkError: Boolean = false) =
         createRequest(
                 request = apiService::updateUser,
                 requestParameter = user,
                 onSuccess =
                 fun (response: Response<Void>) {
-
-                    if (activity is IUpdateUserCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onUpdateUserSuccess()
-                        } else {
-                            activity.onUpdateUserError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback()
+                    } else {
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
-                    else{
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
-                    }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 
-                })
-    }
-
-    fun delete(id: UUID) {
+    fun delete(id: UUID,
+               callback: () -> Unit,
+               errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+               checkError: Boolean = false) =
         createRequest(
                 request = apiService::deleteUser,
                 requestParameter = id,
                 onSuccess =
                 fun(response: Response<Void>) {
-
-                    if (activity is IDeleteUserCallBack) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            activity.onDeleteUserSuccess()
-                        } else {
-                            activity.onDeleteUserError(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
+                    if (response.isSuccessful && response.code() == 200) {
+                        callback()
                     } else {
-                        throw RuntimeException(activity.getString(R.string.invalid_activity_type))
+                        errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
-
-                })
-    }
+                },
+                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                checkError = checkError)
 }

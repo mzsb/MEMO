@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout">
+
+    <data>
+        <variable
+            name="registration"
+            type="hu.mobilclient.memo.model.Registration" />
+        <variable
+            name="fragment"
+            type="hu.mobilclient.memo.fragments.RegistrationFragment" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_rounded_blue"
+        android:padding="15dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="-5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/sign_up"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ImageView
+                android:id="@+id/fg_registration_tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cancel_24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fg_registration_et_username_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_marginTop="10dp"
+            android:textColorHint="@color/primary_light">
+
+            <EditText
+                android:id="@+id/fg_registration_et_username"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/username"
+                android:importantForAutofill="no"
+                android:inputType="textImeMultiLine"
+                android:textColor="@color/primary_light"
+                android:text="@={registration.UserName}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fg_registration_et_email_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColorHint="@color/primary_light">
+
+            <EditText
+                android:id="@+id/fg_registration_et_email"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/primary_light"
+                android:text="@={registration.Email}"
+                android:importantForAutofill="no" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/fg_registration_ln_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fg_registration_et_password_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColorHint="@color/primary_light">
+
+            <EditText
+                android:id="@+id/fg_registration_et_password"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:textColor="@color/primary_light"
+                android:text="@={registration.Password}"
+                android:importantForAutofill="no" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/fg_registration_et_password_image"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="-28dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_visibe_48dp"
+            android:layout_gravity="bottom"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/fg_registration_et_password_again_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColorHint="@color/primary_light" >
+
+            <EditText
+                android:id="@+id/fg_registration_et_password_again"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/password_again"
+                android:inputType="textPassword"
+                android:textColor="@color/primary_light"
+                android:importantForAutofill="no" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton style="@style/AppButton"
+            android:id="@+id/fg_registration_bt_registration"
+            android:layout_marginTop="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{fragment::registrationClick}"
+            android:text="@string/sign_up"
+            android:layout_gravity="end"/>
+
+    </LinearLayout>
+
+</layout>
