@@ -13,4 +13,5 @@ object Constants {
     val FILTER = "filter"
     val DICTIONARYFILTER = "dictionaryFilter"
     val ATTRIBUTEFILTER = "attributeFilter"
+    val USERFILTER = "userFilter"
 }

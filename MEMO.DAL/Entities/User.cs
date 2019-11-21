@@ -12,6 +12,13 @@ namespace MEMO.DAL.Entities
         [NotMapped]
         public string Role { get; set; }
 
+        [NotMapped]
+        public int DictionaryCount { get; set; }
+        [NotMapped]
+        public int ViewedDictionaryCount { get; set; }
+        [NotMapped]
+        public int TranslationCount { get; set; }
+
         public ICollection<Attribute> Attributes { get; set; } = new List<Attribute>();
         public ICollection<UserDictionary> UserDictionaries { get; set; } = new List<UserDictionary>();
         public DateTime CreationDate { get; set; }

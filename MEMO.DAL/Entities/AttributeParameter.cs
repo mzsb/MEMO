@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace MEMO.DAL.Entities
@@ -7,6 +8,7 @@ namespace MEMO.DAL.Entities
     public class AttributeParameter
     {
         public Guid Id { get; set; }
+        [MaxLength(10)]
         public string Value { get; set; }
 
         public Guid AttributeId { get; set; }

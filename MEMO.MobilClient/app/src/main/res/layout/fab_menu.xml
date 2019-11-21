@@ -24,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
+        android:onClick="createAttributeClick"
         android:visibility="invisible"
         android:src="@drawable/ic_attribute_48dp"
         app:backgroundTint="@color/accent"/>

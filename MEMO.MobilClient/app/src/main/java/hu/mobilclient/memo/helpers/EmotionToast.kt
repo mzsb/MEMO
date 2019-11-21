@@ -51,6 +51,12 @@ object EmotionToast {
                 R.color.design_default_color_error)
     }
 
+    fun showSuccess(message: String? = App.instance.getString(R.string.success_save)){
+        show(message?: App.instance.getString(
+                R.string.error_occurred), R.drawable.ic_success_24dp,
+                R.color.green)
+    }
+
     fun showHelp(message: String?){
         show(message?: App.instance.getString(
                 R.string.error_occurred), R.drawable.ic_lightbulb_outline_48dp,

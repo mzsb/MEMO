@@ -44,6 +44,9 @@ class DictionaryListFragment : NavigationFragmentBase(), DictionaryAdapter.OnDic
 
         binding.setVariable(BR.fragment, this)
 
+        adapter.serviceManager = serviceManager
+        adapter.userId = args.getUserId()
+
         return binding.root
     }
 
@@ -59,52 +62,26 @@ class DictionaryListFragment : NavigationFragmentBase(), DictionaryAdapter.OnDic
 
     private fun initializeAdapter(){
         val fabMenu = requireActivity().ac_navigation_ll_fab_menu
-        fabMenu.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
-        recyclerView.visibility = View.GONE
-        serviceManager.dictionary?.getByUserId(args.getUserId(), { ownDictionaries ->
 
+        adapter.initializeAdapter({
+            fabMenu.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+            },{
             recyclerView.layoutManager = GridLayoutManager(context, 1)
             recyclerView.adapter = adapter
             adapter.itemClickListener = this
             adapter.itemLongClickListener = this
-
-            serviceManager.dictionary?.getPublic(args.getUserId(),{ publicDictionaries ->
-                serviceManager.language?.get({ languages ->
-                    if(App.isAdmin()){
-                        serviceManager.dictionary?.get({ allDictionaries ->
-                            updateAdapter(ownDictionaries, publicDictionaries, allDictionaries, languages)
-                        },::onFailure)
-                    }
-                    else {
-                        updateAdapter(ownDictionaries, publicDictionaries, languages = languages)
-                    }
-                },::onFailure)
-            },::onFailure)
-        },{onFailure(getString(R.string.unable_load_dictionaries))})
-    }
-
-    private fun onFailure(message: String){
-        if(message.isNotEmpty()) {
-            EmotionToast.showSad(message)
-        }
-        progressBar.visibility = View.GONE
-    }
-
-    private fun updateAdapter(ownDictionaries: List<Dictionary>,
-                              publicDictionaries: List<Dictionary>,
-                              allDictionaries: List<Dictionary> = ArrayList(),
-                              languages: List<Language>){
-        adapter.initializeAdapter(ownDictionaries, publicDictionaries, allDictionaries, languages)
-        progressBar.visibility = View.GONE
-        recyclerView.startAnimation(popUp)
-        recyclerView.visibility = View.VISIBLE
-        val fabMenu = requireActivity().ac_navigation_ll_fab_menu
-        fabMenu.startAnimation(popUp)
-        fabMenu.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
+            recyclerView.startAnimation(popUp)
+            recyclerView.visibility = View.VISIBLE
+            fabMenu.startAnimation(popUp)
+            fabMenu.visibility = View.VISIBLE
+        })
     }
 
     override fun update(){
+        adapter.reset()
         initializeAdapter()
     }
 

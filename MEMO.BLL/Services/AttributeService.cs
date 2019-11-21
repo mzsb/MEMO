@@ -31,7 +31,6 @@ namespace MEMO.BLL.Services
         public async Task<IEnumerable<Attribute>> GetAsync()
         {
             var attributes = await _context.Attributes
-                                           .Include(a => a.AttributeValues)
                                            .Include(a => a.User)
                                            .Include(a => a.AttributeParameters)
                                            .AsNoTracking()
@@ -39,8 +38,9 @@ namespace MEMO.BLL.Services
 
             foreach(var attribute in attributes)
             {
-                attribute.AttributeValuesCount = attribute.AttributeValues.Count;
-                attribute.AttributeValues.Clear();
+                attribute.AttributeValuesCount = await _context.AttributeValues
+                                                               .Where(av => av.AttributeId == attribute.Id)
+                                                               .CountAsync();
             }
 
             return attributes;
@@ -59,9 +59,9 @@ namespace MEMO.BLL.Services
 
         public async Task<Attribute> InsertAsync(Attribute attribute)
         {
-            if (_authorizationManager.authorizeByUserId(attribute.UserId, Token))
+            if (_authorizationManager.authorizeByUserId(attribute.User.Id, Token))
             {
-                attribute.User = await _userManager.FindByIdAsync(attribute.UserId.ToString()) ?? throw new EntityNotFoundException(typeof(User));
+                attribute.User = await _userManager.FindByIdAsync(attribute.User.Id.ToString()) ?? throw new EntityNotFoundException(typeof(User));
 
                 var inserted = _context.Add(attribute).Entity;
 
@@ -86,27 +86,24 @@ namespace MEMO.BLL.Services
 
         public async Task UpdateAsync(Attribute attribute)
         {
-            var userId = (await _context.Attributes.SingleOrDefaultAsync(a => a.Id == attribute.Id)).UserId;
+            var user = await _userManager.FindByIdAsync(attribute.User.Id.ToString()) ?? throw new EntityNotFoundException(typeof(User));
 
-            if (_authorizationManager.authorizeByUserId(userId, Token))
+            if (_authorizationManager.authorizeByUserId(user.Id, Token))
             {
+                attribute.User = user;
+
                 foreach (var ap in _context.AttributeParameters.Where(ap => ap.AttributeId == attribute.Id))
                 {
                     _context.AttributeParameters.Remove(ap);
                 }
 
-                _context.Attach(attribute).State = EntityState.Modified;
-
-                foreach (var attributeParameter in attribute.AttributeParameters)
+                foreach(var ap in attribute.AttributeParameters)
                 {
-                    foreach (var property in _context.Entry(attributeParameter).Properties)
-                    {
-                        if (!(property.CurrentValue is System.Guid))
-                        {
-                            property.IsModified = true;
-                        }
-                    }
+                    _context.Add(ap);
                 }
+  
+                _context.Entry(attribute).State = EntityState.Modified;
+
 
                 try
                 {

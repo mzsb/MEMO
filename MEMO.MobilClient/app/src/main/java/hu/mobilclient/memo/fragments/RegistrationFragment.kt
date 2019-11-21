@@ -22,6 +22,7 @@ import hu.mobilclient.memo.activities.NavigationActivity
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.FragmentRegistrationBinding
 import hu.mobilclient.memo.helpers.Constants
+import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.model.Registration
 import kotlinx.android.synthetic.main.fragment_registration.*
 import kotlinx.android.synthetic.main.fragment_registration.view.*
@@ -47,9 +48,6 @@ class RegistrationFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val cancelButton = view.fg_registration_tv_cancel
-        cancelButton.setOnClickListener {
-            dismiss()
-        }
 
         fg_registration_et_password_image.setOnTouchListener { _, motionEvent ->
             when (motionEvent.action) {
@@ -70,14 +68,18 @@ class RegistrationFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    fun cancelClick(view: View) = dismiss()
+
     fun registrationClick(view: View){
         if(isValid()){
-            (activity as NetworkActivityBase).serviceManager.authentication?.registration(registration, callback = {
+            (activity as NetworkActivityBase).serviceManager.authentication?.registration(registration,{
                 val intent = Intent(activity, NavigationActivity::class.java)
                 intent.putExtra(Constants.USERID, it.UserId.toString())
                 startActivity(intent)
                 dismiss()
                 activity?.finish()
+            },{
+                EmotionToast.showError(it)
             })
         }
     }

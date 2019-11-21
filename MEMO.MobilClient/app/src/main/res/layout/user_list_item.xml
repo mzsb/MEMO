@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="user"
+            type="hu.mobilclient.memo.model.User" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_blue_1"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="35sp"
+            android:textColor="@color/primary_light"
+            android:text="@{user.userName}"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_light"
+                android:textSize="20sp"
+                android:text="@string/dictionaries_dd"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_light"
+                android:textSize="20sp"
+                android:text="@{` ` + user.dictionaryCount}"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_light"
+                android:textSize="20sp"
+                android:text="@string/translations_dd"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_light"
+                android:textSize="20sp"
+                android:text="@{` ` + user.translationCount}"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>
+

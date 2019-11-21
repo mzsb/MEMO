@@ -17,6 +17,7 @@ import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.FragmentNetworkSettingsBinding
 import hu.mobilclient.memo.helpers.Constants
+import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.network.ApiService
 import kotlinx.android.synthetic.main.fragment_network_settings.view.*
 
@@ -40,16 +41,12 @@ class NetworkSettingFragment : DialogFragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val cancelButton = view.fg_network_settings_tv_cancel
-        cancelButton.setOnClickListener {
-            dismiss()
-        }
-    }
+    fun cancelClick(view: View) = dismiss()
 
     fun saveClick(view: View){
         (activity as NetworkActivityBase).serviceManager.connection?.setConnectionData(ip = settings.Ip.get(), port = settings.Port.get())
 
+        EmotionToast.showSuccess()
         dismiss()
     }
 

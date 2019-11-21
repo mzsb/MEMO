@@ -26,6 +26,11 @@
         <item name="android:textColor">@color/primary</item>
     </style>
 
+    <style name="AccentSwitch" parent="">
+        <item name="android:colorControlActivated">@color/accent</item>
+        <item name="android:colorForeground">#42221f1f</item>
+    </style>
+
     <style name="TextView" parent="Widget.AppCompat.TextView">
         <item name="android:textColor">@color/primary_light</item>
     </style>

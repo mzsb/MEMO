@@ -24,6 +24,8 @@ import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.adapters.NavigationPagerAdapter
 import hu.mobilclient.memo.filters.AttributeFilter
 import hu.mobilclient.memo.filters.DictionaryFilter
+import hu.mobilclient.memo.filters.UserFilter
+import hu.mobilclient.memo.fragments.AttributeFragment
 import hu.mobilclient.memo.fragments.DictionaryFragment
 import hu.mobilclient.memo.fragments.NetworkSettingFragment
 import hu.mobilclient.memo.fragments.bases.NavigationFragmentBase
@@ -60,6 +62,7 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
     private lateinit var fabRotateClose: Animation
 
     private var dictionaryFragment: DictionaryFragment? = null
+    private var attributeFragment: AttributeFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -173,6 +176,7 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
                 startActivity(Intent(this, LoginActivity::class.java))
                 DictionaryFilter.clearFilter()
                 AttributeFilter.clearFilter()
+                UserFilter.clearFilter()
                 finish()
             }
             in idHolder -> {
@@ -260,6 +264,12 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
     fun createDictionaryClick(view: View){
         val fragment = dictionaryFragment?: DictionaryFragment(OkCallback = {getPage(NavigationPagerAdapter.DICTIONARY_LIST_PAGE_POSITION).update(); dictionaryFragment = null})
         dictionaryFragment = fragment
+        fragment.show(supportFragmentManager, "TAG")
+    }
+
+    fun createAttributeClick(view: View){
+        val fragment = attributeFragment?: AttributeFragment(OkCallback = {getPage(NavigationPagerAdapter.ACCOUNT_PAGE_POSITION).update(); attributeFragment = null})
+        attributeFragment = fragment
         fragment.show(supportFragmentManager, "TAG")
     }
 }

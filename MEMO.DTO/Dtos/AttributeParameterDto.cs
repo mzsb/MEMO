@@ -9,7 +9,7 @@ namespace MEMO.DTO
     {
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "AttributeParameter value is required", AllowEmptyStrings = false)]
+        [Required(ErrorMessage = "AttributeParameter value is required", AllowEmptyStrings = false), MaxLength(10)]
         public string Value { get; set; }
     }
 }

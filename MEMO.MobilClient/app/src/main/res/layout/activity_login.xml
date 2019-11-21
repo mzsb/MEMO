@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            app:layout_constraintBottom_toTopOf="@+id/ac_login_btn_login"
+            app:layout_constraintBottom_toTopOf="@+id/ac_login_bt_login"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ac_login_et_username_layout" >
@@ -73,7 +73,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton style="@style/AppButton"
-            android:id="@+id/ac_login_btn_login"
+            android:id="@+id/ac_login_bt_login"
             android:layout_marginBottom="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ac_login_btn_login"/>
+            app:layout_constraintTop_toBottomOf="@+id/ac_login_bt_login"/>
 
         <LinearLayout
             android:id="@+id/ac_login_ll_network_progress"

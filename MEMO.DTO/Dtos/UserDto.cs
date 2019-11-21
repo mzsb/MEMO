@@ -19,6 +19,10 @@ namespace MEMO.DTO
         [Required(ErrorMessage = "Role is required", AllowEmptyStrings = false)]
         public string Role { get; set; }
 
+        public int DictionaryCount { get; set; }
+        public int ViewedDictionaryCount { get; set; }
+        public int TranslationCount { get; set; }
+
         public ICollection<AttributeDto> Attributes { get; set; } = new List<AttributeDto>();
 
         public ICollection<DictionaryDto> Dictionaries { get; set; } = new List<DictionaryDto>();

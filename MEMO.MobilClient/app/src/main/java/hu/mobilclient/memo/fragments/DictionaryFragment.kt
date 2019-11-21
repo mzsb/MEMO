@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -20,6 +21,7 @@ import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.FragmentDictionaryBinding
+import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.model.Dictionary
 import kotlinx.android.synthetic.main.fragment_dictionary.*
 import kotlinx.android.synthetic.main.fragment_dictionary.view.*
@@ -38,6 +40,8 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
 
     var IsViewersVisible: ObservableBoolean = ObservableBoolean(false)
 
+    private val originalDictionary = Dictionary()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val contextThemeWrapper: Context = ContextThemeWrapper(activity, R.style.AppTheme)
@@ -55,6 +59,8 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
             isEnabled = true
         }
 
+        originalDictionary.copy(Dictionary)
+
         isUpdate = Dictionary.Id != null
 
         binding.setVariable(BR.dictionary, Dictionary)
@@ -67,11 +73,6 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val cancelButton = view.fg_dictionary_tv_cancel
-        cancelButton.setOnClickListener {
-            dismiss()
-        }
 
         val viewerCountTextView = view.fg_dictionary_tv_viewer_count
         viewerCountTextView.text = Dictionary.ViewerCount.toString()
@@ -106,6 +107,27 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
         initializeLanguageSpinners(view)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        Dictionary.copy(originalDictionary)
+    }
+
+    private fun Dictionary.copy(rightDictionary: Dictionary){
+        Name = rightDictionary.Name
+        Destination = rightDictionary.Destination
+        Source = rightDictionary.Source
+        IsPublic = rightDictionary.IsPublic
+        IsFastAccessible = rightDictionary.IsFastAccessible
+    }
+
+    private fun Dictionary.dictionaryEquals(rightDictionary: Dictionary) =
+            Name == rightDictionary.Name &&
+            Destination.Code == rightDictionary.Destination.Code &&
+            Source.Code == rightDictionary.Source.Code &&
+            IsPublic == rightDictionary.IsPublic &&
+            IsFastAccessible == rightDictionary.IsFastAccessible
+
     private fun initializeLanguageSpinners(view: View){
         (activity as NetworkActivityBase).serviceManager.language?.get({languages ->
 
@@ -115,7 +137,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
             sourceLanguageSpinner.adapter = ArrayAdapter(App.instance, R.layout.spinner_item_blue, languages)
 
             sourceLanguageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(arg0: AdapterView<*>, arg1: View, position: Int, id: Long) {
+                override fun onItemSelected(arg0: AdapterView<*>, arg1: View?, position: Int, id: Long) {
                     Dictionary.Source = languages[position]
                 }
 
@@ -125,7 +147,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
             destinationLanguageSpinner.adapter = ArrayAdapter(App.instance, R.layout.spinner_item_blue, languages)
 
             destinationLanguageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(arg0: AdapterView<*>, arg1: View, position: Int, id: Long) {
+                override fun onItemSelected(arg0: AdapterView<*>, arg1: View?, position: Int, id: Long) {
                     Dictionary.Destination = languages[position]
                 }
 
@@ -159,59 +181,82 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
         return false
     }
 
+    fun cancelClick(view: View) = dismiss()
+
     fun saveClick(view: View){
-        if(isValid()) {
-            val serviceManager = (activity as NetworkActivityBase).serviceManager
-            if (isUpdate) {
-                if(IsDelete){
-                    SureFragment(Message = Dictionary.Name + getString(R.string.named_dictionary_delete),
-                                 OkCallback = {
-                                     serviceManager.dictionary?.delete(Dictionary.Id!!,{
-                                         OkCallback()
-                                         dismiss() })
-                                 }).show(requireActivity().supportFragmentManager, "TAG")
-                }
-                else{
-                    if(isEnabled) {
-                        serviceManager.dictionary?.update(Dictionary, {
-                            OkCallback()
-                            dismiss()
-                        })
+        val serviceManager = (activity as NetworkActivityBase).serviceManager
+        if (isUpdate) {
+            if(IsDelete){
+                SureFragment(Message = Dictionary.Name + getString(R.string.named_dictionary_delete),
+                             OkCallback = {
+                                 serviceManager.dictionary?.delete(Dictionary.Id!!,{
+                                     OkCallback()
+                                     EmotionToast.showSuccess(getString(R.string.dictionary_delete_success))
+                                     dismiss() },{
+                                     EmotionToast.showSad(getString(R.string.dictionary_delete_fail))
+                                 })
+                             }).show(requireActivity().supportFragmentManager, "TAG")
+            }
+            else{
+                if(isEnabled) {
+                    if(!Dictionary.dictionaryEquals(originalDictionary)) {
+                        if (isValid()) {
+                            serviceManager.dictionary?.update(Dictionary, {
+                                OkCallback()
+                                EmotionToast.showSuccess()
+                                dismiss()
+                            }, {
+                                EmotionToast.showSad(getString(R.string.dictionary_update_fail))
+                            })
+                        }
                     }
                     else{
-                        val isUserViewd = Dictionary.Viewers.filter {it.Id == App.currentUser.Id}.any()
-                        if(IsViewed){
-                            if(!isUserViewd) {
-                                serviceManager.dictionary?.subscribe(App.currentUser.Id!!, Dictionary, {
-                                    OkCallback()
-                                    dismiss()
-                                })
-                            }
-                            else{
+                        EmotionToast.showHelp(getString(R.string.no_changes))
+                    }
+                }
+                else{
+                    val isUserViewd = Dictionary.Viewers.filter {it.Id == App.currentUser.Id}.any()
+                    if(IsViewed){
+                        if(!isUserViewd) {
+                            serviceManager.dictionary?.subscribe(App.currentUser.Id!!, Dictionary, {
+                                OkCallback()
+                                EmotionToast.showSuccess()
                                 dismiss()
-                            }
+                            },{
+                                EmotionToast.showSad(getString(R.string.dictionary_subscribe_fail))
+                            })
                         }
                         else{
-                            if(isUserViewd) {
-                                SureFragment(Message = Dictionary.Name + getString(R.string.name_dictionary_unsubscribe),
-                                        OkCallback = {
-                                            serviceManager.dictionary?.unsubscribe(App.currentUser.Id!!, Dictionary, {
-                                                OkCallback()
-                                                dismiss()
-                                            })
-                                        }).show(requireActivity().supportFragmentManager, "TAG")
-                            }
-                            else{
-                                dismiss()
-                            }
+                            dismiss()
+                        }
+                    }
+                    else{
+                        if(isUserViewd) {
+                            SureFragment(Message = Dictionary.Name + getString(R.string.name_dictionary_unsubscribe),
+                                    OkCallback = {
+                                        serviceManager.dictionary?.unsubscribe(App.currentUser.Id!!, Dictionary, {
+                                            OkCallback()
+                                            EmotionToast.showSuccess()
+                                            dismiss()
+                                        },{
+                                            EmotionToast.showSad(getString(R.string.dictionary_unsubscribe_fail))
+                                        })
+                                    }).show(requireActivity().supportFragmentManager, "TAG")
+                        }
+                        else{
+                            dismiss()
                         }
                     }
                 }
-            } else {
+            }
+        } else {
+            if(isValid()) {
                 Dictionary.Owner = App.currentUser
                 serviceManager.dictionary?.insert(Dictionary, {
                     OkCallback()
                     dismiss()
+                }, {
+                    EmotionToast.showSad(getString(R.string.dictionary_create_fail))
                 })
             }
         }

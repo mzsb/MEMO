@@ -5,7 +5,9 @@ import android.content.Intent
 import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.LoginActivity
+import hu.mobilclient.memo.filters.AttributeFilter
 import hu.mobilclient.memo.filters.DictionaryFilter
+import hu.mobilclient.memo.filters.UserFilter
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.model.TokenHolder
@@ -161,6 +163,8 @@ abstract class ServiceBase(private val activity: Activity) {
     private fun tokenExpired() {
         activity.getSharedPreferences(Constants.AUTHDATA, 0).edit().clear().apply()
         DictionaryFilter.clearFilter()
+        AttributeFilter.clearFilter()
+        UserFilter.clearFilter()
         activity.startActivity(Intent(activity, LoginActivity::class.java))
         activity.finish()
     }

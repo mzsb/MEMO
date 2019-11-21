@@ -115,6 +115,7 @@ namespace MEMO.DAL.DataSeed
                     {
                         attributes = await context.Attributes.Where(a => a.UserId == user.Id)
                                                                           .Include(a => a.AttributeParameters)
+                                                                          
                                                                           .ToListAsync();
                     }
 
@@ -165,6 +166,7 @@ namespace MEMO.DAL.DataSeed
                                                                      .Where(ud => ud.UserId == user.Id &&
                                                                             ud.Type == UserType.owner)
                                                                      .Select(ud => ud.Dictionary)
+                                                                     
                                                                      .ToListAsync();
                     }
 
@@ -283,6 +285,7 @@ namespace MEMO.DAL.DataSeed
                                                                                          ud.Type == UserType.owner) &&
                                                                             ud.Dictionary.IsPublic)
                                                               .Select(ud => ud.Dictionary)
+                                                              
                                                               .ToListAsync();
 
                         if (publicDictionaries.Count >= viewerCount)

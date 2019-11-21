@@ -18,7 +18,6 @@ namespace MEMO.WebAPI
 
             try
             {
-
                 ip = NetworkInterface.GetAllNetworkInterfaces()
                                      .Where(ni => ni.NetworkInterfaceType
                                                     == NetworkInterfaceType.Wireless80211 && ni.Name == WIRELESS)

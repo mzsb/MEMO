@@ -52,6 +52,9 @@ interface ApiService {
     @DELETE("user/{id}")
     fun deleteUser(@Path("id") id: UUID): Call<Void>
 
+    @GET("user/viewers/{id}")
+    fun getViewersByUserId(@Path("id") id: UUID): Call<List<User>>
+
     /* Dictionary */
 
     @GET("dictionary")

@@ -40,6 +40,24 @@ namespace MEMO.BLL.Services
             foreach (var user in users)
             {
                 user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+
+                foreach (var userDictionary in await _context.UserDictionaries
+                                                             .Include(ud => ud.Dictionary)
+                                                             .ThenInclude(d => d.Translations)
+                                                             .AsNoTracking()
+                                                             .Where(ud => ud.UserId == user.Id)
+                                                             .ToListAsync())
+                {
+                    if (userDictionary.Type == UserType.owner)
+                    {
+                        user.DictionaryCount++;
+                        user.TranslationCount += userDictionary.Dictionary.Translations.Count;
+                    }
+                    else
+                    {
+                        user.ViewedDictionaryCount++;
+                    }
+                }
             }
 
             return users;
@@ -53,7 +71,26 @@ namespace MEMO.BLL.Services
 
             user.Attributes = await _context.Attributes.Include(a => a.AttributeParameters)
                                                        .Where(a => a.UserId == id)
+                                                       .AsNoTracking()
                                                        .ToListAsync();
+
+            foreach (var userDictionary in await _context.UserDictionaries
+                                                         .Include(ud => ud.Dictionary)
+                                                         .ThenInclude(d => d.Translations)
+                                                         .AsNoTracking()
+                                                         .Where(ud => ud.UserId == user.Id)
+                                                         .ToListAsync())
+            {
+                if(userDictionary.Type == UserType.owner)
+                {
+                    user.DictionaryCount++;
+                    user.TranslationCount += userDictionary.Dictionary.Translations.Count;
+                }
+                else
+                {
+                    user.ViewedDictionaryCount++;
+                }
+            }
 
             return user;
         }
@@ -119,6 +156,57 @@ namespace MEMO.BLL.Services
             {
                 throw new AuthorizationException(typeof(User));
             }
+        }
+
+        public async Task<IEnumerable<User>> GetViewersByUserIdAsync(Guid id)
+        {
+            var dictionaryIds = await _context.UserDictionaries
+                                              .Where(ud => ud.Type == UserType.owner &&
+                                                           ud.UserId == id)
+                                              .AsNoTracking()
+                                              .Select(ud => ud.DictionaryId)
+                                              .ToListAsync();
+
+            var users = new List<User>();
+
+            foreach(var user in await _context.UserDictionaries
+                                              .Include(ud => ud.User)
+                                              .Where(ud => ud.Type == UserType.viewer &&
+                                                           dictionaryIds.Contains(ud.DictionaryId))
+                                              .AsNoTracking()
+                                              .Select(ud => ud.User)
+                                              .ToListAsync())
+            {
+                if (!users.Select(u => u.Id).Contains(user.Id))
+                {
+                    users.Add(user);
+                }
+            }
+
+            foreach (var user in users)
+            {
+                user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+
+                foreach (var userDictionary in await _context.UserDictionaries
+                                                             .Include(ud => ud.Dictionary)
+                                                             .ThenInclude(d => d.Translations)
+                                                             .AsNoTracking()
+                                                             .Where(ud => ud.UserId == user.Id)
+                                                             .ToListAsync())
+                {
+                    if (userDictionary.Type == UserType.owner)
+                    {
+                        user.DictionaryCount++;
+                        user.TranslationCount += userDictionary.Dictionary.Translations.Count;
+                    }
+                    else
+                    {
+                        user.ViewedDictionaryCount++;
+                    }
+                }
+            }
+
+            return users;
         }
     }
 }

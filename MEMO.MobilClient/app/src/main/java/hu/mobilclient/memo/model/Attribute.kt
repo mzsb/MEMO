@@ -6,7 +6,6 @@ import hu.mobilclient.memo.model.enums.AttributeType
 import java.util.*
 
 class Attribute(@SerializedName("id")var Id: UUID? = null,
-                @SerializedName("userId")var UserId: UUID? = null,
                 @SerializedName("user")var User: User = User(),
                 @SerializedName("name") var Name: String = Constants.EMPTYSTRING,
                 @SerializedName("type") var Type: AttributeType = AttributeType.TEXT,

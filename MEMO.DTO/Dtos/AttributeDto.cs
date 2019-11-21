@@ -15,7 +15,7 @@ namespace MEMO.DTO
 
         public UserDto User { get; set; }
 
-        [Required(ErrorMessage = "Attribute name is required", AllowEmptyStrings = false)]
+        [Required(ErrorMessage = "Attribute name is required", AllowEmptyStrings = false), MaxLength(15)]
         public string Name { get; set; }
         public AttributeType Type { get; set; }
 

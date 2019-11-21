@@ -186,7 +186,7 @@ namespace MEMO.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(maxLength: 15, nullable: true),
                     Type = table.Column<string>(nullable: false),
                     UserId = table.Column<Guid>(nullable: false)
                 },
@@ -279,7 +279,7 @@ namespace MEMO.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Value = table.Column<string>(nullable: true),
+                    Value = table.Column<string>(maxLength: 10, nullable: true),
                     AttributeId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
@@ -324,8 +324,8 @@ namespace MEMO.DAL.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("cc47ee54-c583-47dd-9377-02e5e29d4359"), "0f174be3-429a-4e06-a902-337face006a1", "Administrator", "ADMINISTRATOR" },
-                    { new Guid("e10d43c0-d9e2-41c5-baba-7996907f3d39"), "f0f1e01b-6bfe-4a16-be98-28aa6e8935bb", "User", "USER" }
+                    { new Guid("88d5ec6d-c087-4fb4-b52f-c5b12acd33df"), "31158e61-1304-4db4-9725-abf724d564d1", "Administrator", "ADMINISTRATOR" },
+                    { new Guid("08f05fb0-104d-4d92-8618-261916434348"), "8e74c581-31c1-4f0a-ba87-afc9fdc839ed", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(
@@ -333,8 +333,8 @@ namespace MEMO.DAL.Migrations
                 columns: new[] { "Id", "LanguageCode" },
                 values: new object[,]
                 {
-                    { new Guid("1ac8f05b-411a-463a-aed0-c6f530d5539b"), "hu" },
-                    { new Guid("93c79d95-b09e-4659-81f5-0436cb3d2ca2"), "en" }
+                    { new Guid("28e770a7-fe71-4fd9-a56d-3501ceb17569"), "hu" },
+                    { new Guid("89e27b24-8364-41fc-885c-3afd6d612b06"), "en" }
                 });
 
             migrationBuilder.CreateIndex(

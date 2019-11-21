@@ -11,7 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="15dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
@@ -34,7 +34,7 @@
                 android:layout_height="35dp"
                 android:orientation="horizontal"
                 android:background="@drawable/bg_rounded_accent"
-                android:paddingEnd="7dp"
+                android:paddingEnd="5dp"
                 android:paddingStart="7dp"
                 android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -59,14 +59,14 @@
                     android:layout_height="35dp"
                     android:textSize="14sp"
                     android:gravity="center"
-                    android:text="@{` ` + @string/parameters_dd + ` `}"/>
+                    android:text="@{` ` + @string/values_dd + ` `}"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
                     android:textSize="14sp"
                     android:gravity="center"
-                    android:text="@={filter.totalParameterCount}"/>
+                    android:text="@={filter.totalValueCount}"/>
 
             </LinearLayout>
 

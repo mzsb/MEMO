@@ -26,7 +26,8 @@ namespace MEMO.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(15)")
+                        .HasMaxLength(15);
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -52,7 +53,8 @@ namespace MEMO.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(10)")
+                        .HasMaxLength(10);
 
                     b.HasKey("Id");
 
@@ -155,12 +157,12 @@ namespace MEMO.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1ac8f05b-411a-463a-aed0-c6f530d5539b"),
+                            Id = new Guid("28e770a7-fe71-4fd9-a56d-3501ceb17569"),
                             LanguageCode = "hu"
                         },
                         new
                         {
-                            Id = new Guid("93c79d95-b09e-4659-81f5-0436cb3d2ca2"),
+                            Id = new Guid("89e27b24-8364-41fc-885c-3afd6d612b06"),
                             LanguageCode = "en"
                         });
                 });
@@ -314,15 +316,15 @@ namespace MEMO.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("cc47ee54-c583-47dd-9377-02e5e29d4359"),
-                            ConcurrencyStamp = "0f174be3-429a-4e06-a902-337face006a1",
+                            Id = new Guid("88d5ec6d-c087-4fb4-b52f-c5b12acd33df"),
+                            ConcurrencyStamp = "31158e61-1304-4db4-9725-abf724d564d1",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = new Guid("e10d43c0-d9e2-41c5-baba-7996907f3d39"),
-                            ConcurrencyStamp = "f0f1e01b-6bfe-4a16-be98-28aa6e8935bb",
+                            Id = new Guid("08f05fb0-104d-4d92-8618-261916434348"),
+                            ConcurrencyStamp = "8e74c581-31c1-4f0a-ba87-afc9fdc839ed",
                             Name = "User",
                             NormalizedName = "USER"
                         });

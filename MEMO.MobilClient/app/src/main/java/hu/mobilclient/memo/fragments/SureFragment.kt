@@ -32,6 +32,8 @@ class SureFragment(var Message: String = Constants.EMPTYSTRING,
         return binding.root
     }
 
+    fun cancelClick(view: View) = dismiss()
+
     fun okClick(view: View){
         OkCallback()
         dialog?.dismiss()

@@ -61,6 +61,14 @@ namespace MEMO.WebAPI.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Administrator,User")]
+        [HttpGet("viewers/{id}")]
+        public async Task<IEnumerable<UserDto>> GetViewersByUserIdAsync(Guid id)
+        {
+            return _mapper.Map<List<UserDto>>(await _service.GetViewersByUserIdAsync(id));
+        }
+
+
         private async Task<string> getAccessToken() => await HttpContext.GetTokenAsync("access_token");
     }
 }

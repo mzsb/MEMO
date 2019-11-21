@@ -45,7 +45,9 @@ namespace MEMO.BLL.Services
             foreach(var dictionary in dictionaries)
             {
                 dictionary.ViewerCount = dictionary.UserDictionaries.Count - 1;
-                dictionary.TranslationCount = dictionary.Translations.Count;
+                dictionary.TranslationCount = await _context.Translations
+                                                            .Where(t => t.DictionaryId == dictionary.Id)
+                                                            .CountAsync();
             }
 
             return dictionaries;
@@ -180,7 +182,6 @@ namespace MEMO.BLL.Services
                                                                   .ThenInclude(d => d.DictionaryLanguages)
                                                                   .ThenInclude(dl => dl.Language)
                                                                   .Include(ud => ud.Dictionary)
-                                                                  .ThenInclude(d => d.Translations)
                                                                   .AsNoTracking()
                                                                   .ToListAsync();
 
@@ -195,8 +196,8 @@ namespace MEMO.BLL.Services
                     if (!dictionary.UserDictionaries.Any(ud => ud.UserId == id && ud.Type == UserType.owner))
                     {
                         var viewerUserDictionary = dictionary.UserDictionaries
-                                                          .SingleOrDefault(ud => ud.UserId == id)
-                                                          ?? throw new EntityNotFoundException(typeof(UserDictionary));
+                                                             .SingleOrDefault(ud => ud.UserId == id)
+                                                             ?? throw new EntityNotFoundException(typeof(UserDictionary));
 
                         dictionary.UserDictionaries.Clear();
                         dictionary.UserDictionaries.Add(viewerUserDictionary);
@@ -214,12 +215,13 @@ namespace MEMO.BLL.Services
                                                                     .ToListAsync();
                     }
 
-                    dictionary.TranslationCount = dictionary.Translations.Count;
-                    dictionary.Translations.Clear();
+                    dictionary.TranslationCount = await _context.Translations
+                                                                .Where(t => t.DictionaryId == dictionary.Id)
+                                                                .CountAsync();
 
-                    dictionary.ViewerCount = _context.UserDictionaries
-                                                     .Where(ud => ud.DictionaryId == dictionary.Id)
-                                                     .Count() - 1;
+                    dictionary.ViewerCount = await _context.UserDictionaries
+                                                           .Where(ud => ud.DictionaryId == dictionary.Id)
+                                                           .CountAsync() - 1;
 
                     dictionaries.Add(dictionary);
                 }
@@ -234,7 +236,6 @@ namespace MEMO.BLL.Services
                                                           .ThenInclude(ud => ud.User)
                                                           .Include(d => d.DictionaryLanguages)
                                                           .ThenInclude(dl => dl.Language)
-                                                          .Include(d => d.Translations)
                                                           .Where(d => d.IsPublic)
                                                           .AsNoTracking()
                                                           .ToListAsync();
@@ -250,8 +251,9 @@ namespace MEMO.BLL.Services
                                                                               .ToList();
                 }
 
-                dictionary.TranslationCount = dictionary.Translations.Count;
-                dictionary.Translations.Clear();
+                dictionary.TranslationCount = await _context.Translations
+                                                            .Where(t => t.DictionaryId == dictionary.Id)
+                                                            .CountAsync();
             }
 
             return dictionaries;

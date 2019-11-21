@@ -110,9 +110,7 @@ class App : Application() {
                 @Throws(CertificateException::class)
                 override fun checkServerTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) = Unit
 
-                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
-                    return arrayOf()
-                }
+                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> = arrayOf()
             })
 
             val sslContext = SSLContext.getInstance("SSL")

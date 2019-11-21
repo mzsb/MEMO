@@ -23,7 +23,7 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
                       var MinParameterCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
                       var MaxParameterCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
                       var TotalAttributeCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                      var TotalParameterCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
+                      var TotalValueCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
                       var Type: String = App.instance.getString(R.string.all),
                       var All: ObservableBoolean = ObservableBoolean(false),
                       var SortByAttributeName: ObservableBoolean = ObservableBoolean(true),
@@ -33,13 +33,7 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
                       var IsDescending: ObservableBoolean = ObservableBoolean(true)){
 
     @Transient
-    var allAttributes = ArrayList<Attribute>()
-    @Transient
-    var ownAttributes = ArrayList<Attribute>()
-    @Transient
     var useFilter: () -> Unit = { throw NotImplementedError() }
-    @Transient
-    var setAllAttributes: (dictionaries: List<Attribute>) -> Unit = { throw NotImplementedError() }
     @Transient
     val types = ArrayList<String>()
     @Transient
@@ -96,10 +90,6 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
     fun onAllChanged(buttonView: CompoundButton, isChecked: Boolean) {
         All.set(isChecked)
 
-        setAllAttributes(when {
-            All.get() -> allAttributes
-            else -> ownAttributes
-        })
         useFilter()
     }
 
@@ -194,14 +184,14 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
         TotalAttributeCount.set((attributes.count() - 1).toString())
     }
 
-    fun setTotalParameterCount(attributes: List<Attribute>){
-        var totalParameterCount = 0
+    fun setTotalValueCount(attributes: List<Attribute>){
+        var totalValueCount = 0
 
         for(attribute in attributes){
-            totalParameterCount += attribute.AttributeParameters.size
+            totalValueCount += attribute.AttributeValuesCount
         }
 
-        TotalParameterCount.set(totalParameterCount.toString())
+        TotalValueCount.set(totalValueCount.toString())
     }
 
 }

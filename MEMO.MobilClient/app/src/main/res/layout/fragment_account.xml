@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout">
 
     <data>
@@ -9,128 +10,325 @@
             type="hu.mobilclient.memo.fragments.AccountFragment" />
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/primary_light">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="5dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/primary"
-                android:textSize="60sp"
-                android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
-                android:text="@{fragment.user.userName}"/>
-
-            <EditText
-                android:id="@+id/fg_account_et_user_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/BlueEditText"
-                android:textSize="60sp"
-                android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
-                android:text="@={fragment.user.userName}"/>
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:onClick="@{fragment.updateUserNameClick}"
-                android:src="@drawable/ic_update_48dp"
-                android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
-                android:layout_gravity="top"/>
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:onClick="@{fragment.updateUserNameCancelClick}"
-                android:src="@drawable/ic_cancel_accent_24dp"
-                android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
-                android:layout_gravity="top"/>
-
-        </LinearLayout>
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="5dp"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:background="@drawable/bg_rounded_white_3"
+            android:layout_margin="10dp"
+            android:padding="10dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/primary"
-                android:textSize="40sp"
-                android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
-                android:text="@{fragment.user.email}"/>
+                android:weightSum="10"
+                android:orientation="horizontal"
+                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
-            <EditText
-                android:id="@+id/fg_account_et_email"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="50sp"
+                    android:layout_weight="9"
+                    android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
+                    android:text="@{fragment.user.userName}"/>
+
+                <EditText
+                    android:id="@+id/fg_account_et_user_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    style="@style/BlueEditText"
+                    android:textSize="50sp"
+                    android:layout_weight="9"
+                    android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
+                    android:text="@={fragment.user.userName}"/>
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:onClick="@{fragment::updateUserNameClick}"
+                    android:src="@drawable/ic_update_48dp"
+                    android:layout_weight="9"
+                    android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
+                    android:layout_gravity="top"/>
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:onClick="@{fragment::updateUserNameCancelClick}"
+                    android:src="@drawable/ic_cancel_accent_24dp"
+                    android:layout_weight="9"
+                    android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
+                    android:layout_gravity="top"/>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/BlueEditText"
-                android:textSize="40sp"
-                android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
-                android:text="@={fragment.user.email}"/>
+                android:weightSum="10"
+                android:layout_marginStart="5dp"
+                android:orientation="horizontal"
+                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:onClick="@{fragment.updateEmailClick}"
-                android:src="@drawable/ic_update_48dp"
-                android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
-                android:layout_gravity="top"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="9"
+                    android:textColor="@color/primary"
+                    android:textSize="30sp"
+                    android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
+                    android:text="@{fragment.user.email}"/>
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:onClick="@{fragment.updateEmailCancelClick}"
-                android:src="@drawable/ic_cancel_accent_24dp"
-                android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
-                android:layout_gravity="top"/>
+                <EditText
+                    android:id="@+id/fg_account_et_email"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="9"
+                    style="@style/BlueEditText"
+                    android:textSize="30sp"
+                    android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
+                    android:text="@={fragment.user.email}"/>
 
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:onClick="@{fragment::updateEmailClick}"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_update_48dp"
+                    android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
+                    android:layout_gravity="top"/>
 
-        <com.google.android.material.button.MaterialButton style="@style/AppButtonBlue"
-            android:id="@+id/ac_login_btn_login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_gravity="end"
-            android:onClick="@{fragment.updateClick}"
-            android:text="@string/save"
-            android:visibility="@{fragment.isUpdateEmail | fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"/>
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:onClick="@{fragment::updateEmailCancelClick}"
+                    android:src="@drawable/ic_cancel_accent_24dp"
+                    android:layout_weight="1"
+                    android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
+                    android:layout_gravity="top"/>
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fg_account_rv_attribute_list"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"/>
+                android:layout_marginBottom="10dp">
 
-            <ProgressBar
-                android:id="@+id/fg_account_list_pb"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                android:indeterminateTint="@color/accent"
-                android:indeterminateTintMode="src_in"/>
+                <com.google.android.material.button.MaterialButton style="@style/AppButtonBlue"
+                    android:id="@+id/ac_account_bt_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7dp"
+                    android:layout_gravity="end"
+                    android:onClick="@{fragment::updateClick}"
+                    android:text="@string/save"
+                    android:visibility="@{fragment.isUpdateEmail | fragment.isUpdateUserName | fragment.IsDelete ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
-    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="@string/account_delete"
+                        android:layout_marginEnd="5dp"
+                        android:textColor="@color/primary"
+                        android:textSize="20sp"/>
+
+                    <Switch
+                        android:theme="@style/AccentSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:checked="@={fragment.IsDelete}" />
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="5dp"
+                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="25sp"
+                    android:text="@{@string/dictionaries_dd + ` `}"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="25sp"
+                    android:layout_gravity="start"
+                    android:text="@{fragment.user.dictionaryCount + ` + ` + fragment.user.viewedDictionaryCount}"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="5dp"
+                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="25sp"
+                    android:text="@{@string/translations_dd + ` `}"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="25sp"
+                    android:layout_gravity="start"
+                    android:text="@{fragment.user.translationCount}"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fg_account_ll_users"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/primary"
+                    android:gravity="center"
+                    android:textSize="25sp"
+                    android:text="@string/users"/>
+
+                <ImageView
+                    android:id="@+id/fg_account_iv_user_list_hider"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:src="@drawable/ic_drop_down_24dp"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/fg_account_rl_user_list_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"
+                android:background="@drawable/bg_rounded_blue_3">
+
+                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_rounded_white_4"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/fg_account_rv_user_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
+
+                    <ProgressBar
+                        android:id="@+id/fg_account_user_list_pb"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@color/accent"
+                        android:indeterminateTintMode="src_in"
+                        android:scrollbarSize="4dp"
+                        android:scrollbarStyle="outsideInset" />
+
+                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/fg_account_ll_attributes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="-5dp"
+                android:layout_marginStart="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/primary"
+                    android:gravity="center"
+                    android:textSize="25sp"
+                    android:text="@string/attributes"/>
+
+                <ImageView
+                    android:id="@+id/fg_account_iv_attribute_list_hider"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:src="@drawable/ic_drop_down_24dp"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/fg_account_rl_attribute_list_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:visibility="gone"
+                android:background="@drawable/bg_rounded_blue_3">
+
+                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_rounded_white_4"
+                    android:paddingTop="7dp"
+                    android:paddingBottom="7dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/fg_account_rv_attribute_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
+
+                    <ProgressBar
+                        android:id="@+id/fg_account_attribute_list_pb"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@color/accent"
+                        android:indeterminateTintMode="src_in"
+                        android:scrollbarSize="4dp"
+                        android:scrollbarStyle="outsideInset" />
+
+                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </layout>

@@ -18,26 +18,36 @@ import hu.mobilclient.memo.databinding.DictionaryFilterMenuBinding
 import hu.mobilclient.memo.databinding.DictionaryListItemBinding
 import hu.mobilclient.memo.filters.DictionaryFilter
 import hu.mobilclient.memo.helpers.Constants
+import hu.mobilclient.memo.helpers.EmotionToast
+import hu.mobilclient.memo.managers.ServiceManager
 import hu.mobilclient.memo.model.Dictionary
 import hu.mobilclient.memo.model.Language
 import kotlinx.android.synthetic.main.dictionary_filter_content.view.*
 import kotlinx.android.synthetic.main.dictionary_filter_menu.view.*
 import kotlinx.android.synthetic.main.dictionary_list_item.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
-class DictionaryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    lateinit var serviceManager: ServiceManager
+    lateinit var userId: UUID
 
     private val TYPE_FILTER = 0
     private val TYPE_DICTIONARY = 1
 
     private val filterPosition = Constants.ZERO
 
-    private val allDictionaries = ArrayList<Dictionary>()
     private val displayedDictionaries = ArrayList<Dictionary>()
+    private val allDictionaries = ArrayList<Dictionary>()
+    private val publicDictionaries = ArrayList<Dictionary>()
+    private val ownDictionaries = ArrayList<Dictionary>()
+
     private var dictionaryFilter = DictionaryFilter.loadFilter()
 
-    var itemClickListener: OnDictionaryClickedListener? = null
-    var itemLongClickListener: OnDictionaryClickedListener? = null
+    lateinit var itemClickListener: OnDictionaryClickedListener
+    lateinit var itemLongClickListener: OnDictionaryClickedListener
 
     private val filterOpen: Animation = AnimationUtils.loadAnimation(App.instance, R.anim.filter_open)
     private val searchOpen: Animation = AnimationUtils.loadAnimation(App.instance, R.anim.search_open)
@@ -102,8 +112,8 @@ class DictionaryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     }
 
                     itemView.setOnClickListener {
-                        itemClickListener?.onDictionaryClicked(dictionary, position)
-                        itemLongClickListener?.onDictionaryLongClicked(dictionary)
+                        itemClickListener.onDictionaryClicked(dictionary, position)
+                        itemLongClickListener.onDictionaryLongClicked(dictionary)
                     }
                 }
             }
@@ -206,47 +216,87 @@ class DictionaryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     private fun useFilter(){
-        setDictionaries(allDictionaries)
+        initializeAdapter(beforeInit,afterInit)
     }
 
     override fun getItemCount(): Int = displayedDictionaries.size
 
-    fun initializeAdapter(ownDictionaries: List<Dictionary>,
-                          publicDictionaries: List<Dictionary>,
-                          allDictionaries: List<Dictionary>,
-                          languages: List<Language>){
+    private var beforeInit = {}
+    private var afterInit = {}
 
-        dictionaryFilter.ownDictionaries.clear()
-        dictionaryFilter.publicDictionaries.clear()
-        dictionaryFilter.allDictionaries.clear()
-
-        dictionaryFilter.ownDictionaries.addAll(0, ownDictionaries)
-        dictionaryFilter.publicDictionaries.addAll(0, publicDictionaries)
-        dictionaryFilter.allDictionaries.addAll(0, allDictionaries)
-        dictionaryFilter.setAllDictionaries = ::setAllDictionaries
+    fun initializeAdapter(beforeInit: ()-> Unit, afterInit: ()->Unit){
+        this.beforeInit = beforeInit
+        this.afterInit = afterInit
         dictionaryFilter.useFilter = ::useFilter
-        setLanguages(languages)
-        setDictionaries(isFirstDictionarySet = true)
-    }
-
-    private fun setDictionaries(dictionaries: List<Dictionary> = ArrayList(), isFirstDictionarySet: Boolean = false ) {
-        if(isFirstDictionarySet){
-            allDictionaries.clear()
-            allDictionaries.addAll(0, when {
-                dictionaryFilter.All.get() -> dictionaryFilter.allDictionaries
-                dictionaryFilter.OnlyOwn.get() -> dictionaryFilter.ownDictionaries
-                else -> dictionaryFilter.publicDictionaries
+        if(!dictionaryFilter.sourceLanguages.any()){
+            serviceManager.language?.get({languages ->
+                setLanguages(languages)
             })
         }
+        when {
+            dictionaryFilter.All.get() ->
+                if(!allDictionaries.any()){
+                    beforeInit()
+                    serviceManager.dictionary?.get({allDictionaries ->
+                        this.allDictionaries.addAll(allDictionaries)
+                        setDictionaries(allDictionaries)
+                        ownDictionaries.clear()
+                        publicDictionaries.clear()
+                        afterInit()
+                    },{
+                        EmotionToast.showSad(App.instance.getString(R.string.unable_load_all_dictionaries))
+                    })
+                }
+                else{
+                    setDictionaries(allDictionaries)
+                }
+            dictionaryFilter.OnlyOwn.get() ->
+                if(!ownDictionaries.any()){
+                    beforeInit()
+                    serviceManager.dictionary?.getByUserId(userId,{ ownDictionaries ->
+                        this.ownDictionaries.addAll(ownDictionaries)
+                        setDictionaries(ownDictionaries)
+                        allDictionaries.clear()
+                        publicDictionaries.clear()
+                        afterInit()
+                    },{
+                        EmotionToast.showSad(App.instance.getString(R.string.unable_load_own_dictionaries))
+                    })
+            }
+            else{
+                setDictionaries(ownDictionaries)
+            }
+            !dictionaryFilter.OnlyOwn.get() ->
+                if(!publicDictionaries.any()){
+                    beforeInit()
+                    serviceManager.dictionary?.getPublic(userId,{ publicDictionaries ->
+                        this.publicDictionaries.addAll(publicDictionaries)
+                        setDictionaries(publicDictionaries)
+                        ownDictionaries.clear()
+                        allDictionaries.clear()
+                        afterInit()
+                    },{
+                        EmotionToast.showSad(App.instance.getString(R.string.unable_load_public_dictionaries))
+                    })
+                }
+                else{
+                    setDictionaries(publicDictionaries)
+                }
+        }
+    }
+
+    private fun setDictionaries(dictionaries: List<Dictionary>) {
         displayedDictionaries.clear()
-        displayedDictionaries.addAll(0, dictionaryFilter.filter(if(isFirstDictionarySet) allDictionaries else dictionaries))
+        displayedDictionaries.addAll(0, dictionaryFilter.filter(dictionaries))
         displayedDictionaries.add(filterPosition, Dictionary())
         notifyDataSetChanged()
     }
 
-    private fun setAllDictionaries(dictionaries: List<Dictionary>) {
+    fun reset(){
+        publicDictionaries.clear()
+        ownDictionaries.clear()
         allDictionaries.clear()
-        allDictionaries.addAll(0, dictionaries)
+        dictionaryFilter.sourceLanguages.clear()
     }
 
     private fun setLanguages(languages: List<Language>) {

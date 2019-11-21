@@ -24,25 +24,32 @@ import hu.mobilclient.memo.databinding.AttributeFilterMenuBinding
 import hu.mobilclient.memo.databinding.AttributeListItemBinding
 import hu.mobilclient.memo.filters.AttributeFilter
 import hu.mobilclient.memo.helpers.Constants
+import hu.mobilclient.memo.helpers.EmotionToast
+import hu.mobilclient.memo.managers.ServiceManager
 import hu.mobilclient.memo.model.Attribute
+import hu.mobilclient.memo.model.Dictionary
 import kotlinx.android.synthetic.main.attribute_filter_content.view.*
 import kotlinx.android.synthetic.main.attribute_filter_menu.view.*
 import kotlinx.android.synthetic.main.attribute_list_item.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    lateinit var serviceManager: ServiceManager
+    lateinit var userId: UUID
 
     private val TYPE_FILTER = 0
     private val TYPE_ATTRIBUTE = 1
 
     private val filterPosition = Constants.ZERO
 
-    private val allAttributes = ArrayList<Attribute>()
     private val displayedAttributes = ArrayList<Attribute>()
+    private val allAttributes = ArrayList<Attribute>()
+    private val ownAttributes = ArrayList<Attribute>()
     private var attributeFilter = AttributeFilter.loadFilter()
 
-    /* LATEINIT */
-
-    var itemLongClickListener: OnAttributeClickedListener? = null
+    lateinit var itemLongClickListener: OnAttributeClickedListener
 
     private val filterOpen: Animation = AnimationUtils.loadAnimation(App.instance, R.anim.filter_open)
     private val searchOpen: Animation = AnimationUtils.loadAnimation(App.instance, R.anim.search_open)
@@ -56,7 +63,7 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 val binding: AttributeListItemBinding = DataBindingUtil.inflate(
                         LayoutInflater.from(parent.context), R.layout.attribute_list_item, parent, false)
 
-                DictionaryViewHolder(binding.root, binding)
+                AttributeViewHolder(binding.root, binding)
             }
             TYPE_FILTER ->{
                 val binding: AttributeFilterMenuBinding = DataBindingUtil.inflate(
@@ -80,7 +87,7 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         when(holder.itemViewType) {
             TYPE_ATTRIBUTE -> {
-                if(holder is DictionaryViewHolder) {
+                if(holder is AttributeViewHolder) {
 
                     val attribute = displayedAttributes[position]
 
@@ -124,7 +131,7 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     }
 
                     itemView.setOnClickListener {
-                        itemLongClickListener?.onAttributeLongClicked(attribute)
+                        itemLongClickListener.onAttributeLongClicked(attribute)
                     }
                 }
             }
@@ -135,7 +142,7 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
                     attributeFilter.setTypes()
                     attributeFilter.setTotalAttributeCount(displayedAttributes)
-                    attributeFilter.setTotalParameterCount(displayedAttributes)
+                    attributeFilter.setTotalValueCount(displayedAttributes)
 
                     val filterMenuSearchButton = itemView.fg_account_attribute_filter_menu_iv_search
                     val filterMenuFilterButton = itemView.fg_account_attribute_filter_menu_iv_filter
@@ -216,45 +223,65 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     private fun useFilter(){
-        setAttributes(allAttributes)
+        initializeAdapter(beforeInit,afterInit)
     }
 
     override fun getItemCount(): Int = displayedAttributes.size
 
-    fun initializeAdapter(ownAttributes: List<Attribute>,
-                          allAttributes: List<Attribute>){
+    private var beforeInit = {}
+    private var afterInit = {}
 
-        attributeFilter.ownAttributes.clear()
-        attributeFilter.allAttributes.clear()
-
-        attributeFilter.ownAttributes.addAll(0, ownAttributes)
-        attributeFilter.allAttributes.addAll(0, allAttributes)
-        attributeFilter.setAllAttributes = ::setAllAttributes
+    fun initializeAdapter(beforeInit: ()-> Unit, afterInit: ()->Unit){
+        this.beforeInit = beforeInit
+        this.afterInit = afterInit
         attributeFilter.useFilter = ::useFilter
-
-        setAttributes(isFirstAttributeSet = true)
+        when {
+            attributeFilter.All.get() ->
+                if(!allAttributes.any()){
+                    beforeInit()
+                    serviceManager.attribute?.get({allAttributes ->
+                        this.allAttributes.addAll(allAttributes)
+                        setAttributes(allAttributes)
+                        ownAttributes.clear()
+                        afterInit()
+                    },{
+                        EmotionToast.showSad(App.instance.getString(R.string.unable_load_all_attributes))
+                    })
+                }
+                else{
+                    setAttributes(allAttributes)
+                }
+            !attributeFilter.All.get() ->
+                if(!ownAttributes.any()){
+                    beforeInit()
+                    serviceManager.attribute?.getByUserId(userId,{ ownAttributes ->
+                        this.ownAttributes.addAll(ownAttributes)
+                        setAttributes(ownAttributes)
+                        allAttributes.clear()
+                        afterInit()
+                    },{
+                        EmotionToast.showSad(App.instance.getString(R.string.unable_load_own_attributes))
+                    })
+                }
+                else{
+                    setAttributes(ownAttributes)
+                }
+        }
     }
 
-    private fun setAttributes(attributes: List<Attribute> = ArrayList(), isFirstAttributeSet: Boolean = false ) {
-        if(isFirstAttributeSet){
-            allAttributes.clear()
-            allAttributes.addAll(0, when {
-                attributeFilter.All.get() -> attributeFilter.allAttributes
-                else -> attributeFilter.ownAttributes
-            })
-        }
+    private fun setAttributes(attributes: List<Attribute>) {
         displayedAttributes.clear()
-        displayedAttributes.addAll(0, attributeFilter.filter(if(isFirstAttributeSet) allAttributes else attributes))
+        displayedAttributes.addAll(0, attributeFilter.filter(attributes))
         displayedAttributes.add(filterPosition, Attribute())
         notifyDataSetChanged()
     }
 
-    private fun setAllAttributes(attributes: List<Attribute>) {
+    fun reset(){
+        ownAttributes.clear()
         allAttributes.clear()
-        allAttributes.addAll(0, attributes)
     }
 
-    inner class DictionaryViewHolder(itemView: View, val binding: AttributeListItemBinding, var parametersVisibility : Boolean = false) : RecyclerView.ViewHolder(itemView)
+    inner class AttributeViewHolder(itemView: View, val binding: AttributeListItemBinding, var parametersVisibility : Boolean = false) : RecyclerView.ViewHolder(itemView)
 
     inner class FilterViewHolder(itemView: View, val binding: AttributeFilterMenuBinding): RecyclerView.ViewHolder(itemView)
 

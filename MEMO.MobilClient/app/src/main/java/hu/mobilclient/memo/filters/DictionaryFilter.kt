@@ -13,6 +13,9 @@ import hu.mobilclient.memo.R
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
 import hu.mobilclient.memo.model.Dictionary
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
@@ -36,15 +39,7 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
                        var IsDescending: ObservableBoolean = ObservableBoolean(true)){
 
     @Transient
-    var allDictionaries = ArrayList<Dictionary>()
-    @Transient
-    var publicDictionaries = ArrayList<Dictionary>()
-    @Transient
-    var ownDictionaries = ArrayList<Dictionary>()
-    @Transient
     var useFilter: () -> Unit = { throw NotImplementedError() }
-    @Transient
-    var setAllDictionaries: (dictionaries: List<Dictionary>) -> Unit = { throw NotImplementedError() }
     @Transient
     val sourceLanguages = ArrayList<String>()
     @Transient
@@ -111,21 +106,12 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
     fun onOnlyOwnChanged(buttonView: CompoundButton, isChecked: Boolean) {
         OnlyOwn.set(isChecked)
 
-        setAllDictionaries(when {
-            OnlyOwn.get() -> ownDictionaries
-            else -> publicDictionaries
-        })
         useFilter()
     }
 
     fun onAllChanged(buttonView: CompoundButton, isChecked: Boolean) {
         All.set(isChecked)
 
-        setAllDictionaries(when {
-            All.get() -> allDictionaries
-            OnlyOwn.get() -> ownDictionaries
-            else -> publicDictionaries
-        })
         useFilter()
     }
 
@@ -216,14 +202,19 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
         return sortAndPrivate(filteredDictionaries)
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun sortAndPrivate(dictionaries: List<Dictionary>): List<Dictionary>{
         var sortedDictionaries = dictionaries
+
+        val dateFormat = SimpleDateFormat(App.instance.getString(R.string.date_format))
+
         if(OnlyPrivate.get()) {
             sortedDictionaries = sortedDictionaries.filter { !it.IsPublic }
         }
+
         if(SortByDate.get()) {
-            sortedDictionaries = if(IsDescending.get()) sortedDictionaries.sortedByDescending { it.CreationDate }
-                                                    else sortedDictionaries.sortedBy { it.CreationDate }
+            sortedDictionaries = if(IsDescending.get()) sortedDictionaries.sortedByDescending { dateFormat.parse(it.CreationDate) }
+                                                    else sortedDictionaries.sortedBy { dateFormat.parse(it.CreationDate) }
         }
         if(SortByDictionaryName.get()) {
             sortedDictionaries = if(IsDescending.get()) sortedDictionaries.sortedByDescending { it.Name }

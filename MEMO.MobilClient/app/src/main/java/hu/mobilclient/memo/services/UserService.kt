@@ -82,4 +82,23 @@ class UserService(activity: Activity, private val errorCallback: (String) -> Uni
                 },
                 onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
                 checkError = checkError)
+
+    fun getViewersByUserId(id: UUID,
+                           callback: (List<User>) -> Unit,
+                           errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                           checkError: Boolean = false) =
+                    createRequest(
+                            request = apiService::getViewersByUserId,
+                            requestParameter = id,
+                            onSuccess =
+                            fun (response: Response<List<User>>) {
+                                if (response.isSuccessful && response.code() == 200) {
+                                    callback(response.body()
+                                            ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
+                                } else {
+                                    errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
+                                }
+                            },
+                            onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                            checkError = checkError)
 }
