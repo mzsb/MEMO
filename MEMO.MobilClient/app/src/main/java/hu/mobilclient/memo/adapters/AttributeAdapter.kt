@@ -26,8 +26,7 @@ import hu.mobilclient.memo.filters.AttributeFilter
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.managers.ServiceManager
-import hu.mobilclient.memo.model.Attribute
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.memoapi.Attribute
 import kotlinx.android.synthetic.main.attribute_filter_content.view.*
 import kotlinx.android.synthetic.main.attribute_filter_menu.view.*
 import kotlinx.android.synthetic.main.attribute_list_item.view.*
@@ -97,12 +96,13 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     val parametersLinearLayout = itemView.fg_account_attribute_list_item_ll_parameter_holder
                     val parametersHiderButton = itemView.fg_account_attribute_list_item_iv_parameters_hider
 
+                    parametersLinearLayout.removeAllViews()
+
                     if(parametersLinearLayout.childCount < attribute.AttributeParameters.size) {
                         for (parameter in attribute.AttributeParameters) {
                             val parameterTextView = TextView(App.instance)
                             parameterTextView.text = parameter.Value
                             parameterTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
-                            parameterTextView.typeface = ResourcesCompat.getFont(App.instance, R.font.aldrich)
                             parameterTextView.setTextColor(ContextCompat.getColor(App.instance, R.color.primary_light))
                             val params = LinearLayout.LayoutParams(
                                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -130,7 +130,7 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         parametersLinearLayout.visibility = if (holder.parametersVisibility) View.VISIBLE else View.GONE
                     }
 
-                    itemView.setOnClickListener {
+                    itemView.setOnLongClickListener {
                         itemLongClickListener.onAttributeLongClicked(attribute)
                     }
                 }
@@ -230,22 +230,27 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var beforeInit = {}
     private var afterInit = {}
+    private var onError = {}
 
-    fun initializeAdapter(beforeInit: ()-> Unit, afterInit: ()->Unit){
+    fun initializeAdapter(beforeInit: ()-> Unit = this.beforeInit,
+                          afterInit: ()->Unit = this.afterInit,
+                          onError: ()->Unit = this.onError){
         this.beforeInit = beforeInit
         this.afterInit = afterInit
         attributeFilter.useFilter = ::useFilter
+        reset()
         when {
             attributeFilter.All.get() ->
                 if(!allAttributes.any()){
                     beforeInit()
-                    serviceManager.attribute?.get({allAttributes ->
+                    serviceManager.attribute.get({allAttributes ->
                         this.allAttributes.addAll(allAttributes)
                         setAttributes(allAttributes)
                         ownAttributes.clear()
                         afterInit()
                     },{
                         EmotionToast.showSad(App.instance.getString(R.string.unable_load_all_attributes))
+                        onError()
                     })
                 }
                 else{
@@ -254,13 +259,14 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             !attributeFilter.All.get() ->
                 if(!ownAttributes.any()){
                     beforeInit()
-                    serviceManager.attribute?.getByUserId(userId,{ ownAttributes ->
+                    serviceManager.attribute.getByUserId(userId,{ ownAttributes ->
                         this.ownAttributes.addAll(ownAttributes)
                         setAttributes(ownAttributes)
                         allAttributes.clear()
                         afterInit()
                     },{
                         EmotionToast.showSad(App.instance.getString(R.string.unable_load_own_attributes))
+                        onError()
                     })
                 }
                 else{
@@ -276,7 +282,7 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun reset(){
+    private fun reset(){
         ownAttributes.clear()
         allAttributes.clear()
     }
@@ -286,6 +292,6 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class FilterViewHolder(itemView: View, val binding: AttributeFilterMenuBinding): RecyclerView.ViewHolder(itemView)
 
     interface OnAttributeClickedListener {
-        fun onAttributeLongClicked(attribute: Attribute)
+        fun onAttributeLongClicked(attribute: Attribute): Boolean
     }
 }

@@ -43,7 +43,6 @@ namespace MEMO.BLL.Services
 
                 foreach (var userDictionary in await _context.UserDictionaries
                                                              .Include(ud => ud.Dictionary)
-                                                             .ThenInclude(d => d.Translations)
                                                              .AsNoTracking()
                                                              .Where(ud => ud.UserId == user.Id)
                                                              .ToListAsync())
@@ -51,7 +50,9 @@ namespace MEMO.BLL.Services
                     if (userDictionary.Type == UserType.owner)
                     {
                         user.DictionaryCount++;
-                        user.TranslationCount += userDictionary.Dictionary.Translations.Count;
+                        user.TranslationCount += await _context.Translations
+                                                               .Where(t => t.Id == userDictionary.DictionaryId)
+                                                               .CountAsync();
                     }
                     else
                     {
@@ -76,7 +77,6 @@ namespace MEMO.BLL.Services
 
             foreach (var userDictionary in await _context.UserDictionaries
                                                          .Include(ud => ud.Dictionary)
-                                                         .ThenInclude(d => d.Translations)
                                                          .AsNoTracking()
                                                          .Where(ud => ud.UserId == user.Id)
                                                          .ToListAsync())
@@ -84,7 +84,9 @@ namespace MEMO.BLL.Services
                 if(userDictionary.Type == UserType.owner)
                 {
                     user.DictionaryCount++;
-                    user.TranslationCount += userDictionary.Dictionary.Translations.Count;
+                    user.TranslationCount += await _context.Translations
+                                                           .Where(t => t.Id == userDictionary.DictionaryId)
+                                                           .CountAsync();
                 }
                 else
                 {
@@ -189,7 +191,6 @@ namespace MEMO.BLL.Services
 
                 foreach (var userDictionary in await _context.UserDictionaries
                                                              .Include(ud => ud.Dictionary)
-                                                             .ThenInclude(d => d.Translations)
                                                              .AsNoTracking()
                                                              .Where(ud => ud.UserId == user.Id)
                                                              .ToListAsync())
@@ -197,7 +198,9 @@ namespace MEMO.BLL.Services
                     if (userDictionary.Type == UserType.owner)
                     {
                         user.DictionaryCount++;
-                        user.TranslationCount += userDictionary.Dictionary.Translations.Count;
+                        user.TranslationCount += await _context.Translations
+                                                               .Where(t => t.DictionaryId == userDictionary.DictionaryId)
+                                                               .CountAsync();
                     }
                     else
                     {

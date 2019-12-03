@@ -67,7 +67,14 @@ namespace MEMO.BLL.Services
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "User");
+                    if (user.Email.Contains("admin@"))
+                    {
+                        await _userManager.AddToRoleAsync(user, "Administrator");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "User");
+                    }
 
                     user.Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 

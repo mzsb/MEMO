@@ -6,6 +6,6 @@ namespace MEMO.DTO.Interfaces
 {
     public interface IAuditable
     {
-        String CreationDate { get; set; }
+        string CreationDate { get; set; }
     }
 }

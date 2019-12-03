@@ -4,9 +4,9 @@ import android.app.Activity
 import hu.mobilclient.memo.App
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
-import hu.mobilclient.memo.model.Login
-import hu.mobilclient.memo.model.Registration
-import hu.mobilclient.memo.model.TokenHolder
+import hu.mobilclient.memo.model.authentication.Login
+import hu.mobilclient.memo.model.authentication.Registration
+import hu.mobilclient.memo.model.authentication.TokenHolder
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 
@@ -30,7 +30,7 @@ class AuthenticationService(activity: Activity, private val errorCallback: (Stri
                     errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                 }
             },
-            onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+            onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
             checkError = checkError)
 
     fun autoLogin(token: String,
@@ -49,7 +49,7 @@ class AuthenticationService(activity: Activity, private val errorCallback: (Stri
                     errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                 }
             },
-            onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+            onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
             checkError = checkError)
 
     fun registration(registration: Registration,
@@ -70,6 +70,6 @@ class AuthenticationService(activity: Activity, private val errorCallback: (Stri
                     errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                 }
             },
-            onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+            onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
             checkError = checkError)
 }

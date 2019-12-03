@@ -8,8 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace MEMO.BLL.Services
 {
@@ -19,6 +21,7 @@ namespace MEMO.BLL.Services
 
         private readonly MEMOContext _context;
         private readonly AuthorizationManager _authorizationManager;
+        private WebClient _webClient = new WebClient { Encoding = System.Text.Encoding.UTF8 };
 
         public TranslationService(MEMOContext context,
                                  AuthorizationManager authorizationManager)
@@ -29,10 +32,19 @@ namespace MEMO.BLL.Services
 
         public async Task<IEnumerable<Translation>> GetAsync()
         {
-            return await _context.Translations.Include(t => t.AttributeValues)
-                                              .ThenInclude(av => av.Attribute)
-                                              .AsNoTracking()
-                                              .ToListAsync();
+            var translations =  await _context.Translations.Include(t => t.AttributeValues)
+                                                           .ThenInclude(av => av.Attribute)
+                                                           .AsNoTracking()
+                                                           .ToListAsync();
+
+            foreach(var translation in translations)
+            {
+                translation.AttributeValueCount = await _context.AttributeValues
+                                                                .Where(av => av.TranslationId == translation.Id)
+                                                                .CountAsync();
+            }
+
+            return translations;
         }
 
         public async Task<Translation> GetByIdAsync(Guid id)
@@ -149,12 +161,37 @@ namespace MEMO.BLL.Services
 
         public async Task<IEnumerable<Translation>> GetByDictionaryIdAsync(Guid id)
         {
-            return await _context.Translations.Where(t => t.DictionaryId == id)
-                                            .Include(t => t.AttributeValues)
-                                            .ThenInclude(av => av.Attribute)
-                                            .ThenInclude(md => md.AttributeParameters)
-                                            .AsNoTracking()
-                                            .ToListAsync();
+            var translations = await _context.Translations
+                                             .Where(t => t.DictionaryId == id)
+                                             .Include(t => t.AttributeValues)
+                                             .ThenInclude(av => av.Attribute)
+                                             .ThenInclude(md => md.AttributeParameters)
+                                             .AsNoTracking()
+                                             .ToListAsync();
+
+            foreach (var translation in translations)
+            {
+                translation.AttributeValueCount = await _context.AttributeValues
+                                                                .Where(av => av.TranslationId == translation.Id)
+                                                                .CountAsync();
+            }
+
+            return translations;
+        }
+
+        public async Task<Translation> TranslateAsync(string original, string from, string to)
+        {
+            string url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={from.ToLower()}&tl={to.ToLower()}&dt=t&q={HttpUtility.UrlEncode(original)}";
+
+            try
+            {
+                var result = await _webClient.DownloadStringTaskAsync(url);
+                return new Translation { Original = original, Translated = result.Substring(4, result.IndexOf("\"", 4, StringComparison.Ordinal) - 4) };
+            }
+            catch
+            {
+                throw new TranslationException();
+            }
         }
     }
 }

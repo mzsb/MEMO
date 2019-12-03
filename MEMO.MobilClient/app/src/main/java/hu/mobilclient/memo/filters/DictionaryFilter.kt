@@ -1,6 +1,7 @@
 package hu.mobilclient.memo.filters
 
 import android.annotation.SuppressLint
+import android.text.Editable
 import android.view.View
 import android.widget.AdapterView
 import android.widget.CompoundButton
@@ -12,26 +13,25 @@ import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.memoapi.Dictionary
 import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 
-class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                       var UserName: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                       var MinTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                       var MaxTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                       var MinViewerCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                       var MaxViewerCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
+class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                       var UserName: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                       var MinTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                       var MaxTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                       var MinViewerCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                       var MaxViewerCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
                        var SourceLanguage: String = App.instance.getString(R.string.source),
                        var DestinationLanguage: String = App.instance.getString(R.string.destination),
-                       var TotalDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                       var TotalTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
+                       var TotalDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                       var TotalTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
                        var OnlyOwn: ObservableBoolean = ObservableBoolean(true),
                        var All: ObservableBoolean = ObservableBoolean(false),
                        var OnlyPrivate: ObservableBoolean = ObservableBoolean(false),
-                       var SortByDictionaryName: ObservableBoolean = ObservableBoolean(true),
+                       var SortByDictionaryName: ObservableBoolean = ObservableBoolean(false),
                        var SortByTranslation: ObservableBoolean = ObservableBoolean(false),
                        var SortByDate: ObservableBoolean = ObservableBoolean(true),
                        var SortByUserName: ObservableBoolean = ObservableBoolean(false),
@@ -59,26 +59,26 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
     companion object{
         fun loadFilter() : DictionaryFilter{
             return Gson().fromJson<DictionaryFilter>(App.instance.getSharedPreferences(Constants.FILTER, 0)
-                         .getString(Constants.DICTIONARYFILTER, null), DictionaryFilter::class.java) ?: DictionaryFilter()
+                         .getString(Constants.DICTIONARY_FILTER, null), DictionaryFilter::class.java) ?: DictionaryFilter()
         }
 
         fun clearFilter(){
             App.instance.getSharedPreferences(Constants.FILTER, 0).edit()
-                        .putString(Constants.DICTIONARYFILTER, "")
+                        .putString(Constants.DICTIONARY_FILTER, "")
                         .apply()
         }
     }
 
     fun resetSearch(){
-        DictionaryName.set(Constants.EMPTYSTRING)
-        UserName.set(Constants.EMPTYSTRING)
+        DictionaryName.set(Constants.EMPTY_STRING)
+        UserName.set(Constants.EMPTY_STRING)
     }
 
     fun resetFilter(){
-        MinTranslationCount.set(Constants.EMPTYSTRING)
-        MaxTranslationCount.set(Constants.EMPTYSTRING)
-        MinViewerCount.set(Constants.EMPTYSTRING)
-        MaxViewerCount.set(Constants.EMPTYSTRING)
+        MinTranslationCount.set(Constants.EMPTY_STRING)
+        MaxTranslationCount.set(Constants.EMPTY_STRING)
+        MinViewerCount.set(Constants.EMPTY_STRING)
+        MaxViewerCount.set(Constants.EMPTY_STRING)
         SourceLanguage = App.instance.getString(R.string.source)
         DestinationLanguage = App.instance.getString(R.string.destination)
         OnlyOwn.set(true)
@@ -94,7 +94,7 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
 
     private fun saveFilter(){
         App.instance.getSharedPreferences(Constants.FILTER, 0).edit()
-                    .putString(Constants.DICTIONARYFILTER, Gson().toJson(this))
+                    .putString(Constants.DICTIONARY_FILTER, Gson().toJson(this))
                     .apply()
     }
 
@@ -156,7 +156,7 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
     }
 
     inner class FilterTextWatcher : OnceRunTextWatcher() {
-        override val onceAfterTextChanged: () -> Unit = {
+        override val onceAfterTextChanged: (p0: Editable?) -> Unit = {
             useFilter()
         }
     }

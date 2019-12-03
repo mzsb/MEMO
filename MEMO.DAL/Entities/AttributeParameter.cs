@@ -8,7 +8,8 @@ namespace MEMO.DAL.Entities
     public class AttributeParameter
     {
         public Guid Id { get; set; }
-        [MaxLength(10)]
+
+        [MaxLength(15)]
         public string Value { get; set; }
 
         public Guid AttributeId { get; set; }

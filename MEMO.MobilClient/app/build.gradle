@@ -37,21 +37,20 @@ dependencies {
     implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0'
     implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0'
     implementation "androidx.drawerlayout:drawerlayout:1.0.0"
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation "androidx.core:core-ktx:1.1.0"
-    kapt 'com.android.databinding:compiler:3.1.4'
-
+    implementation "android.arch.persistence.room:runtime:1.1.1"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation 'com.github.QuadFlask:colorpicker:0.0.15'
+    kapt "android.arch.persistence.room:compiler:1.1.1"
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    kapt 'com.android.databinding:compiler:3.1.4'
 }
 repositories {
     mavenCentral()

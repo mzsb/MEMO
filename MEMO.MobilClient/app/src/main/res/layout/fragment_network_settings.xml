@@ -129,7 +129,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:onClick="@{fragment::resetClick}"
-                    android:src="@drawable/ic_refresh_48dp"/>
+                    android:src="@drawable/ic_restart_48dp"/>
 
             </LinearLayout>
 

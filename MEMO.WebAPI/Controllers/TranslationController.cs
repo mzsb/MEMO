@@ -2,6 +2,7 @@
 using MEMO.BLL.Interfaces;
 using MEMO.DAL.Entities;
 using MEMO.DTO;
+using MEMO.DTO.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -77,6 +78,12 @@ namespace MEMO.WebAPI.Controllers
         public async Task<ActionResult<IEnumerable<TranslationDto>>> GetByDictionaryIdAsync(Guid id)
         {
             return _mapper.Map<List<TranslationDto>>(await _service.GetByDictionaryIdAsync(id));
+        }
+
+        [HttpGet("translate/{original}/{from}/{to}")]
+        public async Task<Translation> TranslateAsync(string original, string from, string to)
+        {
+            return await _service.TranslateAsync(original, from, to);
         }
 
         private async Task<string> getAccessToken() => await HttpContext.GetTokenAsync("access_token");

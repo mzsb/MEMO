@@ -3,7 +3,7 @@ package hu.mobilclient.memo.services
 import android.app.Activity
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
-import hu.mobilclient.memo.model.Language
+import hu.mobilclient.memo.model.memoapi.Language
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 
@@ -23,6 +23,6 @@ class LanguageService(activity: Activity, private val errorCallback: (String) ->
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 }

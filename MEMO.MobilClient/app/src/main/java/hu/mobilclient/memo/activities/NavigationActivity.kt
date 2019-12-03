@@ -7,12 +7,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewParent
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.core.view.GravityCompat
 import androidx.core.view.children
-import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager.widget.ViewPager
@@ -24,18 +22,27 @@ import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.adapters.NavigationPagerAdapter
 import hu.mobilclient.memo.filters.AttributeFilter
 import hu.mobilclient.memo.filters.DictionaryFilter
+import hu.mobilclient.memo.filters.TranslationFilter
 import hu.mobilclient.memo.filters.UserFilter
 import hu.mobilclient.memo.fragments.AttributeFragment
 import hu.mobilclient.memo.fragments.DictionaryFragment
-import hu.mobilclient.memo.fragments.NetworkSettingFragment
+import hu.mobilclient.memo.fragments.TranslationFragment
+import hu.mobilclient.memo.fragments.TranslationListFragment
 import hu.mobilclient.memo.fragments.bases.NavigationFragmentBase
-import hu.mobilclient.memo.fragments.interfaces.IUpdateable
+import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeCreationHandler
+import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeDeletionHandler
+import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeUpdateHandler
+import hu.mobilclient.memo.fragments.interfaces.dictionary.*
+import hu.mobilclient.memo.fragments.interfaces.translation.ITranslationCreationHandler
+import hu.mobilclient.memo.fragments.interfaces.translation.ITranslationDeletionHandler
+import hu.mobilclient.memo.fragments.interfaces.translation.ITranslationUpdateHandler
+import hu.mobilclient.memo.fragments.interfaces.user.IUserDeletionHandler
+import hu.mobilclient.memo.fragments.interfaces.user.IUserUpdateHandler
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.helpers.IdHolder
-import hu.mobilclient.memo.helpers.NavigationArguments
-import hu.mobilclient.memo.model.Dictionary
-import hu.mobilclient.memo.model.Translation
+import hu.mobilclient.memo.model.memoapi.Dictionary
+import hu.mobilclient.memo.model.enums.LanguageCode
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.content_navigation.*
@@ -44,17 +51,30 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshListener {
-
-    val args:  NavigationArguments = NavigationArguments()
+class NavigationActivity : NetworkActivityBase(),
+                           SwipeRefreshLayout.OnRefreshListener,
+                           IDictionaryCreationHandler,
+                           IDictionaryUpdateHandler,
+                           IDictionaryDeletionHandler,
+                           IDictionarySelectionHandler,
+                           ITranslationCreationHandler,
+                           ITranslationUpdateHandler,
+                           ITranslationDeletionHandler,
+                           IAttributeCreationHandler,
+                           IAttributeUpdateHandler,
+                           IAttributeDeletionHandler,
+                           IUserUpdateHandler,
+                           IUserDeletionHandler {
 
     private lateinit var idHolder : IdHolder<UUID>
-    private lateinit var navigationViewPage : ViewPager
+    private lateinit var navigationViewPager : ViewPager
+    private lateinit var viewPagerAdapter: NavigationPagerAdapter
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var navigationView: NavigationView
     private lateinit var drawerLayout: DrawerLayout
 
     private var isFabMenuOpen = false
+    private var isFastAccess = false
 
     private lateinit var fabOpen: Animation
     private lateinit var fabClose: Animation
@@ -63,89 +83,73 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
 
     private var dictionaryFragment: DictionaryFragment? = null
     private var attributeFragment: AttributeFragment? = null
+    private var translationFragment: TranslationFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
 
-        fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close)
-        fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open)
-        fabRotateOpen = AnimationUtils.loadAnimation(this, R.anim.fab_rotate_open)
-        fabRotateClose = AnimationUtils.loadAnimation(this, R.anim.fab_rotate_close)
-
-        navigationView = ac_navigation_nv
-        drawerLayout = ac_navigation_dl
-
-        refreshLayout = ac_navigation_rl
-        refreshLayout.setOnRefreshListener(this)
-        refreshLayout.setColorSchemeResources(R.color.accent)
-        refreshLayout.setProgressBackgroundColorSchemeResource(R.color.primary_light)
-
-        navigationViewPage = ac_navigation_vp
-        navigationViewPage.adapter = NavigationPagerAdapter(supportFragmentManager)
-
-        val fabMenu = ac_navigation_ll_fab_menu
-        fabMenu.setOnClickListener {
-            val fabCreate = fab_create
-            if(isFabMenuOpen){
-                fabCreate.callOnClick()
-            }
-        }
-        fabMenu.isClickable = false
-        fabMenu.visibility = View.GONE
-
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = Constants.EMPTYSTRING
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_navigation_menu_34dp)
-
         val userId = UUID.fromString(intent.extras?.getString(Constants.USERID))
-        serviceManager.user?.get(userId, callback = {
-            App.currentUser = it
-        })
-        args.putUserId(userId)
+        serviceManager.user.get(userId, { user->
+            App.currentUser = user
 
-        serviceManager.dictionary?.getFastAccessible(userId, callback = ::getFastAccessibleDictionariesSuccess)
+            fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close)
+            fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open)
+            fabRotateOpen = AnimationUtils.loadAnimation(this, R.anim.fab_rotate_open)
+            fabRotateClose = AnimationUtils.loadAnimation(this, R.anim.fab_rotate_close)
 
-        navigationViewPage.addOnPageChangeListener(object : OnPageChangeListener {
-            val fabCreate = fab_create
-            val fabCreateDictionary = fab_create_dictionary
-            val fabCreateTranslation = fab_create_translation
-            val fabCreateAttribute = fab_create_attribute
-            override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                if(position == NavigationPagerAdapter.ACCOUNT_PAGE_POSITION){
-                    fabMenu.alpha = 1 - positionOffset
-                }
-                if(fabMenu.alpha < 0.6){
-                    fabCreate.isEnabled = false
-                    if(isFabMenuOpen){
-                        fabCreate.callOnClick()
-                    }
-                }
-                else{
-                    fabCreate.isEnabled = true
-                    fabCreateDictionary.isEnabled = true
-                    fabCreateTranslation.isEnabled = true
-                    fabCreateAttribute.isEnabled = true
+            navigationView = ac_navigation_nv
+            drawerLayout = ac_navigation_dl
+
+            refreshLayout = ac_navigation_rl
+            refreshLayout.setOnRefreshListener(this)
+            refreshLayout.setColorSchemeResources(R.color.accent)
+            refreshLayout.setProgressBackgroundColorSchemeResource(R.color.primary_light)
+
+            navigationViewPager = ac_navigation_vp
+            navigationViewPager.adapter = NavigationPagerAdapter(supportFragmentManager)
+            viewPagerAdapter = (navigationViewPager.adapter as NavigationPagerAdapter)
+
+            val fabMenu = ac_navigation_ll_fab_menu
+            fabMenu.setOnClickListener {
+                val fabCreate = fab_create
+                if(isFabMenuOpen){
+                    fabCreate.callOnClick()
                 }
             }
-            override fun onPageSelected(position: Int) {
-                navigationView.menu.getItem(position).isChecked = true
-                supportActionBar?.title = getPageName(position)
+            fabMenu.isClickable = false
+            fabMenu.visibility = View.GONE
+
+            setSupportActionBar(toolbar)
+            supportActionBar?.title = Constants.EMPTY_STRING
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_navigation_menu_34dp)
+
+            serviceManager.dictionary.getFastAccessible(userId, ::getFastAccessibleDictionariesSuccess)
+
+            navigationViewPager.addOnPageChangeListener(object : OnPageChangeListener {
+                override fun onPageScrollStateChanged(state: Int) {}
+                override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
+                override fun onPageSelected(position: Int) {
+                    navigationView.menu.getItem(position).isChecked = true
+                    supportActionBar?.title = getPageName(position)
+                }
+            })
+
+            navigationView.setNavigationItemSelectedListener(::navigationItemSelectedListener)
+            navigationView.menu.findItem(R.id.nav_translations).isChecked = true
+
+            val invalidKeys = ArrayList<Int>()
+            for (menuItem in navigationView.menu.children){
+                invalidKeys.add(menuItem.itemId)
             }
+            idHolder = IdHolder(invalidKeys)
+
+            supportActionBar?.title = getPageName(NavigationPagerAdapter.TRANSLATION_LIST_PAGE_POSITION)
+        },errorCallback = {
+            EmotionToast.showSad(getString(R.string.unable_load_user))
+            logout()
         })
-
-        navigationView.setNavigationItemSelectedListener(::navigationItemSelectedListener)
-        navigationView.menu.findItem(R.id.nav_dictionarylist).isChecked = true
-
-        val invalidKeys = ArrayList<Int>()
-        for (menuItem in navigationView.menu.children){
-            invalidKeys.add(menuItem.itemId)
-        }
-        idHolder = IdHolder(invalidKeys)
-
-        supportActionBar?.title = getPageName(NavigationPagerAdapter.DICTIONARY_LIST_PAGE_POSITION)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -157,11 +161,10 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
         when(item.itemId) {
             id.home -> drawerLayout.openDrawer(GravityCompat.START)
             R.id.refresh -> {
-                val currentItem = navigationViewPage.currentItem
-                navigationViewPage.adapter = NavigationPagerAdapter(supportFragmentManager)
-                navigationViewPage.setCurrentItem(currentItem, false)
-
-                serviceManager.dictionary?.getFastAccessible(args.getUserId(), callback = ::getFastAccessibleDictionariesSuccess)
+                serviceManager.translation.translate("kutya", LanguageCode.HU.name, LanguageCode.EN.name,callback = {
+                    val i = it
+                    it
+                })
             }
         }
         return super.onOptionsItemSelected(item)
@@ -169,19 +172,14 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
 
     private fun navigationItemSelectedListener(menuItem: MenuItem) : Boolean {
         when(menuItem.itemId){
-            R.id.nav_dictionarylist -> navigationViewPage.setCurrentItem(NavigationPagerAdapter.DICTIONARY_LIST_PAGE_POSITION, true)
-            R.id.nav_account -> navigationViewPage.setCurrentItem(NavigationPagerAdapter.ACCOUNT_PAGE_POSITION, true)
-            R.id.nav_logout -> {
-                getSharedPreferences(Constants.AUTHDATA, 0).edit().clear().apply()
-                startActivity(Intent(this, LoginActivity::class.java))
-                DictionaryFilter.clearFilter()
-                AttributeFilter.clearFilter()
-                UserFilter.clearFilter()
-                finish()
-            }
+            R.id.nav_translations -> navigationViewPager.setCurrentItem(NavigationPagerAdapter.TRANSLATION_LIST_PAGE_POSITION, true)
+            R.id.nav_dictionarylist -> navigationViewPager.setCurrentItem(NavigationPagerAdapter.DICTIONARY_LIST_PAGE_POSITION, true)
+            R.id.nav_account -> navigationViewPager.setCurrentItem(NavigationPagerAdapter.ACCOUNT_PAGE_POSITION, true)
+            R.id.nav_logout -> logout()
             in idHolder -> {
                 navigationView.menu.findItem(menuItem.itemId).isChecked = true
-                val i = idHolder[menuItem.itemId]
+                isFastAccess = true
+                onDictionarySelected(idHolder[menuItem.itemId])
             }
             else -> throw IllegalArgumentException(getString(R.string.not_existing_page))
         }
@@ -191,21 +189,32 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
         return true
     }
 
+    private fun logout(){
+        getSharedPreferences(Constants.AUTHENTICATION_DATA, 0).edit().clear().apply()
+        startActivity(Intent(this, LoginActivity::class.java))
+        DictionaryFilter.clearFilter()
+        AttributeFilter.clearFilter()
+        UserFilter.clearFilter()
+        TranslationFilter.clearFilter()
+        finish()
+    }
+
     fun closeNavigationDrawer(view: View){
         ac_navigation_dl.closeDrawers()
     }
 
     private fun getPageName(pagePosition: Int) : String {
         return getString(when(pagePosition){
+            NavigationPagerAdapter.TRANSLATION_LIST_PAGE_POSITION -> R.string.translations
             NavigationPagerAdapter.DICTIONARY_LIST_PAGE_POSITION -> R.string.dictionaries
             NavigationPagerAdapter.ACCOUNT_PAGE_POSITION -> R.string.account
             else -> throw IllegalArgumentException(getString(R.string.not_existing_page))
         })
     }
 
-
     private fun getFastAccessibleDictionariesSuccess(dictionaries: List<Dictionary>){
-        for(key in idHolder.getKeys()){
+        navigationView.menu.findItem(R.id.nav_fast_access).isVisible = dictionaries.isNotEmpty()
+        for (key in idHolder.getKeys()) {
             navigationView.menu.removeItem(key)
         }
         idHolder.clear()
@@ -246,30 +255,155 @@ class NavigationActivity : NetworkActivityBase(), SwipeRefreshLayout.OnRefreshLi
     }
 
     override fun onRefresh() {
-        serviceManager.dictionary?.getFastAccessible(args.getUserId(), callback = ::getFastAccessibleDictionariesSuccess)
+        serviceManager.dictionary.getFastAccessible(App.getCurrentUserId(), ::getFastAccessibleDictionariesSuccess)
 
         getCurrentPage().update()
 
         refreshLayout.isRefreshing = false
     }
 
-    private fun getCurrentPage(): NavigationFragmentBase {
-        return (navigationViewPage.adapter as NavigationPagerAdapter).getItem(navigationViewPage.currentItem)
+    fun isCurrentPage(index: Int): Boolean{
+        return navigationViewPager.currentItem == index
     }
 
-    private fun getPage(index: Int): NavigationFragmentBase {
-        return (navigationViewPage.adapter as NavigationPagerAdapter).getItem(index)
+    private fun getCurrentPage(): NavigationFragmentBase {
+        return (navigationViewPager.adapter as NavigationPagerAdapter).getItem(navigationViewPager.currentItem)
     }
 
     fun createDictionaryClick(view: View){
-        val fragment = dictionaryFragment?: DictionaryFragment(OkCallback = {getPage(NavigationPagerAdapter.DICTIONARY_LIST_PAGE_POSITION).update(); dictionaryFragment = null})
+        val fragment = dictionaryFragment?: DictionaryFragment()
         dictionaryFragment = fragment
-        fragment.show(supportFragmentManager, "TAG")
+        fragment.show(supportFragmentManager, Constants.DICTIONARY_FRAGMENT_TAG)
+        fab_create.callOnClick()
+    }
+
+    fun createTranslationClick(view: View){
+        if(App.currentUser.DictionaryCount.toInt() != 0) {
+            val fragment = translationFragment ?: TranslationFragment()
+            translationFragment = fragment
+            viewPagerAdapter.forEachOnFragments {navigationFragment ->
+                if(navigationFragment is ISelectedDictionaryHolder && navigationFragment is TranslationListFragment){
+                    fragment.setDictionarySpinnerSelection(navigationFragment.getSelectedDictionaryId())
+                }
+            }
+            fragment.show(supportFragmentManager, Constants.TRANSLATION_FRAGMENT_TAG)
+            fab_create.callOnClick()
+        }
+        else{
+            EmotionToast.showHelp(getString(R.string.create_dictionary_first))
+        }
     }
 
     fun createAttributeClick(view: View){
-        val fragment = attributeFragment?: AttributeFragment(OkCallback = {getPage(NavigationPagerAdapter.ACCOUNT_PAGE_POSITION).update(); attributeFragment = null})
+        val fragment = attributeFragment?: AttributeFragment()
         attributeFragment = fragment
-        fragment.show(supportFragmentManager, "TAG")
+        fragment.show(supportFragmentManager, Constants.ATTRIBUTE_FRAGMENT_TAG)
+        fab_create.callOnClick()
+    }
+
+    override fun onDictionarySelected(dictionaryId: UUID) {
+        navigationViewPager.setCurrentItem(NavigationPagerAdapter.TRANSLATION_LIST_PAGE_POSITION, true)
+        navigationView.menu.getItem(Constants.ZERO).isChecked = !isFastAccess
+        isFastAccess = false
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IDictionarySelectionHandler){
+                navigationFragment.onDictionarySelected(dictionaryId)
+            }
+        }
+    }
+
+    override fun onDictionaryCreated(dictionaryId: UUID) {
+        dictionaryFragment = null
+        serviceManager.dictionary.getFastAccessible(App.getCurrentUserId(), ::getFastAccessibleDictionariesSuccess)
+        navigationViewPager.setCurrentItem(NavigationPagerAdapter.TRANSLATION_LIST_PAGE_POSITION, true)
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IDictionaryCreationHandler){
+                navigationFragment.onDictionaryCreated(dictionaryId)
+            }
+        }
+    }
+
+    override fun onDictionaryUpdated(dictionaryId: UUID) {
+        serviceManager.dictionary.getFastAccessible(App.getCurrentUserId(), ::getFastAccessibleDictionariesSuccess)
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IDictionaryUpdateHandler){
+                navigationFragment.onDictionaryUpdated(dictionaryId)
+            }
+        }
+    }
+
+    override fun onDictionaryDeleted(dictionaryId: UUID) {
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IDictionaryDeletionHandler){
+                navigationFragment.onDictionaryDeleted(dictionaryId)
+            }
+        }
+    }
+
+    override fun onTranslationCreated(translationId: UUID) {
+        translationFragment = null
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is ITranslationCreationHandler){
+                navigationFragment.onTranslationCreated(translationId)
+            }
+        }
+    }
+
+    override fun onTranslationUpdated(translationId: UUID) {
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is ITranslationUpdateHandler){
+                navigationFragment.onTranslationUpdated(translationId)
+            }
+        }
+    }
+
+    override fun onTranslationDeleted(translationId: UUID) {
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is ITranslationDeletionHandler){
+                navigationFragment.onTranslationDeleted(translationId)
+            }
+        }
+    }
+
+    override fun onAttributeCreated(attributeId: UUID) {
+        attributeFragment = null
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IAttributeCreationHandler){
+                navigationFragment.onAttributeCreated(attributeId)
+            }
+        }
+    }
+
+    override fun onAttributeUpdated(attributeId: UUID) {
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IAttributeUpdateHandler){
+                navigationFragment.onAttributeUpdated(attributeId)
+            }
+        }
+    }
+
+    override fun onAttributeDeleted(attributeId: UUID) {
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IAttributeDeletionHandler){
+                navigationFragment.onAttributeDeleted(attributeId)
+            }
+        }
+    }
+
+    override fun onUserUpdated(userId: UUID) {
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IUserUpdateHandler){
+                navigationFragment.onUserUpdated(userId)
+            }
+        }
+    }
+
+    override fun onUserDeleted(userId: UUID) {
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IUserDeletionHandler){
+                navigationFragment.onUserDeleted(userId)
+            }
+        }
+        logout()
     }
 }

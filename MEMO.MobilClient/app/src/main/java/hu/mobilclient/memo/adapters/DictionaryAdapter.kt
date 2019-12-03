@@ -20,8 +20,8 @@ import hu.mobilclient.memo.filters.DictionaryFilter
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.managers.ServiceManager
-import hu.mobilclient.memo.model.Dictionary
-import hu.mobilclient.memo.model.Language
+import hu.mobilclient.memo.model.memoapi.Dictionary
+import hu.mobilclient.memo.model.memoapi.Language
 import kotlinx.android.synthetic.main.dictionary_filter_content.view.*
 import kotlinx.android.synthetic.main.dictionary_filter_menu.view.*
 import kotlinx.android.synthetic.main.dictionary_list_item.view.*
@@ -29,7 +29,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class DictionaryAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     lateinit var serviceManager: ServiceManager
     lateinit var userId: UUID
@@ -97,7 +97,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
                     userNameTextView.paintFlags = userNameTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
-                    if(App.isCurrent(dictionary.Owner.Id!!) || App.isAdmin()){
+                    if(App.isCurrent(dictionary.Owner.Id) || App.isAdmin()){
                         creationDateTextView.visibility = View.VISIBLE
                     }
                     else{
@@ -113,6 +113,9 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
                     itemView.setOnClickListener {
                         itemClickListener.onDictionaryClicked(dictionary, position)
+                    }
+
+                    itemView.setOnLongClickListener {
                         itemLongClickListener.onDictionaryLongClicked(dictionary)
                     }
                 }
@@ -223,13 +226,17 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var beforeInit = {}
     private var afterInit = {}
+    private var onError = {}
 
-    fun initializeAdapter(beforeInit: ()-> Unit, afterInit: ()->Unit){
+    fun initializeAdapter(beforeInit: ()-> Unit = this.beforeInit,
+                          afterInit: ()->Unit = this.afterInit,
+                          onError: ()->Unit = this.onError){
         this.beforeInit = beforeInit
         this.afterInit = afterInit
         dictionaryFilter.useFilter = ::useFilter
+        reset()
         if(!dictionaryFilter.sourceLanguages.any()){
-            serviceManager.language?.get({languages ->
+            serviceManager.language.get({languages ->
                 setLanguages(languages)
             })
         }
@@ -237,7 +244,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             dictionaryFilter.All.get() ->
                 if(!allDictionaries.any()){
                     beforeInit()
-                    serviceManager.dictionary?.get({allDictionaries ->
+                    serviceManager.dictionary.get({allDictionaries ->
                         this.allDictionaries.addAll(allDictionaries)
                         setDictionaries(allDictionaries)
                         ownDictionaries.clear()
@@ -245,6 +252,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         afterInit()
                     },{
                         EmotionToast.showSad(App.instance.getString(R.string.unable_load_all_dictionaries))
+                        onError()
                     })
                 }
                 else{
@@ -253,7 +261,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             dictionaryFilter.OnlyOwn.get() ->
                 if(!ownDictionaries.any()){
                     beforeInit()
-                    serviceManager.dictionary?.getByUserId(userId,{ ownDictionaries ->
+                    serviceManager.dictionary.getByUserId(userId,{ ownDictionaries ->
                         this.ownDictionaries.addAll(ownDictionaries)
                         setDictionaries(ownDictionaries)
                         allDictionaries.clear()
@@ -261,6 +269,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         afterInit()
                     },{
                         EmotionToast.showSad(App.instance.getString(R.string.unable_load_own_dictionaries))
+                        onError()
                     })
             }
             else{
@@ -269,7 +278,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             !dictionaryFilter.OnlyOwn.get() ->
                 if(!publicDictionaries.any()){
                     beforeInit()
-                    serviceManager.dictionary?.getPublic(userId,{ publicDictionaries ->
+                    serviceManager.dictionary.getPublic(userId,{ publicDictionaries ->
                         this.publicDictionaries.addAll(publicDictionaries)
                         setDictionaries(publicDictionaries)
                         ownDictionaries.clear()
@@ -277,6 +286,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         afterInit()
                     },{
                         EmotionToast.showSad(App.instance.getString(R.string.unable_load_public_dictionaries))
+                        onError()
                     })
                 }
                 else{
@@ -292,7 +302,7 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun reset(){
+    private fun reset(){
         publicDictionaries.clear()
         ownDictionaries.clear()
         allDictionaries.clear()
@@ -316,6 +326,6 @@ class DictionaryAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnDictionaryClickedListener {
         fun onDictionaryClicked(dictionary: Dictionary, position: Int)
-        fun onDictionaryLongClicked(dictionary: Dictionary)
+        fun onDictionaryLongClicked(dictionary: Dictionary): Boolean
     }
 }

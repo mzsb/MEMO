@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:textSize="18sp"
     android:gravity="center"
-    android:fontFamily="@font/aldrich"
     android:textColor="@color/primary_light"
     android:background="@color/accent"
     android:padding="5dp"/>

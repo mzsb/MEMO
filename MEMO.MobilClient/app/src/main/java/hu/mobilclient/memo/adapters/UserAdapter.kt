@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import hu.mobilclient.memo.App
@@ -18,7 +17,7 @@ import hu.mobilclient.memo.filters.UserFilter
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.managers.ServiceManager
-import hu.mobilclient.memo.model.User
+import hu.mobilclient.memo.model.memoapi.User
 import kotlinx.android.synthetic.main.user_filter_content.view.*
 import kotlinx.android.synthetic.main.user_filter_menu.view.*
 import java.util.*
@@ -83,7 +82,7 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
                     holder.binding.setVariable(BR.user, user)
 
-                    itemView.setOnClickListener {
+                    itemView.setOnLongClickListener {
                         itemLongClickListener.onUserLongClicked(user)
                     }
                 }
@@ -178,16 +177,20 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var beforeInit = {}
     private var afterInit = {}
+    private var onError = {}
 
-    fun initializeAdapter(beforeInit: ()-> Unit, afterInit: ()->Unit){
+    fun initializeAdapter(beforeInit: ()-> Unit = this.beforeInit,
+                          afterInit: ()->Unit = this.afterInit,
+                          onError: ()->Unit = this.onError){
         this.beforeInit = beforeInit
         this.afterInit = afterInit
         userFilter.useFilter = ::useFilter
+        reset()
         when {
             userFilter.All.get() ->
                 if(!allUsers.any()){
                     beforeInit()
-                    serviceManager.user?.get({allUsers ->
+                    serviceManager.user.get({allUsers ->
                         this.allUsers.addAll(allUsers)
                         this.allUsers.remove(this.allUsers.single{ it.Id == App.currentUser.Id })
                         setUsers(allUsers)
@@ -195,6 +198,7 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         afterInit()
                     },{
                         EmotionToast.showSad(App.instance.getString(R.string.unable_to_load_all_user))
+                        onError()
                     })
                 }
                 else{
@@ -203,13 +207,14 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             !userFilter.All.get() ->
                 if(!ownUsers.any()){
                     beforeInit()
-                    serviceManager.user?.getViewersByUserId(userId,{ ownUsers ->
+                    serviceManager.user.getViewersByUserId(userId,{ ownUsers ->
                         this.ownUsers.addAll(ownUsers)
                         setUsers(ownUsers)
                         allUsers.clear()
                         afterInit()
                     },{
                         EmotionToast.showSad(App.instance.getString(R.string.unable_to_load_users))
+                        onError()
                     })
                 }
                 else{
@@ -225,7 +230,7 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun reset(){
+    private fun reset(){
         ownUsers.clear()
         allUsers.clear()
     }
@@ -235,6 +240,6 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class FilterViewHolder(itemView: View, val binding: UserFilterMenuBinding): RecyclerView.ViewHolder(itemView)
 
     interface OnUserClickedListener {
-        fun onUserLongClicked(user: User)
+        fun onUserLongClicked(user: User): Boolean
     }
 }

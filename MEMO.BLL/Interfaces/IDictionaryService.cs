@@ -17,6 +17,7 @@ namespace MEMO.BLL.Interfaces
 
         Task<IEnumerable<Dictionary>> GetByUserIdAsync(Guid id);
         Task<IEnumerable<Dictionary>> GetPublicAsync(Guid userId);
+
         Task<IEnumerable<Dictionary>> GetFastAccessibleAsync(Guid id);
 
         Task SubscribeAsync(Guid userId, Dictionary dictionary);

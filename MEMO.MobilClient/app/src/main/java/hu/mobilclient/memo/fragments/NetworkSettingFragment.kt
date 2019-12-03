@@ -44,7 +44,7 @@ class NetworkSettingFragment : DialogFragment() {
     fun cancelClick(view: View) = dismiss()
 
     fun saveClick(view: View){
-        (activity as NetworkActivityBase).serviceManager.connection?.setConnectionData(ip = settings.Ip.get(), port = settings.Port.get())
+        (activity as NetworkActivityBase).serviceManager.connection.setConnectionData(ip = settings.Ip.get(), port = settings.Port.get())
 
         EmotionToast.showSuccess()
         dismiss()
@@ -55,10 +55,10 @@ class NetworkSettingFragment : DialogFragment() {
         settings.Port.set(ApiService.DEFAULTSERVERPORT)
     }
 
-    inner class NetworkSettings(var Ip: ObservableField<String> = ObservableField(App.instance.getSharedPreferences(Constants.NETWORKDATA, 0)
+    inner class NetworkSettings(var Ip: ObservableField<String> = ObservableField(App.instance.getSharedPreferences(Constants.NETWORK_DATA, 0)
                                                                                                     .getString(Constants.IP, ApiService.DEFAULTSERVERIP)
                                                                                                     ?: ApiService.DEFAULTSERVERIP),
-                                var Port: ObservableField<String> = ObservableField(App.instance.getSharedPreferences(Constants.NETWORKDATA, 0)
+                                var Port: ObservableField<String> = ObservableField(App.instance.getSharedPreferences(Constants.NETWORK_DATA, 0)
                                                                                                       .getString(Constants.PORT, ApiService.DEFAULTSERVERPORT)
                                                                                                       ?: ApiService.DEFAULTSERVERPORT))
 

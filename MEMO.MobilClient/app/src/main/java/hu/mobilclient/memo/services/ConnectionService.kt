@@ -25,28 +25,39 @@ import retrofit2.Response
 
 class ConnectionService(val activity: Activity, private val errorCallback: (String) -> Unit) : ServiceBase(activity)  {
 
-    private val defaultIp= activity.getSharedPreferences(Constants.NETWORKDATA, 0)
+    private val defaultIp= activity.getSharedPreferences(Constants.NETWORK_DATA, 0)
                                         .getString(Constants.IP, ApiService.DEFAULTSERVERIP)
                                         ?: ApiService.DEFAULTSERVERIP
 
-    private val defaultPort = activity.getSharedPreferences(Constants.NETWORKDATA, 0)
+    private val defaultPort = activity.getSharedPreferences(Constants.NETWORK_DATA, 0)
                                             .getString(Constants.PORT, ApiService.DEFAULTSERVERPORT)
                                             ?: ApiService.DEFAULTSERVERPORT
 
     fun connect(ifConnected: () -> Unit = {}, ifNotConnected: () -> Unit = {}){
-        if(!isEmulator()) {
-            connect("https://${defaultIp}:${defaultPort}/api/connection",
-                    callback = { activity.ac_login_ll_network_progress.visibility = View.GONE; ifConnected() },
-                    errorCallback = { scanNetwork(ifConnected, ifNotConnected) })
+        if(isNetworkAvailable()) {
+            if (!isEmulator()) {
+                connect("https://${defaultIp}:${defaultPort}/api/connection",
+                        callback = {
+                            activity.ac_login_ll_network_progress.visibility = View.GONE;
+                            ifConnected()
+                        },
+                        errorCallback = {
+                            scanNetwork(ifConnected,
+                                    ifNotConnected)
+                        })
+            } else {
+                setConnectionData(ApiService.DEFAULTSERVERIP,ApiService.DEFAULTSERVERPORT)
+                activity.ac_login_ll_network_progress.visibility = View.GONE
+                ifConnected()
+            }
         }
         else{
             activity.ac_login_ll_network_progress.visibility = View.GONE
-            ifConnected()
         }
     }
 
     fun setConnectionData(ip: String? = defaultIp, port: String? = defaultPort){
-        activity.getSharedPreferences(Constants.NETWORKDATA, 0).edit()
+        activity.getSharedPreferences(Constants.NETWORK_DATA, 0).edit()
                 .putString(Constants.IP, ip?: defaultIp)
                 .putString(Constants.PORT, port?: defaultPort)
                 .apply()
@@ -62,26 +73,32 @@ class ConnectionService(val activity: Activity, private val errorCallback: (Stri
 
         var failCounter = 0
         for(i in 0..255) {
-            connect("https://${subnet}.${i}:5001/api/connection", callback = {
-                if (it.Ip != Constants.EMPTYSTRING) {
-                    activity.ac_login_ll_network_progress.visibility = View.GONE
-                    setConnectionData(ip = it.Ip)
-                    EmotionToast.showHelp(activity.getString(R.string.server_connection_on))
-                    ifConnected()
-                }
-            }, errorCallback =
-            {
-                if(failCounter == 255){
-                    activity.ac_login_ll_network_progress.visibility = View.GONE
+            if(isNetworkAvailable(false)) {
+                connect("https://${subnet}.${i}:5001/api/connection", callback = {
+                    if (it.Ip != Constants.EMPTY_STRING) {
+                        activity.ac_login_ll_network_progress.visibility = View.GONE
+                        setConnectionData(ip = it.Ip)
+                        EmotionToast.showHelp(activity.getString(R.string.server_connection_on))
+                        ifConnected()
+                    }
+                }, errorCallback =
+                {
+                    if (failCounter == 255) {
+                        activity.ac_login_ll_network_progress.visibility = View.GONE
 
-                    EmotionToast.showError(activity.getString(R.string.server_connection_off))
-                    EmotionToast.showHelp(activity.getString(R.string.manual_configuration_can_help))
-                    NetworkSettingFragment().show((activity as FragmentActivity).supportFragmentManager, "TAG")
+                        EmotionToast.showError(activity.getString(R.string.server_connection_off))
+                        EmotionToast.showHelp(activity.getString(R.string.manual_configuration_can_help))
+                        NetworkSettingFragment().show((activity as FragmentActivity).supportFragmentManager, "TAG")
 
-                    ifNotConnected()
-                }
-                failCounter += 1
-            })
+                        ifNotConnected()
+                    }
+                    failCounter += 1
+                })
+            }
+            else{
+                activity.ac_login_ll_network_progress.visibility = View.GONE
+                ifConnected()
+            }
         }
     }
 
@@ -101,7 +118,7 @@ class ConnectionService(val activity: Activity, private val errorCallback: (Stri
                                     errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                                 }
                             },
-                            onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                            onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                             checkError = checkError)
 
     private fun getSubnetAddress(address: Int): String {
@@ -121,5 +138,5 @@ class ConnectionService(val activity: Activity, private val errorCallback: (Stri
                                          || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
                                          || "google_sdk" == Build.PRODUCT)
 
-    inner class Connection(@SerializedName("ip")var Ip: String = Constants.EMPTYSTRING)
+    inner class Connection(@SerializedName("ip")var Ip: String = Constants.EMPTY_STRING)
 }

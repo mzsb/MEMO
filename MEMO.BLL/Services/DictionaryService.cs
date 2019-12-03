@@ -55,19 +55,24 @@ namespace MEMO.BLL.Services
 
         public async Task<Dictionary> GetByIdAsync(Guid id)
         {
-            var userId = await _context.UserDictionaries.Where(ud => ud.Type == UserType.owner &&
-                                                               ud.DictionaryId == id)
-                                                        .Select(ud => ud.UserId)
-                                                        .SingleOrDefaultAsync();
+            var dictionary = await _context.Dictionaries.Include(d => d.UserDictionaries)
+                                                        .ThenInclude(ud => ud.User)
+                                                        .Include(d => d.DictionaryLanguages)
+                                                        .ThenInclude(dl => dl.Language)
+                                                        .Include(d => d.Translations)
+                                                        .ThenInclude(t => t.AttributeValues)
+                                                        .ThenInclude(av => av.Attribute)
+                                                        .AsNoTracking()
+                                                        .SingleOrDefaultAsync(d => d.Id == id)
+                                                        ?? throw new EntityNotFoundException(typeof(Dictionary));
 
-            return await _context.Dictionaries.Where(d => d.Id == id)
-                                              .Include(d => d.DictionaryLanguages)
-                                              .ThenInclude(dl => dl.Language)
-                                              .Include(d => d.UserDictionaries)
-                                              .ThenInclude(ud => ud.User)
-                                              .AsNoTracking()
-                                              .SingleOrDefaultAsync()
-                                              ?? throw new EntityNotFoundException(typeof(Dictionary));
+
+            dictionary.ViewerCount = dictionary.UserDictionaries.Count - 1;
+            dictionary.TranslationCount = await _context.Translations
+                                                        .Where(t => t.DictionaryId == dictionary.Id)
+                                                        .CountAsync();
+
+            return dictionary;
         }
 
         public async Task<Dictionary> InsertAsync(Dictionary dictionary)
@@ -248,7 +253,7 @@ namespace MEMO.BLL.Services
                                                            ud.UserId == userId))
                 {
                     dictionary.UserDictionaries = dictionary.UserDictionaries.Where(ud => ud.Type == UserType.owner || ud.UserId == userId)
-                                                                              .ToList();
+                                                                             .ToList();
                 }
 
                 dictionary.TranslationCount = await _context.Translations

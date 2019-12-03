@@ -93,6 +93,13 @@ namespace MEMO.WebAPI
             services.AddProblemDetails(options =>
             {
                 options.IncludeExceptionDetails = ctx => false;
+                options.Map<TranslationException>(ex =>
+                    new ProblemDetails
+                    {
+                        Title = ex.Name,
+                        Detail = ex.Message,
+                        Status = StatusCodes.Status404NotFound
+                    });
                 options.Map<EntityInsertException>(ex =>
                     new ProblemDetails
                     {

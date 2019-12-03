@@ -1,18 +1,13 @@
 package hu.mobilclient.memo
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Application
-import android.content.Context
-import android.net.ConnectivityManager
 import android.os.Handler
 import android.os.Looper
 import com.google.gson.Gson
 import hu.mobilclient.memo.helpers.Constants
-import hu.mobilclient.memo.model.User
+import hu.mobilclient.memo.model.memoapi.User
 import hu.mobilclient.memo.network.ApiService
-import hu.mobilclient.memo.network.interceptors.InternetConnectionInterceptor
-import hu.mobilclient.memo.network.interfaces.IInternetConnectionListener
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -23,11 +18,8 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-
-/* https://medium.com/@tsaha.cse/advanced-retrofit2-part-1-network-error-handling-response-caching-77483cf68620 */
 class App : Application() {
 
-    private lateinit var mInternetConnectionListener: IInternetConnectionListener
     private lateinit var retrofit: Retrofit
 
     companion object {
@@ -40,6 +32,8 @@ class App : Application() {
         private val mHandler: Handler = Handler()
 
         var currentUser: User = User()
+
+        fun getCurrentUserId() = currentUser.Id
 
         fun isAdmin() = currentUser.Role == Constants.ADMIN
 
@@ -62,12 +56,8 @@ class App : Application() {
         setNetworkData()
     }
 
-    fun setInternetConnectionListener(listener: IInternetConnectionListener) {
-        mInternetConnectionListener = listener
-    }
-
     fun refreshToken(token: String){
-        getSharedPreferences(Constants.AUTHDATA, 0).edit()
+        getSharedPreferences(Constants.AUTHENTICATION_DATA, 0).edit()
             .putString(Constants.TOKEN, token)
             .apply()
 
@@ -75,10 +65,10 @@ class App : Application() {
     }
 
     fun setNetworkData(){
-        ApiService.ServerIP = getSharedPreferences(Constants.NETWORKDATA, 0)
+        ApiService.ServerIP = getSharedPreferences(Constants.NETWORK_DATA, 0)
                                 .getString(Constants.IP, ApiService.DEFAULTSERVERIP) ?: ApiService.DEFAULTSERVERIP
 
-        ApiService.ServerPort = getSharedPreferences(Constants.NETWORKDATA, 0)
+        ApiService.ServerPort = getSharedPreferences(Constants.NETWORK_DATA, 0)
                 .getString(Constants.PORT, ApiService.DEFAULTSERVERPORT) ?: ApiService.DEFAULTSERVERPORT
 
         apiService = createApiService()
@@ -123,24 +113,12 @@ class App : Application() {
 
             builder.hostnameVerifier { _, _ -> true }
 
-            builder.connectTimeout(15, TimeUnit.SECONDS)
-            builder.readTimeout(15, TimeUnit.SECONDS)
-            builder.writeTimeout(15, TimeUnit.SECONDS)
-            builder.addInterceptor(object : InternetConnectionInterceptor() {
-                override val isInternetAvailable: Boolean
-                    get() {
-                        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                        val activeNetworkInfo = connectivityManager.activeNetworkInfo
-                        return activeNetworkInfo != null && activeNetworkInfo.isConnected
-                    }
-
-                override fun onInternetUnavailable() {
-                    mInternetConnectionListener.onInternetUnavailable()
-                }
-            })
+            builder.connectTimeout(30, TimeUnit.SECONDS)
+            builder.readTimeout(30, TimeUnit.SECONDS)
+            builder.writeTimeout(30, TimeUnit.SECONDS)
             builder.addInterceptor { chain ->
                 val newRequest = chain.request().newBuilder()
-                        .addHeader("Authorization", "Bearer ${getSharedPreferences(Constants.AUTHDATA, 0).getString(Constants.TOKEN, null)}")
+                        .addHeader("Authorization", "Bearer ${getSharedPreferences(Constants.AUTHENTICATION_DATA, 0).getString(Constants.TOKEN, null)}")
                         .build()
                 chain.proceed(newRequest)
             }

@@ -39,7 +39,6 @@ namespace MEMO.BLL.Authentication
 
             return _tokenHandler.WriteToken(token);
         }
-
         public string DecodeUserId(string token)
         {
             var decodedToken = _tokenHandler.ReadToken(token) as JwtSecurityToken;

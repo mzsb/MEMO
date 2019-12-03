@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_rounded_accent"
+        android:background="@drawable/bg_rounded_accent_1"
         android:padding="5dp">
 
         <ImageView
@@ -24,7 +24,7 @@
 
         <ImageView
             android:id="@+id/fg_dictionary_list_dictionary_filter_content_iv_reset"
-            android:src="@drawable/ic_refresh_48dp"
+            android:src="@drawable/ic_restart_48dp"
             android:layout_width="35dp"
             android:layout_height="35dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -289,35 +289,30 @@
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:checked="@={filter.SortByDictionaryName}"
                         android:hint="@string/name" />
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:checked="@={filter.SortByUserName}"
                         android:hint="@string/username" />
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
                         android:checked="@={filter.SortByTranslation}"
                         android:hint="@string/phrases" />
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
                         android:checked="@={filter.SortByViewer}"
                         android:hint="@string/viewer_users" />
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:checked="@={filter.SortByDate}"
                         android:hint="@string/date" />
 

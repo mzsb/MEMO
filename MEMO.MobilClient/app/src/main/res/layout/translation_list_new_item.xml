@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout">
+
+    <data>
+        <variable
+            name="translation"
+            type="hu.mobilclient.memo.model.memoapi.Translation" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded_accent_1"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="3dp"
+        android:weightSum="8"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+
+        <ImageView
+            android:id="@+id/fg_translation_list_new_iv_add"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:src="@drawable/ic_add_48dp"/>
+
+        <EditText
+            android:id="@+id/fg_translation_list_new_et_original"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:layout_gravity="center"
+            android:hint="@string/original"
+            android:inputType="textImeMultiLine"
+            android:text="@={translation.original}"
+            android:textSize="20sp"
+            android:importantForAutofill="no" />
+
+        <EditText
+            android:id="@+id/fg_translation_list_new_et_translation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:hint="@string/translated"
+            android:layout_gravity="center"
+            android:inputType="textImeMultiLine"
+            android:text="@={translation.translated}"
+            android:textSize="20sp"
+            android:importantForAutofill="no" />
+
+        <ImageView
+            android:id="@+id/fg_translation_list_new_iv_translate"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="5dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:src="@drawable/ic_translate_white_64dp"/>
+
+    </LinearLayout>
+
+</layout>

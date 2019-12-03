@@ -1,24 +1,22 @@
 package hu.mobilclient.memo.activities.bases
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import hu.mobilclient.memo.App
-import hu.mobilclient.memo.R
-import hu.mobilclient.memo.helpers.EmotionToast
-import hu.mobilclient.memo.network.interfaces.IInternetConnectionListener
 import hu.mobilclient.memo.managers.ServiceManager
 
-abstract class NetworkActivityBase : AppCompatActivity(), IInternetConnectionListener {
+abstract class NetworkActivityBase : AppCompatActivity() {
 
-    var serviceManager: ServiceManager = ServiceManager(this) {}
+    lateinit var serviceManager: ServiceManager
         private set
+
+    lateinit var connectivityManager: ConnectivityManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.instance.setInternetConnectionListener(this)
-    }
 
-    override fun onInternetUnavailable() {
-        EmotionToast.showHelp(getString(R.string.check_internet))
+        serviceManager = ServiceManager(this) {}
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 }

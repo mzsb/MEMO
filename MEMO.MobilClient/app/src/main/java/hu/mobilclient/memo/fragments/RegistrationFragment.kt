@@ -17,13 +17,14 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.DialogFragment
+import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.NavigationActivity
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.FragmentRegistrationBinding
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
-import hu.mobilclient.memo.model.Registration
+import hu.mobilclient.memo.model.authentication.Registration
 import kotlinx.android.synthetic.main.fragment_registration.*
 import kotlinx.android.synthetic.main.fragment_registration.view.*
 
@@ -72,7 +73,7 @@ class RegistrationFragment : DialogFragment() {
 
     fun registrationClick(view: View){
         if(isValid()){
-            (activity as NetworkActivityBase).serviceManager.authentication?.registration(registration,{
+            (activity as NetworkActivityBase).serviceManager.authentication.registration(registration,{
                 val intent = Intent(activity, NavigationActivity::class.java)
                 intent.putExtra(Constants.USERID, it.UserId.toString())
                 startActivity(intent)
@@ -94,7 +95,7 @@ class RegistrationFragment : DialogFragment() {
     }
 
     private fun EditText.isValidPassword(): Boolean{
-        if(this.text.length < 6){
+        if(this.text.length < Constants.USER_PASSWORD_MIN_LENGTH){
             this.requestFocus()
             this.error = getString(R.string.too_short_password)
             return false
@@ -123,7 +124,7 @@ class RegistrationFragment : DialogFragment() {
     private fun EditText.tooLong(maxLength: Int, errorMessage: String): Boolean{
         if(this.text.length > maxLength){
             this.requestFocus()
-            this.error = errorMessage + this.text.length + " " + getString(R.string.character)
+            this.error = errorMessage + " " + App.instance.getString(R.string.now_dd, this.text.length)
             return true
         }
         return false
@@ -131,12 +132,12 @@ class RegistrationFragment : DialogFragment() {
 
     private fun isValid() =
             fg_registration_et_username.isNotEmpty() &&
-             !fg_registration_et_username.tooLong(15, getString(R.string.username_too_long) + " " + getString(R.string.now_dd) + " ") &&
+             !fg_registration_et_username.tooLong(Constants.USER_NAME_MAX_LENGTH, getString(R.string.username_too_long, Constants.USER_NAME_MAX_LENGTH)) &&
             fg_registration_et_email.isNotEmpty() &&
-             !fg_registration_et_email.tooLong(50, getString(R.string.email_too_long) + " " + getString(R.string.now_dd) + " ") &&
+             !fg_registration_et_email.tooLong(Constants.USER_EMAIL_MAX_LENGTH, getString(R.string.email_too_long, Constants.USER_EMAIL_MAX_LENGTH)) &&
             fg_registration_et_email.isValidEmail() &&
             fg_registration_et_password.isNotEmpty() &&
-             !fg_registration_et_password.tooLong(20, getString(R.string.password_too_long) + " " + getString(R.string.now_dd) + " ") &&
+             !fg_registration_et_password.tooLong(Constants.USER_PASSWORD_MAX_LENGTH, getString(R.string.password_too_long, Constants.USER_PASSWORD_MAX_LENGTH)) &&
             fg_registration_et_password.isValidPassword() &&
             fg_registration_et_password_again.isNotEmpty() &&
             fg_registration_et_password.textEquals(fg_registration_et_password_again)

@@ -1,11 +1,12 @@
 ﻿using MEMO.DAL.Enums;
+using MEMO.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace MEMO.DAL.Entities
 {
-    public class UserDictionary
+    public class UserDictionary : IAuditable
     {
         public Guid Id { get; set; }
         public UserType Type { get; set; }
@@ -15,5 +16,6 @@ namespace MEMO.DAL.Entities
 
         public Guid UserId { get; set; }
         public User User { get; set; }
+        public DateTime CreationDate { get; set; }
     }
 }

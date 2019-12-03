@@ -26,6 +26,6 @@ namespace MEMO.DTO
         public ICollection<AttributeDto> Attributes { get; set; } = new List<AttributeDto>();
 
         public ICollection<DictionaryDto> Dictionaries { get; set; } = new List<DictionaryDto>();
-        public String CreationDate { get; set; }
+        public string CreationDate { get; set; }
     }
 }

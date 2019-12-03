@@ -3,7 +3,7 @@ package hu.mobilclient.memo.services
 import android.app.Activity
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.memoapi.Dictionary
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 import java.util.*
@@ -24,7 +24,7 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun get(id: UUID,
@@ -43,7 +43,7 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun insert(dictionary: Dictionary,
@@ -62,7 +62,7 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun update(dictionary: Dictionary,
@@ -80,7 +80,7 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun delete(id: UUID,
@@ -98,7 +98,7 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun getByUserId(id: UUID,
@@ -117,7 +117,7 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun getPublic(userId: UUID,
@@ -136,12 +136,12 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun getFastAccessible(id: UUID,
-                  callback: (List<Dictionary>) -> Unit,
-                  errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                          callback: (List<Dictionary>) -> Unit,
+                          errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
                           checkError: Boolean = false) =
             createRequest(
                     request = apiService::getDictionariesFastAccessible,
@@ -155,38 +155,18 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 
     fun subscribe(userId: UUID,
-               dictionary: Dictionary,
-               callback: () -> Unit,
-               errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
-                  checkError: Boolean = false) =
-            createRequest(
-                    request = apiService::subscribe,
-                    pathRequestParameter = userId,
-                    bodyRequestParameter = dictionary,
-                    onSuccess =
-                    fun(response: Response<Void>) {
-                        if (response.isSuccessful && response.code() == 200) {
-                            callback()
-                        } else {
-                            errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
-                        }
-                    },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
-                    checkError = checkError)
-
-    fun unsubscribe(userId: UUID,
                   dictionary: Dictionary,
                   callback: () -> Unit,
                   errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
-                    checkError: Boolean = false) =
+                  checkError: Boolean = false) =
             createRequest(
-                    request = apiService::unsubscribe,
-                    pathRequestParameter = userId,
-                    bodyRequestParameter = dictionary,
+                    request = apiService::subscribe,
+                    firstRequestParameter = userId,
+                    secondRequestParameter = dictionary,
                     onSuccess =
                     fun(response: Response<Void>) {
                         if (response.isSuccessful && response.code() == 200) {
@@ -195,6 +175,26 @@ class DictionaryService(activity: Activity, private val errorCallback: (String) 
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
+                    checkError = checkError)
+
+    fun unsubscribe(userId: UUID,
+                    dictionary: Dictionary,
+                    callback: () -> Unit,
+                    errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                    checkError: Boolean = false) =
+            createRequest(
+                    request = apiService::unsubscribe,
+                    firstRequestParameter = userId,
+                    secondRequestParameter = dictionary,
+                    onSuccess =
+                    fun(response: Response<Void>) {
+                        if (response.isSuccessful && response.code() == 200) {
+                            callback()
+                        } else {
+                            errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
+                        }
+                    },
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 }

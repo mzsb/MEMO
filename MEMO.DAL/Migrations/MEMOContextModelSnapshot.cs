@@ -26,8 +26,8 @@ namespace MEMO.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(15)")
-                        .HasMaxLength(15);
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -53,8 +53,8 @@ namespace MEMO.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(10)")
-                        .HasMaxLength(10);
+                        .HasColumnType("nvarchar(15)")
+                        .HasMaxLength(15);
 
                     b.HasKey("Id");
 
@@ -76,7 +76,8 @@ namespace MEMO.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasMaxLength(30);
 
                     b.HasKey("Id");
 
@@ -157,12 +158,12 @@ namespace MEMO.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("28e770a7-fe71-4fd9-a56d-3501ceb17569"),
+                            Id = new Guid("4e3b1224-1a04-4ab5-8686-5783e0cc4dcc"),
                             LanguageCode = "hu"
                         },
                         new
                         {
-                            Id = new Guid("89e27b24-8364-41fc-885c-3afd6d612b06"),
+                            Id = new Guid("f2cadeef-4c9c-4f24-8a11-6747fa34f5f2"),
                             LanguageCode = "en"
                         });
                 });
@@ -173,6 +174,9 @@ namespace MEMO.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Color")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -180,10 +184,12 @@ namespace MEMO.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Original")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasMaxLength(30);
 
                     b.Property<string>("Translated")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasMaxLength(30);
 
                     b.HasKey("Id");
 
@@ -267,6 +273,9 @@ namespace MEMO.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("DictionaryId")
                         .HasColumnType("uniqueidentifier");
 
@@ -316,15 +325,15 @@ namespace MEMO.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("88d5ec6d-c087-4fb4-b52f-c5b12acd33df"),
-                            ConcurrencyStamp = "31158e61-1304-4db4-9725-abf724d564d1",
+                            Id = new Guid("591d3fa7-d5af-4359-b080-9bf4b00d77a6"),
+                            ConcurrencyStamp = "8f38dc7a-97df-4900-ba0f-b1b2fdc394e0",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = new Guid("08f05fb0-104d-4d92-8618-261916434348"),
-                            ConcurrencyStamp = "8e74c581-31c1-4f0a-ba87-afc9fdc839ed",
+                            Id = new Guid("2deab827-b5f6-4a5c-8215-043957128e61"),
+                            ConcurrencyStamp = "39f90123-0bd9-43b8-88ee-ec3f1d983c89",
                             Name = "User",
                             NormalizedName = "USER"
                         });

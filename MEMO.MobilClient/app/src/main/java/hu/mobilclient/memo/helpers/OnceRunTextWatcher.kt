@@ -7,21 +7,20 @@ import android.text.TextWatcher
 abstract class OnceRunTextWatcher : TextWatcher {
     private val interval: Long = 100
     private val handler: Handler = Handler()
-    private val running = Runnable { runned = true }
     private var runned = true
         set(runned){
             if(!runned){
-                handler.postDelayed(running, interval)
+                handler.postDelayed({this.runned = true}, interval)
             }
             field = runned
         }
 
-    open val onceAfterTextChanged: ()->Unit = {}
+    open val onceAfterTextChanged: (p0: Editable?) -> Unit = {}
 
     override fun afterTextChanged(p0: Editable?){
         if(runned) {
             runned = false
-            onceAfterTextChanged()
+            onceAfterTextChanged(p0)
         }
     }
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}

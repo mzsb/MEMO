@@ -1,7 +1,6 @@
 package hu.mobilclient.memo.adapters
 
 import android.annotation.SuppressLint
-import android.provider.SyncStateContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +12,8 @@ import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.databinding.AttributeParameterListItemBinding
 import hu.mobilclient.memo.helpers.Constants
-import hu.mobilclient.memo.model.AttributeParameter
+import hu.mobilclient.memo.model.memoapi.AttributeParameter
 import kotlinx.android.synthetic.main.attribute_parameter_list_item.view.*
-import kotlinx.android.synthetic.main.fragment_attribute.*
 import kotlin.collections.ArrayList
 
 class AttributeParameterAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -47,28 +45,29 @@ class AttributeParameterAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
             if (position == displayedAttributeParameters.size - 1) {
                 addEditText = valueEditText
-                controlButton.setImageResource(R.drawable.ic_add_48dp)
+                controlButton.setImageResource(R.drawable.ic_add_accent_48dp)
                 controlButton.setOnClickListener {
-                    if (valueEditText.isNotEmpty() && !valueEditText.tooLong(10, App.instance.getString(R.string.parameter_value_too_long) + " " + App.Companion.instance.getString(R.string.now_dd) + " ")){
+                    if (valueEditText.isNotEmpty() && !valueEditText.tooLong(Constants.ATTRIBUTE_PARAMETER_VALUE_MAX_LENGTH, App.instance.getString(R.string.parameter_value_too_long, Constants.ATTRIBUTE_PARAMETER_VALUE_MAX_LENGTH))){
                         val newParameter = AttributeParameter().copy(parameter)
                         displayedAttributeParameters.add(displayedAttributeParameters.size - 1,newParameter)
                         attributeParameters.add(newParameter)
-                        parameter.Value = Constants.EMPTYSTRING
+                        parameter.Value = Constants.EMPTY_STRING
                         valueEditTexts.clear()
                         notifyDataSetChanged()
                     }
                 }
             }
             else {
-                if(!valueEditTexts.contains(valueEditText)){
-                    valueEditTexts.add(valueEditText)
-                }
-                controlButton.setImageResource(R.drawable.ic_remove_24dp)
-                controlButton.setOnClickListener {
-                    displayedAttributeParameters.remove(parameter)
-                    attributeParameters.remove(parameter)
-                    valueEditTexts.clear()
-                    notifyDataSetChanged()
+                    if(!valueEditTexts.contains(valueEditText)){
+                        valueEditTexts.add(valueEditText)
+                    }
+
+                    controlButton.setImageResource(R.drawable.ic_remove_accent_24dp)
+                    controlButton.setOnClickListener {
+                        displayedAttributeParameters.remove(parameter)
+                        attributeParameters.remove(parameter)
+                        valueEditTexts.clear()
+                        notifyDataSetChanged()
                 }
             }
         }
@@ -76,7 +75,7 @@ class AttributeParameterAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
 
     fun isValid(): Boolean {
         for(editText in valueEditTexts){
-            if (!editText.isNotEmpty() || editText.tooLong(10, App.instance.getString(R.string.parameter_value_too_long) + " " + App.Companion.instance.getString(R.string.now_dd) + " ")){
+            if (!editText.isNotEmpty() || editText.tooLong(Constants.ATTRIBUTE_PARAMETER_VALUE_MAX_LENGTH, App.instance.getString(R.string.parameter_value_too_long, Constants.ATTRIBUTE_PARAMETER_VALUE_MAX_LENGTH))){
                 return false
             }
         }
@@ -100,7 +99,7 @@ class AttributeParameterAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
     private fun EditText.tooLong(maxLength: Int, errorMessage: String): Boolean{
         if(this.text.length > maxLength){
             this.requestFocus()
-            this.error = errorMessage + this.text.length + " " + App.instance.getString(R.string.character)
+            this.error = errorMessage + " " + App.instance.getString(R.string.now_dd, this.text.length)
             return true
         }
         return false
@@ -110,7 +109,7 @@ class AttributeParameterAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(
         return attributeParameters
     }
 
-    private fun AttributeParameter.copy(rightParameter: AttributeParameter): AttributeParameter{
+    private fun AttributeParameter.copy(rightParameter: AttributeParameter): AttributeParameter {
         Value = rightParameter.Value
         return this
     }

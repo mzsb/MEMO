@@ -5,6 +5,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_translations"
+            android:icon="@drawable/ic_translation_48dp"
+            android:title="@string/translations" />
+        <item
             android:id="@+id/nav_dictionarylist"
             android:icon="@drawable/ic_dictionary_48dp"
             android:title="@string/dictionaries" />
@@ -14,6 +18,7 @@
             android:title="@string/account" />
         <group android:id="@+id/group_dictionaries">
             <item
+                android:id="@+id/nav_fast_access"
                 android:title="@string/fast_access"
                 android:enabled="false"/>
         </group>

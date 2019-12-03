@@ -92,8 +92,34 @@ namespace MEMO.BLL.Services
             {
                 attribute.User = user;
 
-                foreach (var ap in _context.AttributeParameters.Where(ap => ap.AttributeId == attribute.Id))
+                if (attribute.Type == DAL.Enums.AttributeType.spinner)
                 {
+                    foreach (var attributeValue in _context.AttributeValues
+                                                           .Include(av => av.Attribute)
+                                                           .ThenInclude(a => a.AttributeParameters)
+                                                           .Where(av => av.AttributeId == attribute.Id)
+                                                           .AsNoTracking())
+                    {
+                        foreach (var ap in attributeValue.Attribute.AttributeParameters)
+                        {
+                            if (attributeValue.Value == ap.Value)
+                            {
+                                if (attribute.AttributeParameters.Select(nap => nap.Id).Contains(ap.Id))
+                                {
+                                    attributeValue.Value = attribute.AttributeParameters.SingleOrDefault(nap => nap.Id == ap.Id).Value;
+                                    _context.Entry(attributeValue).State = EntityState.Modified;
+                                }
+                                else{
+                                    attributeValue.Attribute = null;
+                                    _context.Remove(attributeValue);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (var ap in _context.AttributeParameters.Where(ap => ap.AttributeId == attribute.Id))
+                { 
                     _context.AttributeParameters.Remove(ap);
                 }
 
@@ -103,7 +129,6 @@ namespace MEMO.BLL.Services
                 }
   
                 _context.Entry(attribute).State = EntityState.Modified;
-
 
                 try
                 {
@@ -146,15 +171,15 @@ namespace MEMO.BLL.Services
         public async Task<IEnumerable<Attribute>> GetByUserIdAsync(System.Guid id)
         {
             var attributes = await _context.Attributes.Where(a => a.UserId == id)
-                                                      .Include(a => a.AttributeValues)
                                                       .Include(a => a.User)
                                                       .Include(a => a.AttributeParameters)
                                                       .AsNoTracking()
                                                       .ToListAsync();
             foreach (var attribute in attributes)
             {
-                attribute.AttributeValuesCount = attribute.AttributeValues.Count;
-                attribute.AttributeValues.Clear();
+                attribute.AttributeValuesCount = await _context.AttributeValues
+                                                               .Where(av => av.AttributeId == attribute.Id)
+                                                               .CountAsync();
             }
 
             return attributes;

@@ -13,23 +13,28 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.DialogFragment
+import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
+import hu.mobilclient.memo.activities.NavigationActivity
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.FragmentUserBinding
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
-import hu.mobilclient.memo.model.User
+import hu.mobilclient.memo.model.memoapi.User
 import kotlinx.android.synthetic.main.fragment_user.*
 
 
-class UserFragment(private var User: User = User(),
-                   private val OkCallback: ()->Unit) : DialogFragment() {
+class UserFragment(private var User: User = User()) : DialogFragment() {
+
+    private lateinit var activity: NavigationActivity
 
     var IsDelete: Boolean = false
 
     private val originalUser = User()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        activity = requireActivity() as NavigationActivity
 
         val contextThemeWrapper: Context = ContextThemeWrapper(activity, R.style.AppTheme)
 
@@ -62,9 +67,9 @@ class UserFragment(private var User: User = User(),
 
     private fun isValid() =
                      fg_user_et_user_name.isNotEmpty() &&
-                    !fg_user_et_user_name.tooLong(15, getString(R.string.username_too_long) + " " + getString(R.string.now_dd) + " ") &&
+                    !fg_user_et_user_name.tooLong(Constants.USER_NAME_MAX_LENGTH, getString(R.string.username_too_long, Constants.USER_NAME_MAX_LENGTH)) &&
                      fg_user_et_user_email.isNotEmpty() &&
-                    !fg_user_et_user_email.tooLong(50, getString(R.string.email_too_long) + " " + getString(R.string.now_dd) + " ") &&
+                    !fg_user_et_user_email.tooLong(Constants.USER_EMAIL_MAX_LENGTH, getString(R.string.email_too_long, Constants.USER_EMAIL_MAX_LENGTH)) &&
                      fg_user_et_user_email.isValidEmail()
 
     private fun EditText.isNotEmpty(): Boolean{
@@ -88,7 +93,7 @@ class UserFragment(private var User: User = User(),
     private fun EditText.tooLong(maxLength: Int, errorMessage: String): Boolean{
         if(this.text.length > maxLength){
             this.requestFocus()
-            this.error = errorMessage + this.text.length + " " + getString(R.string.character)
+            this.error = errorMessage + " " + App.instance.getString(R.string.now_dd, this.text.length)
             return true
         }
         return false
@@ -97,13 +102,13 @@ class UserFragment(private var User: User = User(),
     fun cancelClick(view: View) = dismiss()
 
     fun saveClick(view: View){
-        val serviceManager = (activity as NetworkActivityBase).serviceManager
+        val serviceManager = activity.serviceManager
         if(User.Role != Constants.ADMIN) {
                 if (IsDelete) {
-                    SureFragment(Message = User.UserName + getString(R.string.named_user_delete),
+                    SureFragment(Message = User.UserName + " " + getString(R.string.named_user_delete),
                             OkCallback = {
-                                serviceManager.user?.delete(User.Id!!, {
-                                    OkCallback()
+                                serviceManager.user.delete(User.Id, {
+                                    activity.onUserDeleted(User.Id)
                                     EmotionToast.showSuccess(getString(R.string.user_delete_success))
                                     dismiss()
                                 }, {
@@ -113,8 +118,8 @@ class UserFragment(private var User: User = User(),
                 } else {
                     if(!User.userEquals(originalUser)) {
                         if (isValid()) {
-                            serviceManager.user?.update(User, {
-                                OkCallback()
+                            serviceManager.user.update(User, {
+                                activity.onUserUpdated(User.Id)
                                 EmotionToast.showSuccess()
                                 dismiss()
                             }, {

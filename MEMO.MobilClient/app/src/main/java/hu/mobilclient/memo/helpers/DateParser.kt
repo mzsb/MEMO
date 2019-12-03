@@ -6,10 +6,10 @@ object DateParser {
     {
         val splitted = date.split(".")
         return if(splitted.size == 4) {
-            return "${splitted[0]}.${splitted[1]}.${splitted[2]}.".replace( " ",Constants.EMPTYSTRING)
+            return "${splitted[0]}.${splitted[1]}.${splitted[2]}.".replace( " ",Constants.EMPTY_STRING)
         }
         else{
-            Constants.EMPTYSTRING
+            Constants.EMPTY_STRING
         }
     }
 }

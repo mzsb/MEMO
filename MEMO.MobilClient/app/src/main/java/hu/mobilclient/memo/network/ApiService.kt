@@ -1,7 +1,10 @@
 package hu.mobilclient.memo.network
 
-import hu.mobilclient.memo.model.*
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.authentication.Login
+import hu.mobilclient.memo.model.authentication.Registration
+import hu.mobilclient.memo.model.authentication.TokenHolder
+import hu.mobilclient.memo.model.memoapi.*
+import hu.mobilclient.memo.model.memoapi.Dictionary
 import hu.mobilclient.memo.services.ConnectionService
 import retrofit2.Call
 import retrofit2.http.*
@@ -106,6 +109,9 @@ interface ApiService {
 
     @GET("translation/dictionary/{id}")
     fun getTranslationsByDictionaryId(@Path("id") id: UUID): Call<List<Translation>>
+
+    @GET("translation/translate/{original}/{from}/{to}")
+    fun translate(@Path("original") original: String, @Path("from") from: String, @Path("to") to: String): Call<Translation>
 
     /* Attribute */
 

@@ -1,5 +1,6 @@
 package hu.mobilclient.memo.fragments
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
@@ -8,45 +9,64 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
+import android.widget.*
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import hu.mobilclient.memo.App
 import hu.mobilclient.memo.BR
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.activities.LoginActivity
-import hu.mobilclient.memo.activities.NavigationActivity
 import hu.mobilclient.memo.adapters.AttributeAdapter
+import hu.mobilclient.memo.adapters.NavigationPagerAdapter
 import hu.mobilclient.memo.adapters.UserAdapter
 import hu.mobilclient.memo.databinding.FragmentAccountBinding
 import hu.mobilclient.memo.filters.AttributeFilter
 import hu.mobilclient.memo.filters.DictionaryFilter
+import hu.mobilclient.memo.filters.TranslationFilter
 import hu.mobilclient.memo.filters.UserFilter
 import hu.mobilclient.memo.fragments.bases.NavigationFragmentBase
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
-import hu.mobilclient.memo.model.Attribute
-import hu.mobilclient.memo.model.User
+import hu.mobilclient.memo.model.memoapi.Attribute
+import hu.mobilclient.memo.model.memoapi.Dictionary
+import hu.mobilclient.memo.model.memoapi.User
+import hu.mobilclient.memo.activities.MemoryGameActivity
+import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeCreationHandler
+import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeDeletionHandler
+import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeUpdateHandler
+import hu.mobilclient.memo.fragments.interfaces.dictionary.IDictionaryCreationHandler
+import hu.mobilclient.memo.fragments.interfaces.dictionary.IDictionaryDeletionHandler
+import hu.mobilclient.memo.fragments.interfaces.user.IUserUpdateHandler
+import hu.mobilclient.memo.model.enums.PracticeType
 import kotlinx.android.synthetic.main.fab_menu.*
 import kotlinx.android.synthetic.main.fragment_account.view.*
+import java.util.*
 
 
-class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeClickedListener, UserAdapter.OnUserClickedListener {
+class AccountFragment: NavigationFragmentBase(),
+                       AttributeAdapter.OnAttributeClickedListener,
+                       UserAdapter.OnUserClickedListener,
+                       IDictionaryCreationHandler,
+                       IDictionaryDeletionHandler,
+                       IAttributeCreationHandler,
+                       IAttributeUpdateHandler,
+                       IAttributeDeletionHandler,
+                       IUserUpdateHandler {
 
     private val attributeAdapter : AttributeAdapter = AttributeAdapter()
     private val userAdapter : UserAdapter = UserAdapter()
 
     var user: ObservableField<User> = ObservableField()
+    var dictionary: Dictionary = Dictionary()
 
-    private var originalUserName = Constants.EMPTYSTRING
-    private var originalEmail = Constants.EMPTYSTRING
+    private var originalUserName = Constants.EMPTY_STRING
+    private var originalEmail = Constants.EMPTY_STRING
     var IsUpdateUserName: ObservableBoolean = ObservableBoolean(false)
     var IsUpdateEmail: ObservableBoolean = ObservableBoolean(false)
+    var IsUserDataLoaded: ObservableBoolean = ObservableBoolean(false)
     var IsAttributesVisible: ObservableBoolean = ObservableBoolean(false)
     var IsUsersVisible: ObservableBoolean = ObservableBoolean(false)
     var IsDelete: ObservableBoolean = ObservableBoolean(false)
@@ -54,9 +74,12 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
     private lateinit var emailEditText: EditText
     private lateinit var userNameEditText: EditText
 
+    private lateinit var practiceTypeSpinner: Spinner
+
     private lateinit var attributesProgressBar: ProgressBar
     private lateinit var attributesRecyclerView: RecyclerView
 
+    private lateinit var userDataProgressBar: ProgressBar
     private lateinit var usersProgressBar: ProgressBar
     private lateinit var usersRecyclerView: RecyclerView
 
@@ -74,10 +97,10 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
         binding.setVariable(BR.fragment, this)
 
         attributeAdapter.serviceManager = serviceManager
-        attributeAdapter.userId = args.getUserId()
+        attributeAdapter.userId = App.getCurrentUserId()
 
         userAdapter.serviceManager = serviceManager
-        userAdapter.userId = args.getUserId()
+        userAdapter.userId = App.getCurrentUserId()
 
         return binding.root
     }
@@ -85,16 +108,19 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         attributesRecyclerView = view.fg_account_rv_attribute_list
-        attributesProgressBar = view.fg_account_attribute_list_pb
+        attributesProgressBar = view.fg_account_pb_attribute_list
+
+        userDataProgressBar = view.fg_account_pb_user_data
 
         usersRecyclerView = view.fg_account_rv_user_list
-        usersProgressBar = view.fg_account_user_list_pb
+        usersProgressBar = view.fg_account_pb_user_list
 
         popUp = AnimationUtils.loadAnimation(requireContext(), R.anim.pop_up)
 
         emailEditText = view.fg_account_et_email
         userNameEditText = view.fg_account_et_user_name
 
+        practiceTypeSpinner = view.fg_account_sp_practice_type
 
         val attributesHiderButton = view.fg_account_iv_attribute_list_hider
         val attributesHolder = view.fg_account_rl_attribute_list_holder
@@ -103,14 +129,12 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
         val usersHolder = view.fg_account_rl_user_list_holder
         val usersLinearLayout = view.fg_account_ll_users
 
-        attributesHiderButton.setOnClickListener {
-            IsAttributesVisible.set(!IsAttributesVisible.get())
-            (it as ImageView).setImageResource(if (IsAttributesVisible.get()) R.drawable.ic_drop_up_24dp else R.drawable.ic_drop_down_24dp)
+        val showAttributes = {
             attributesHolder.visibility = if (IsAttributesVisible.get()) {
-                                                attributesRecyclerView.startAnimation(popUp)
-                                                View.VISIBLE
-                                           }
-                                           else View.GONE
+                attributesRecyclerView.startAnimation(popUp)
+                View.VISIBLE
+            } else View.GONE
+
             if(IsAttributesVisible.get()){
                 usersLinearLayout.visibility = View.GONE
                 usersHolder.visibility = View.GONE
@@ -119,15 +143,20 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
                 usersLinearLayout.visibility = View.VISIBLE
             }
         }
+        showAttributes()
 
-        usersHiderButton.setOnClickListener {
-            IsUsersVisible.set(!IsUsersVisible.get())
-            (it as ImageView).setImageResource(if (IsUsersVisible.get()) R.drawable.ic_drop_up_24dp else R.drawable.ic_drop_down_24dp)
+        attributesHiderButton.setOnClickListener {
+            IsAttributesVisible.set(!IsAttributesVisible.get())
+            (it as ImageView).setImageResource(if (IsAttributesVisible.get()) R.drawable.ic_drop_up_24dp else R.drawable.ic_drop_down_24dp)
+            showAttributes()
+        }
+
+        val showUsers = {
             usersHolder.visibility = if (IsUsersVisible.get()) {
-                                        usersRecyclerView.startAnimation(popUp)
-                                        View.VISIBLE
-                                    }
-                                    else View.GONE
+                usersRecyclerView.startAnimation(popUp)
+                View.VISIBLE
+            }
+            else View.GONE
 
             if(IsUsersVisible.get()){
                 attributesHolder.visibility = View.GONE
@@ -137,16 +166,48 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
                 attributesLinearLayout.visibility = View.VISIBLE
             }
         }
+        showUsers()
 
-        initializeUserData()
+        usersHiderButton.setOnClickListener {
+            IsUsersVisible.set(!IsUsersVisible.get())
+            (it as ImageView).setImageResource(if (IsUsersVisible.get()) R.drawable.ic_drop_up_24dp else R.drawable.ic_drop_down_24dp)
+            showUsers()
+        }
+
+        usersRecyclerView.layoutManager = LinearLayoutManager(context)
+        usersRecyclerView.adapter = userAdapter
+
+        attributesRecyclerView.layoutManager = LinearLayoutManager(context)
+        attributesRecyclerView.adapter = attributeAdapter
+
+        userDataProgressBar.visibility = View.GONE
+        IsUserDataLoaded.set(true)
+        user.set(App.currentUser)
         initializeAttributeAdapter()
         initializeUserAdapter()
+        initializePractice()
+    }
+
+    private fun initializePractice(){
+        practiceTypeSpinner.adapter = ArrayAdapter(App.instance, R.layout.spinner_item_accent, PracticeType.values())
+        practiceTypeSpinner.visibility = View.VISIBLE
+        practiceTypeSpinner.setSelection(Constants.ZERO)
     }
 
     private fun initializeUserData(){
-        serviceManager.user?.get(args.getUserId(), { user ->
+        IsUserDataLoaded.set(false)
+
+        userDataProgressBar.visibility = View.VISIBLE
+        serviceManager.user.get(App.getCurrentUserId(), { user ->
+            App.currentUser = user
             this.user.set(user)
-        },{EmotionToast.showSad(getString(R.string.unable_load_user))})
+            userDataProgressBar.visibility = View.GONE
+            IsUserDataLoaded.set(true)
+        }, {
+            IsUserDataLoaded.set(false)
+            EmotionToast.showSad(getString(R.string.unable_load_user))
+            userDataProgressBar.visibility = View.GONE
+        })
     }
 
     fun updateUserNameClick(view: View){
@@ -173,35 +234,37 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
         IsUpdateEmail.set(!IsUpdateEmail.get())
     }
 
+    fun practiceClick(view: View){
+        if(user.get()!!.DictionaryCount.toInt() != Constants.ZERO || user.get()!!.ViewedDictionaryCount.toInt() != Constants.ZERO) {
+            when (practiceTypeSpinner.selectedItem) {
+                PracticeType.MEMORYGAME -> {
+                    startActivity(Intent(requireContext(), MemoryGameActivity::class.java))
+                }
+            }
+        }
+        else{
+            EmotionToast.showHelp(getString(R.string.create_or_view_one_dictionary))
+        }
+    }
+
     fun updateClick(view: View){
         if(IsDelete.get()){
             SureFragment(Message = getString(R.string.account_delete_message),
                     OkCallback = {
-                        serviceManager.user?.delete(user.get()!!.Id!!,{
-                            requireActivity().getSharedPreferences(Constants.AUTHDATA, 0).edit().clear().apply()
-                            startActivity(Intent(requireActivity(), LoginActivity::class.java))
-                            DictionaryFilter.clearFilter()
-                            AttributeFilter.clearFilter()
-                            UserFilter.clearFilter()
-                            EmotionToast.showSuccess(getString(R.string.account_delete_success))
-                            requireActivity().finish()}, {
+                        serviceManager.user.delete(user.get()!!.Id,{
+                            activity.onUserDeleted(user.get()!!.Id)
+                        }, {
                             EmotionToast.showSad(getString(R.string.account_delete_fail))
                         })
                     }).show(requireActivity().supportFragmentManager, "TAG")
         }
         else {
             if (isValid()) {
-                view.isEnabled = false
                 emailEditText.isEnabled = false
                 userNameEditText.isEnabled = false
-                serviceManager.user?.update(user.get()!!, {
-                    emailEditText.isEnabled = true
-                    userNameEditText.isEnabled = true
-                    view.isEnabled = true
-                    IsUpdateEmail.set(false)
-                    IsUpdateUserName.set(false)
+                serviceManager.user.update(user.get()!!,{
+                    activity.onUserUpdated(user.get()!!.Id)
                     EmotionToast.showSuccess()
-                    initializeUserData()
                 }, {
                     emailEditText.isEnabled = true
                     userNameEditText.isEnabled = true
@@ -233,7 +296,7 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
     private fun EditText.tooLong(maxLength: Int, errorMessage: String): Boolean{
         if(this.text.length > maxLength){
             this.requestFocus()
-            this.error = errorMessage + this.text.length + " " + getString(R.string.character)
+            this.error = errorMessage + " " + App.instance.getString(R.string.now_dd, this.text.length)
             return true
         }
         return false
@@ -241,63 +304,93 @@ class AccountFragment: NavigationFragmentBase(), AttributeAdapter.OnAttributeCli
 
     private fun isValid() =
                     userNameEditText.isNotEmpty() &&
-                    !userNameEditText.tooLong(15, getString(R.string.username_too_long) + " " + getString(R.string.now_dd) + " ") &&
+                    !userNameEditText.tooLong(Constants.USER_NAME_MAX_LENGTH, getString(R.string.username_too_long, Constants.USER_NAME_MAX_LENGTH)) &&
                     emailEditText.isNotEmpty() &&
-                    !emailEditText.tooLong(50, getString(R.string.email_too_long) + " " + getString(R.string.now_dd) + " ") &&
+                    !emailEditText.tooLong(Constants.USER_EMAIL_MAX_LENGTH, getString(R.string.email_too_long, Constants.USER_EMAIL_MAX_LENGTH)) &&
                     emailEditText.isValidEmail()
 
     private fun initializeAttributeAdapter(){
+        val isCurrentPage = activity.isCurrentPage(NavigationPagerAdapter.ACCOUNT_PAGE_POSITION)
+
         val fabMenu = requireActivity().ac_navigation_ll_fab_menu
 
-        attributeAdapter.initializeAdapter({
-            fabMenu.visibility = View.GONE
+        attributeAdapter.initializeAdapter(beforeInit = {
+            if(isCurrentPage) {
+                fabMenu.visibility = View.GONE
+            }
             attributesProgressBar.visibility = View.VISIBLE
             attributesRecyclerView.visibility = View.GONE
-        },{
-            attributesRecyclerView.layoutManager = GridLayoutManager(context, 1)
-            attributesRecyclerView.adapter = attributeAdapter
+        }, afterInit = {
             attributeAdapter.itemLongClickListener = this
             attributesProgressBar.visibility = View.GONE
             attributesRecyclerView.startAnimation(popUp)
             attributesRecyclerView.visibility = View.VISIBLE
-            fabMenu.startAnimation(popUp)
-            fabMenu.visibility = View.VISIBLE
+            if(isCurrentPage) {
+                fabMenu.startAnimation(popUp)
+                fabMenu.visibility = View.VISIBLE
+            }
+        }, onError = {
+            attributesProgressBar.visibility = View.GONE
         })
     }
 
     private fun initializeUserAdapter(){
-        val fabMenu = requireActivity().ac_navigation_ll_fab_menu
-
-        userAdapter.initializeAdapter({
-            fabMenu.visibility = View.GONE
+        userAdapter.initializeAdapter(beforeInit = {
             usersProgressBar.visibility = View.VISIBLE
             usersRecyclerView.visibility = View.GONE
-        },{
-            usersRecyclerView.layoutManager = GridLayoutManager(context, 1)
-            usersRecyclerView.adapter = userAdapter
+        }, afterInit = {
             userAdapter.itemLongClickListener = this
             usersProgressBar.visibility = View.GONE
             usersRecyclerView.startAnimation(popUp)
             usersRecyclerView.visibility = View.VISIBLE
-            fabMenu.startAnimation(popUp)
-            fabMenu.visibility = View.VISIBLE
+        }, onError = {
+            usersProgressBar.visibility = View.GONE
         })
     }
 
     override fun update() {
-        attributeAdapter.reset()
-        userAdapter.reset()
+        initializeUserData()
         initializeAttributeAdapter()
+        initializeUserAdapter()
+        initializePractice()
+    }
+
+    override fun onAttributeLongClicked(attribute: Attribute): Boolean {
+        AttributeFragment(attribute).show(requireActivity().supportFragmentManager, Constants.ATTRIBUTE_FRAGMENT_TAG)
+        return true
+    }
+
+    override fun onUserLongClicked(user: User): Boolean {
+        if(App.isAdmin()) {
+            UserFragment(user).show(requireActivity().supportFragmentManager, Constants.USER_FRAGMENT_TAG)
+        }
+        return true
+    }
+
+    override fun onDictionaryDeleted(dictionaryId: UUID) {
+        initializeUserData()
         initializeUserAdapter()
     }
 
-    override fun onAttributeLongClicked(attribute: Attribute) {
-        AttributeFragment(attribute) {(activity as NavigationActivity).onRefresh()}.show(requireActivity().supportFragmentManager, "TAG")
+    override fun onDictionaryCreated(dictionaryId: UUID) {
+        initializeUserData()
+        initializeUserAdapter()
     }
 
-    override fun onUserLongClicked(user: User) {
-        if(App.isAdmin()) {
-            UserFragment(user) { (activity as NavigationActivity).onRefresh() }.show(requireActivity().supportFragmentManager, "TAG")
+    override fun onAttributeCreated(attributeId: UUID) = initializeAttributeAdapter()
+
+    override fun onAttributeUpdated(attributeId: UUID) = initializeAttributeAdapter()
+
+    override fun onAttributeDeleted(attributeId: UUID) = initializeAttributeAdapter()
+
+    override fun onUserUpdated(userId: UUID) {
+        emailEditText.isEnabled = true
+        userNameEditText.isEnabled = true
+        IsUpdateEmail.set(false)
+        IsUpdateUserName.set(false)
+        initializeUserData()
+        if(App.isAdmin()){
+            initializeUserAdapter()
         }
     }
 }

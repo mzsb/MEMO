@@ -3,7 +3,7 @@ package hu.mobilclient.memo.services
 import android.app.Activity
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
-import hu.mobilclient.memo.model.Translation
+import hu.mobilclient.memo.model.memoapi.Translation
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 import java.util.*
@@ -24,7 +24,7 @@ class TranslationService(activity: Activity, private val errorCallback: (String)
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun get(id: UUID,
@@ -43,7 +43,7 @@ class TranslationService(activity: Activity, private val errorCallback: (String)
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun insert(translation: Translation,
@@ -62,7 +62,7 @@ class TranslationService(activity: Activity, private val errorCallback: (String)
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun update(translation: Translation,
@@ -80,7 +80,7 @@ class TranslationService(activity: Activity, private val errorCallback: (String)
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun delete(id: UUID,
@@ -98,7 +98,7 @@ class TranslationService(activity: Activity, private val errorCallback: (String)
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun getByDictionaryId(id: UUID,
@@ -117,6 +117,29 @@ class TranslationService(activity: Activity, private val errorCallback: (String)
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
+
+    fun translate(original: String,
+                  from: String,
+                  to: String,
+                  callback: (Translation) -> Unit,
+                  errorCallback: (errorMessage: String) -> Unit = this.errorCallback,
+                  checkError: Boolean = false) =
+            createRequest(
+                    request = apiService::translate,
+                    firstRequestParameter = original,
+                    secondRequestParameter = from,
+                    thirdRequestParameter = to,
+                    onSuccess =
+                    fun(response: Response<Translation>) {
+                        if (response.isSuccessful) {
+                            callback(response.body()
+                                    ?: return errorCallback(ProblemDetails(response.errorBody()?.string()).detail))
+                        } else {
+                            errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
+                        }
+                    },
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
+                    checkError = checkError)
 }

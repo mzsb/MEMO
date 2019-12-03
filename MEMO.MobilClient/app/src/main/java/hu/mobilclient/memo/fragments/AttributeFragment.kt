@@ -4,14 +4,11 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.library.baseAdapters.BR
@@ -19,24 +16,23 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
+import hu.mobilclient.memo.activities.NavigationActivity
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
-import hu.mobilclient.memo.adapters.AttributeAdapter
 import hu.mobilclient.memo.adapters.AttributeParameterAdapter
 import hu.mobilclient.memo.databinding.FragmentAttributeBinding
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
-import hu.mobilclient.memo.model.Attribute
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.memoapi.Attribute
+import hu.mobilclient.memo.model.memoapi.AttributeParameter
 import hu.mobilclient.memo.model.enums.AttributeType
 import kotlinx.android.synthetic.main.fragment_attribute.*
 import kotlinx.android.synthetic.main.fragment_attribute.view.*
-import kotlinx.android.synthetic.main.fragment_dictionary.*
-import kotlinx.android.synthetic.main.fragment_dictionary.view.*
-import org.w3c.dom.Attr
+import java.util.*
 
 
-class AttributeFragment(private var Attribute: Attribute = Attribute(),
-                        private val OkCallback: ()->Unit) : DialogFragment() {
+class AttributeFragment(private var Attribute: Attribute = Attribute()) : DialogFragment() {
+
+    private lateinit var activity: NavigationActivity
 
     private val adapter : AttributeParameterAdapter = AttributeParameterAdapter()
 
@@ -50,6 +46,8 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+        activity = requireActivity() as NavigationActivity
+
         val contextThemeWrapper: Context = ContextThemeWrapper(activity, R.style.AppTheme)
 
         val binding: FragmentAttributeBinding = DataBindingUtil.inflate(
@@ -57,7 +55,7 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
 
         originalAttribute.copy(Attribute)
 
-        isUpdate = Attribute.Id != null
+        isUpdate = Attribute.Id != UUID(0,0)
 
         binding.setVariable(BR.attribute, Attribute)
         binding.setVariable(BR.fragment, this)
@@ -88,8 +86,11 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
     private fun Attribute.copy(rightAttribute: Attribute){
         Name = rightAttribute.Name
         Type = rightAttribute.Type
+
         AttributeParameters.clear()
-        AttributeParameters.addAll(rightAttribute.AttributeParameters)
+        for(attributeParameter in rightAttribute.AttributeParameters){
+            AttributeParameters.add(AttributeParameter().copy(attributeParameter))
+        }
     }
 
     private fun Attribute.attributeNotEquals(rightAttribute: Attribute): Boolean {
@@ -106,14 +107,21 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
         return false
     }
 
+    private fun AttributeParameter.copy(rightAttributeParameter: AttributeParameter): AttributeParameter {
+        Id = rightAttributeParameter.Id
+        Value = rightAttributeParameter.Value
+
+        return this
+    }
+
     private fun initializeTypeSpinner(view: View){
         val typeSpinner = view.fg_attribute_sp_type
 
         val types = AttributeType.values()
                                             .contentToString()
-                                            .replace(" ", Constants.EMPTYSTRING)
-                                            .replace("[", Constants.EMPTYSTRING)
-                                            .replace("]", Constants.EMPTYSTRING)
+                                            .replace(" ", Constants.EMPTY_STRING)
+                                            .replace("[", Constants.EMPTY_STRING)
+                                            .replace("]", Constants.EMPTY_STRING)
                                             .split(",")
 
 
@@ -134,7 +142,7 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
     }
 
     private fun isValid() = fg_attribute_et_attribute_name.isNotEmpty() &&
-                                    !fg_attribute_et_attribute_name.tooLong(15, getString(R.string.attribute_name_too_long) + " " + getString(R.string.now_dd) + " ")
+                                    !fg_attribute_et_attribute_name.tooLong(Constants.ATTRIBUTE_NAME_MAX_LENGTH, getString(R.string.attribute_name_too_long, Constants.ATTRIBUTE_NAME_MAX_LENGTH))
 
     private fun EditText.isNotEmpty(): Boolean{
         if(this.text.isEmpty()){
@@ -148,7 +156,7 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
     private fun EditText.tooLong(maxLength: Int, errorMessage: String): Boolean{
         if(this.text.length > maxLength){
             this.requestFocus()
-            this.error = errorMessage + this.text.length + " " + getString(R.string.character)
+            this.error = errorMessage + " " + App.instance.getString(R.string.now_dd, this.text.length)
             return true
         }
         return false
@@ -160,22 +168,25 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
         val serviceManager = (activity as NetworkActivityBase).serviceManager
         if (isUpdate) {
             if(IsDelete){
-                SureFragment(Message = Attribute.Name + getString(R.string.named_attribute_delete),
-                             OkCallback = {
-                                 serviceManager.attribute?.delete(Attribute.Id!!,{
-                                     OkCallback()
-                                     EmotionToast.showSuccess(getString(R.string.attribute_delete_success))
-                                     dismiss() },{
-                                     EmotionToast.showSad(getString(R.string.attribute_delete_fail))
-                                 })
-                             }).show(requireActivity().supportFragmentManager, "TAG")
+                SureFragment(Message = Attribute.Name + " " + getString(R.string.named_attribute_delete),
+                        OkCallback = {
+                            serviceManager.attribute.delete(Attribute.Id, {
+                                activity.onAttributeDeleted(Attribute.Id)
+                                EmotionToast.showSuccess(getString(R.string.attribute_delete_success))
+                                dismiss()
+                            }, {
+                                EmotionToast.showSad(getString(R.string.attribute_delete_fail))
+                            })
+                        }).show(requireActivity().supportFragmentManager, "TAG")
             }
             else{
+                Attribute.AttributeParameters.clear()
+                Attribute.AttributeParameters.addAll(adapter.getParameters())
                 if(Attribute.attributeNotEquals(originalAttribute)) {
                     if (isValid()) {
                         if (validateSpinnerAttribute()) {
-                            serviceManager.attribute?.update(Attribute, {
-                                OkCallback()
+                            serviceManager.attribute.update(Attribute, {
+                                activity.onAttributeUpdated(Attribute.Id)
                                 EmotionToast.showSuccess()
                                 dismiss()
                             }, {
@@ -194,8 +205,8 @@ class AttributeFragment(private var Attribute: Attribute = Attribute(),
                     Attribute.AttributeParameters.clear()
                     Attribute.AttributeParameters.addAll(adapter.getParameters())
                     Attribute.User = App.currentUser
-                    serviceManager.attribute?.insert(Attribute, {
-                        OkCallback()
+                    serviceManager.attribute.insert(Attribute, {attribute ->
+                        activity.onAttributeCreated(attribute.Id)
                         dismiss()
                         EmotionToast.showSuccess(getString(R.string.attribute_create_success))
                     },{

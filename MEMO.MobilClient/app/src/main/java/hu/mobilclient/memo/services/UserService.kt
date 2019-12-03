@@ -1,10 +1,9 @@
 package hu.mobilclient.memo.services
 
 import android.app.Activity
-import hu.mobilclient.memo.R
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
-import hu.mobilclient.memo.model.User
+import hu.mobilclient.memo.model.memoapi.User
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 import java.util.*
@@ -25,7 +24,7 @@ class UserService(activity: Activity, private val errorCallback: (String) -> Uni
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun get(id: UUID,
@@ -44,7 +43,7 @@ class UserService(activity: Activity, private val errorCallback: (String) -> Uni
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun update(user: User,
@@ -62,7 +61,7 @@ class UserService(activity: Activity, private val errorCallback: (String) -> Uni
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun delete(id: UUID,
@@ -80,7 +79,7 @@ class UserService(activity: Activity, private val errorCallback: (String) -> Uni
                         errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                     }
                 },
-                onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                 checkError = checkError)
 
     fun getViewersByUserId(id: UUID,
@@ -99,6 +98,6 @@ class UserService(activity: Activity, private val errorCallback: (String) -> Uni
                                     errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                                 }
                             },
-                            onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                            onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                             checkError = checkError)
 }

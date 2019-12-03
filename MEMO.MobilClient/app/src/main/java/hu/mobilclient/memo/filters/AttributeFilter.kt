@@ -1,6 +1,7 @@
 package hu.mobilclient.memo.filters
 
 import android.annotation.SuppressLint
+import android.text.Editable
 import android.view.View
 import android.widget.AdapterView
 import android.widget.CompoundButton
@@ -12,18 +13,16 @@ import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
-import hu.mobilclient.memo.model.Attribute
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.memoapi.Attribute
 import hu.mobilclient.memo.model.enums.AttributeType
-import java.util.*
 import kotlin.collections.ArrayList
 
-class AttributeFilter(var AttributeName: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                      var UserName: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                      var MinParameterCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                      var MaxParameterCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                      var TotalAttributeCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                      var TotalValueCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
+class AttributeFilter(var AttributeName: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                      var UserName: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                      var MinParameterCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                      var MaxParameterCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                      var TotalAttributeCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                      var TotalValueCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
                       var Type: String = App.instance.getString(R.string.all),
                       var All: ObservableBoolean = ObservableBoolean(false),
                       var SortByAttributeName: ObservableBoolean = ObservableBoolean(true),
@@ -49,24 +48,24 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
     companion object{
         fun loadFilter() : AttributeFilter {
             return Gson().fromJson<AttributeFilter>(App.instance.getSharedPreferences(Constants.FILTER, 0)
-                    .getString(Constants.ATTRIBUTEFILTER, null), AttributeFilter::class.java) ?: AttributeFilter()
+                    .getString(Constants.ATTRIBUTE_FILTER, null), AttributeFilter::class.java) ?: AttributeFilter()
         }
 
         fun clearFilter(){
             App.instance.getSharedPreferences(Constants.FILTER, 0).edit()
-                    .putString(Constants.ATTRIBUTEFILTER, "")
+                    .putString(Constants.ATTRIBUTE_FILTER, "")
                     .apply()
         }
     }
 
     fun resetSearch(){
-        AttributeName.set(Constants.EMPTYSTRING)
-        UserName.set(Constants.EMPTYSTRING)
+        AttributeName.set(Constants.EMPTY_STRING)
+        UserName.set(Constants.EMPTY_STRING)
     }
 
     fun resetFilter(){
-        MinParameterCount.set(Constants.EMPTYSTRING)
-        MaxParameterCount.set(Constants.EMPTYSTRING)
+        MinParameterCount.set(Constants.EMPTY_STRING)
+        MaxParameterCount.set(Constants.EMPTY_STRING)
         All.set(false)
         Type = App.instance.getString(R.string.all)
         SortByAttributeName.set(true)
@@ -78,7 +77,7 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
 
     private fun saveFilter(){
         App.instance.getSharedPreferences(Constants.FILTER, 0).edit()
-                .putString(Constants.ATTRIBUTEFILTER, Gson().toJson(this))
+                .putString(Constants.ATTRIBUTE_FILTER, Gson().toJson(this))
                 .apply()
     }
 
@@ -113,7 +112,7 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
     }
 
     inner class FilterTextWatcher : OnceRunTextWatcher() {
-        override val onceAfterTextChanged: () -> Unit = {
+        override val onceAfterTextChanged: (p0: Editable?) -> Unit = {
             useFilter()
         }
     }
@@ -174,9 +173,9 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
         types.add(App.instance.getString(R.string.all))
         types.addAll(AttributeType.values()
                 .contentToString()
-                .replace(" ", Constants.EMPTYSTRING)
-                .replace("[", Constants.EMPTYSTRING)
-                .replace("]", Constants.EMPTYSTRING)
+                .replace(" ", Constants.EMPTY_STRING)
+                .replace("[", Constants.EMPTY_STRING)
+                .replace("]", Constants.EMPTY_STRING)
                 .split(","))
     }
 

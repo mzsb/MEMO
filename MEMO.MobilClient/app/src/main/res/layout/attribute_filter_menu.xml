@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:orientation="horizontal"
-                android:background="@drawable/bg_rounded_accent"
+                android:background="@drawable/bg_rounded_accent_1"
                 android:paddingEnd="5dp"
                 android:paddingStart="7dp"
                 android:layout_marginEnd="5dp"
@@ -76,7 +76,7 @@
                 android:layout_height="35dp"
                 android:src="@drawable/ic_filter_24dp"
                 android:layout_marginEnd="5dp"
-                android:background="@drawable/bg_rounded_accent"
+                android:background="@drawable/bg_rounded_accent_1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/fg_account_attribute_filter_menu_iv_search" />
 
@@ -85,7 +85,7 @@
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:src="@drawable/ic_search_24dp"
-                android:background="@drawable/bg_rounded_accent"
+                android:background="@drawable/bg_rounded_accent_1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

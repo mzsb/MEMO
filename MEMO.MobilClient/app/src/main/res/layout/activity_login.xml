@@ -7,7 +7,7 @@
     <data>
         <variable
             name="login"
-            type="hu.mobilclient.memo.model.Login" />
+            type="hu.mobilclient.memo.model.authentication.Login" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         tools:context=".activities.LoginActivity">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ac_login_img_logo"
             android:layout_width="261dp"
             android:layout_height="139dp"
@@ -36,7 +36,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ac_login_img_logo">
 
-            <EditText
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/ac_login_et_username"
                 android:layout_width="165dp"
                 android:layout_height="wrap_content"

@@ -3,8 +3,7 @@ package hu.mobilclient.memo.services
 import android.app.Activity
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.ProblemDetails
-import hu.mobilclient.memo.model.Attribute
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.memoapi.Attribute
 import hu.mobilclient.memo.services.bases.ServiceBase
 import retrofit2.Response
 import java.util.*
@@ -25,7 +24,7 @@ class AttributeService(activity: Activity, private val errorCallback: (String) -
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 
     fun get(id: UUID,
@@ -44,7 +43,7 @@ class AttributeService(activity: Activity, private val errorCallback: (String) -
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 
     fun insert(dictionary: Attribute,
@@ -63,7 +62,7 @@ class AttributeService(activity: Activity, private val errorCallback: (String) -
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 
     fun update(dictionary: Attribute,
@@ -81,7 +80,7 @@ class AttributeService(activity: Activity, private val errorCallback: (String) -
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 
     fun delete(id: UUID,
@@ -99,7 +98,7 @@ class AttributeService(activity: Activity, private val errorCallback: (String) -
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 
     fun getByUserId(id: UUID,
@@ -118,6 +117,6 @@ class AttributeService(activity: Activity, private val errorCallback: (String) -
                             errorCallback(ProblemDetails(response.errorBody()?.string()).detail)
                         }
                     },
-                    onFailure = {errorCallback(it.message?:Constants.EMPTYSTRING)},
+                    onFailure = {errorCallback(it.message?:Constants.EMPTY_STRING)},
                     checkError = checkError)
 }

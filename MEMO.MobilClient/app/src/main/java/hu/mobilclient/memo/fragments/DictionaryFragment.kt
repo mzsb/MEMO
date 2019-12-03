@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -12,23 +11,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.library.baseAdapters.BR
 import androidx.fragment.app.DialogFragment
 import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
+import hu.mobilclient.memo.activities.NavigationActivity
 import hu.mobilclient.memo.activities.bases.NetworkActivityBase
 import hu.mobilclient.memo.databinding.FragmentDictionaryBinding
+import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
-import hu.mobilclient.memo.model.Dictionary
+import hu.mobilclient.memo.model.memoapi.Dictionary
 import kotlinx.android.synthetic.main.fragment_dictionary.*
 import kotlinx.android.synthetic.main.fragment_dictionary.view.*
+import java.util.*
 
 
-class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
-                         private val OkCallback: ()->Unit) : DialogFragment() {
+class DictionaryFragment(private var Dictionary: Dictionary = Dictionary()) : DialogFragment() {
+
+    private lateinit var activity: NavigationActivity
 
     var isUpdate = false
 
@@ -40,17 +42,31 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
 
     var IsViewersVisible: ObservableBoolean = ObservableBoolean(false)
 
+    val IsAdmin: Boolean
+        get(){
+            return App.isAdmin()
+        }
+
+    val IsPublic: Boolean
+        get(){
+            return Dictionary.IsPublic
+        }
+
     private val originalDictionary = Dictionary()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        activity = requireActivity() as NavigationActivity
 
         val contextThemeWrapper: Context = ContextThemeWrapper(activity, R.style.AppTheme)
 
         val binding: FragmentDictionaryBinding = DataBindingUtil.inflate(
                 inflater.cloneInContext(contextThemeWrapper), R.layout.fragment_dictionary, container, false)
 
+        isUpdate = Dictionary.Id != UUID(0,0)
+
         val ownerId = Dictionary.Owner.Id
-        if(ownerId != null && !App.isCurrent(ownerId)) {
+        if(isUpdate && !App.isCurrent(ownerId)) {
             isEnabled = false
             IsViewed = Dictionary.Viewers.any()
         }
@@ -60,8 +76,6 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
         }
 
         originalDictionary.copy(Dictionary)
-
-        isUpdate = Dictionary.Id != null
 
         binding.setVariable(BR.dictionary, Dictionary)
         binding.setVariable(BR.fragment, this)
@@ -85,7 +99,6 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
                 val viewerTextView = TextView(requireContext())
                 viewerTextView.text = viewer.UserName
                 viewerTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                viewerTextView.typeface = ResourcesCompat.getFont(requireActivity(), R.font.aldrich)
                 val params = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -129,7 +142,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
             IsFastAccessible == rightDictionary.IsFastAccessible
 
     private fun initializeLanguageSpinners(view: View){
-        (activity as NetworkActivityBase).serviceManager.language?.get({languages ->
+        (activity as NetworkActivityBase).serviceManager.language.get({languages ->
 
             val sourceLanguageSpinner = view.fg_dictionary_sp_source_language
             val destinationLanguageSpinner = view.fg_dictionary_sp_destination_language
@@ -160,8 +173,8 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
     }
 
     private fun isValid() = fg_dictionary_et_dictionary_name.isNotEmpty() &&
-                                    !fg_dictionary_et_dictionary_name.tooLong(20, getString(R.string.dictionary_name_too_long) + " " + getString(R.string.now_dd) + " ") &&
-                                    !fg_dictionary_et_dictionary_description.tooLong(250, getString(R.string.description_too_long) + " " + getString(R.string.now_dd) + " ")
+                                    !fg_dictionary_et_dictionary_name.tooLong(Constants.DICTIONARY_NAME_MAX_LENGTH, getString(R.string.dictionary_name_too_long, Constants.DICTIONARY_NAME_MAX_LENGTH)) &&
+                                    !fg_dictionary_et_dictionary_description.tooLong(Constants.DICTIONARY_DESCRIPTION_MAX_LENGTH, getString(R.string.description_too_long, Constants.DICTIONARY_DESCRIPTION_MAX_LENGTH))
 
     private fun EditText.isNotEmpty(): Boolean{
         if(this.text.isEmpty()){
@@ -175,7 +188,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
     private fun EditText.tooLong(maxLength: Int, errorMessage: String): Boolean{
         if(this.text.length > maxLength){
             this.requestFocus()
-            this.error = errorMessage + this.text.length + " " + getString(R.string.character)
+            this.error = errorMessage + " " + App.instance.getString(R.string.now_dd, this.text.length)
             return true
         }
         return false
@@ -187,10 +200,10 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
         val serviceManager = (activity as NetworkActivityBase).serviceManager
         if (isUpdate) {
             if(IsDelete){
-                SureFragment(Message = Dictionary.Name + getString(R.string.named_dictionary_delete),
+                SureFragment(Message = Dictionary.Name + " " + getString(R.string.named_dictionary_delete),
                              OkCallback = {
-                                 serviceManager.dictionary?.delete(Dictionary.Id!!,{
-                                     OkCallback()
+                                 serviceManager.dictionary.delete(Dictionary.Id,{
+                                     activity.onDictionaryDeleted(Dictionary.Id)
                                      EmotionToast.showSuccess(getString(R.string.dictionary_delete_success))
                                      dismiss() },{
                                      EmotionToast.showSad(getString(R.string.dictionary_delete_fail))
@@ -201,8 +214,8 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
                 if(isEnabled) {
                     if(!Dictionary.dictionaryEquals(originalDictionary)) {
                         if (isValid()) {
-                            serviceManager.dictionary?.update(Dictionary, {
-                                OkCallback()
+                            serviceManager.dictionary.update(Dictionary, {
+                                activity.onDictionaryUpdated(Dictionary.Id)
                                 EmotionToast.showSuccess()
                                 dismiss()
                             }, {
@@ -214,12 +227,12 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
                         EmotionToast.showHelp(getString(R.string.no_changes))
                     }
                 }
-                else{
-                    val isUserViewd = Dictionary.Viewers.filter {it.Id == App.currentUser.Id}.any()
+                if(!isEnabled || (IsAdmin && IsPublic)){
+                    val isUserViewed = Dictionary.Viewers.filter {it.Id == App.currentUser.Id}.any()
                     if(IsViewed){
-                        if(!isUserViewd) {
-                            serviceManager.dictionary?.subscribe(App.currentUser.Id!!, Dictionary, {
-                                OkCallback()
+                        if(!isUserViewed) {
+                            serviceManager.dictionary.subscribe(App.currentUser.Id, Dictionary, {
+                                activity.onDictionaryCreated(Dictionary.Id)
                                 EmotionToast.showSuccess()
                                 dismiss()
                             },{
@@ -231,11 +244,11 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
                         }
                     }
                     else{
-                        if(isUserViewd) {
-                            SureFragment(Message = Dictionary.Name + getString(R.string.name_dictionary_unsubscribe),
+                        if(isUserViewed) {
+                            SureFragment(Message = Dictionary.Name + " " + getString(R.string.name_dictionary_unsubscribe),
                                     OkCallback = {
-                                        serviceManager.dictionary?.unsubscribe(App.currentUser.Id!!, Dictionary, {
-                                            OkCallback()
+                                        serviceManager.dictionary.unsubscribe(App.currentUser.Id, Dictionary, {
+                                            activity.onDictionaryDeleted(Dictionary.Id)
                                             EmotionToast.showSuccess()
                                             dismiss()
                                         },{
@@ -252,8 +265,9 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary(),
         } else {
             if(isValid()) {
                 Dictionary.Owner = App.currentUser
-                serviceManager.dictionary?.insert(Dictionary, {
-                    OkCallback()
+                serviceManager.dictionary.insert(Dictionary, {dictionary ->
+                    activity.onDictionaryCreated(dictionary.Id)
+                    EmotionToast.showSuccess(getString(R.string.dictionary_create_success))
                     dismiss()
                 }, {
                     EmotionToast.showSad(getString(R.string.dictionary_create_fail))

@@ -10,9 +10,10 @@
             type="hu.mobilclient.memo.fragments.AccountFragment" />
     </data>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,100 +23,130 @@
             android:layout_margin="10dp"
             android:padding="10dp">
 
-            <LinearLayout
+            <ProgressBar
+                android:id="@+id/fg_account_pb_user_data"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/accent"
+                android:visibility="gone"
+                android:indeterminateTintMode="src_in"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/fg_account_ll_user_name_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:weightSum="10"
                 android:orientation="horizontal"
-                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
+                android:visibility="@{!fragment.isUserDataLoaded ? View.GONE : fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:id="@+id/fg_account_tv_user_name"
+                    android:layout_width="wrap_content"
+                    android:maxWidth="300dp"
                     android:layout_height="wrap_content"
                     android:textColor="@color/primary"
                     android:textSize="50sp"
                     android:layout_weight="9"
                     android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
-                    android:text="@{fragment.user.userName}"/>
+                    android:text="@{fragment.user.userName}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <EditText
                     android:id="@+id/fg_account_et_user_name"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
+                    android:maxWidth="300dp"
                     android:layout_height="wrap_content"
                     style="@style/BlueEditText"
                     android:textSize="50sp"
                     android:layout_weight="9"
                     android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
-                    android:text="@={fragment.user.userName}"/>
+                    android:text="@={fragment.user.userName}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <ImageView
-                    android:layout_width="0dp"
+                    android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:minWidth="24dp"
+                    android:minHeight="24dp"
                     android:onClick="@{fragment::updateUserNameClick}"
                     android:src="@drawable/ic_update_48dp"
-                    android:layout_weight="9"
                     android:visibility="@{fragment.isUpdateUserName ? View.GONE : View.VISIBLE}"
-                    android:layout_gravity="top"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/fg_account_tv_user_name"/>
 
                 <ImageView
-                    android:layout_width="0dp"
+                    android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:minWidth="24dp"
+                    android:minHeight="24dp"
                     android:onClick="@{fragment::updateUserNameCancelClick}"
                     android:src="@drawable/ic_cancel_accent_24dp"
-                    android:layout_weight="9"
                     android:visibility="@{fragment.isUpdateUserName ? View.VISIBLE : View.GONE}"
-                    android:layout_gravity="top"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/fg_account_et_user_name"/>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/fg_account_ll_email_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:weightSum="10"
                 android:layout_marginStart="5dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
-                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
+                android:visibility="@{!fragment.isUserDataLoaded ? View.GONE : fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:id="@+id/fg_account_tv_email"
+                    android:layout_width="wrap_content"
+                    android:maxWidth="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="9"
                     android:textColor="@color/primary"
                     android:textSize="30sp"
                     android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
-                    android:text="@{fragment.user.email}"/>
+                    android:text="@{fragment.user.email}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <EditText
                     android:id="@+id/fg_account_et_email"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
+                    android:maxWidth="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="9"
                     style="@style/BlueEditText"
                     android:textSize="30sp"
+                    android:inputType="textEmailAddress"
                     android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
-                    android:text="@={fragment.user.email}"/>
+                    android:text="@={fragment.user.email}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <ImageView
-                    android:layout_width="0dp"
+                    android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:onClick="@{fragment::updateEmailClick}"
-                    android:layout_weight="1"
                     android:src="@drawable/ic_update_48dp"
                     android:visibility="@{fragment.isUpdateEmail ? View.GONE : View.VISIBLE}"
-                    android:layout_gravity="top"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/fg_account_tv_email"/>
 
                 <ImageView
-                    android:layout_width="0dp"
+                    android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:minWidth="24dp"
+                    android:minHeight="24dp"
                     android:onClick="@{fragment::updateEmailCancelClick}"
                     android:src="@drawable/ic_cancel_accent_24dp"
-                    android:layout_weight="1"
                     android:visibility="@{fragment.isUpdateEmail ? View.VISIBLE : View.GONE}"
-                    android:layout_gravity="top"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/fg_account_et_email"/>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/fg_account_cl_delete_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp">
@@ -128,7 +159,7 @@
                     android:layout_gravity="end"
                     android:onClick="@{fragment::updateClick}"
                     android:text="@string/save"
-                    android:visibility="@{fragment.isUpdateEmail | fragment.isUpdateUserName | fragment.IsDelete ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{!fragment.isUserDataLoaded ? View.GONE : fragment.isUpdateEmail | fragment.isUpdateUserName | fragment.IsDelete ? View.VISIBLE : View.GONE}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
 
@@ -140,7 +171,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
+                    android:visibility="@{!fragment.isUserDataLoaded ? View.GONE : fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -166,7 +197,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginStart="5dp"
-                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
+                android:visibility="@{!fragment.isUserDataLoaded ? View.GONE : fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -190,7 +221,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginStart="5dp"
-                android:visibility="@{fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
+                android:visibility="@{!fragment.isUserDataLoaded ? View.GONE : fragment.IsAttributesVisible | fragment.IsUsersVisible ? View.GONE : View.VISIBLE}">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -254,7 +285,7 @@
                         android:visibility="gone"/>
 
                     <ProgressBar
-                        android:id="@+id/fg_account_user_list_pb"
+                        android:id="@+id/fg_account_pb_user_list"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:layout_gravity="center"
@@ -314,7 +345,7 @@
                         android:visibility="gone"/>
 
                     <ProgressBar
-                        android:id="@+id/fg_account_attribute_list_pb"
+                        android:id="@+id/fg_account_pb_attribute_list"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:layout_gravity="center"
@@ -329,6 +360,49 @@
 
         </LinearLayout>
 
-    </RelativeLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_rounded_accent_1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/fg_account_tv_practice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:text="@string/practice"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/fg_account_sp_practice_type"/>
+
+            <Spinner
+                android:id="@+id/fg_account_sp_practice_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/fg_account_tv_practice"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{fragment::practiceClick}"
+                android:text="@string/start"
+                android:textColor="@color/accent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
 
 </layout>

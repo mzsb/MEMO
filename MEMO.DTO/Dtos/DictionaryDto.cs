@@ -37,6 +37,6 @@ namespace MEMO.DTO
 
         public ICollection<TranslationDto> Translations { get; set; } = new List<TranslationDto>();
         public ICollection<UserDto> Viewers { get; set; } = new List<UserDto>();
-        public String CreationDate { get; set; }
+        public string CreationDate { get; set; }
     }
 }

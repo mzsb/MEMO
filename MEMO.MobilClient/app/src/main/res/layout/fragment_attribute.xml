@@ -6,7 +6,7 @@
         <import type="android.view.View"/>
         <variable
             name="attribute"
-            type="hu.mobilclient.memo.model.Attribute" />
+            type="hu.mobilclient.memo.model.memoapi.Attribute" />
         <variable
             name="fragment"
             type="hu.mobilclient.memo.fragments.AttributeFragment" />

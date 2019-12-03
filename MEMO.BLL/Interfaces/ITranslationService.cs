@@ -1,4 +1,5 @@
 ﻿using MEMO.DAL.Entities;
+using MEMO.DAL.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,5 +16,7 @@ namespace MEMO.BLL.Interfaces
         Task DeleteAsync(Guid id);
 
         Task<IEnumerable<Translation>> GetByDictionaryIdAsync(Guid id);
+
+        Task<Translation> TranslateAsync(string original, string from, string to);
     }
 }

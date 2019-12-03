@@ -10,7 +10,7 @@ namespace MEMO.DAL.Entities
     public class Attribute
     {
         public Guid Id { get; set; }
-        [MaxLength(15)]
+        [MaxLength(20)]
         public string Name { get; set; }
         public AttributeType Type { get; set; }
 

@@ -103,7 +103,7 @@ namespace MEMO.DAL.DataSeed
 
                             var attribute = new Entities.Attribute
                             {
-                                Name = loremIpsum.CustomSubstring(idx, 6, stringRemoves),
+                                Name = type == AttributeType.text ? "példamondat" : type == AttributeType.spinner ? "szófaj" : "fontos" ,
                                 User = user,
                                 Type = type
                             };
@@ -184,6 +184,7 @@ namespace MEMO.DAL.DataSeed
                                 {
                                     Original = loremIpsum.CustomSubstring(idx1, 6, stringRemoves),
                                     Translated = loremIpsum.CustomSubstring(idx2, 6, stringRemoves),
+                                    Color = -13615201,
                                     Dictionary = dictionary
                                 };
                                 translations.Add(translation);
@@ -219,7 +220,7 @@ namespace MEMO.DAL.DataSeed
                                     {
                                         attributeValue = new AttributeValue
                                         {
-                                            Value = loremIpsum.CustomSubstring(idx, 6, stringRemoves),
+                                            Value = attribute.Type == AttributeType.text ? loremIpsum.CustomSubstring(idx, 6, stringRemoves) : random.Next(2) == 0 ? "true" : "false",
                                             Translation = traslation,
                                             Attribute = attribute
                                         };

@@ -13,11 +13,9 @@ enum class AttributeType {
     CHECKBOX
     ;
 
-    override fun toString(): String{
-        return when(this){
-            TEXT -> App.instance.getString(R.string.text)
-            SPINNER -> App.instance.getString(R.string.list)
-            CHECKBOX -> App.instance.getString(R.string.checkbox)
-        }
+    override fun toString() = when(this){
+        TEXT -> App.instance.getString(R.string.text)
+        SPINNER -> App.instance.getString(R.string.list)
+        CHECKBOX -> App.instance.getString(R.string.checkbox)
     }
 }

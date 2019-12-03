@@ -7,7 +7,7 @@
     <data>
         <variable
             name="registration"
-            type="hu.mobilclient.memo.model.Registration" />
+            type="hu.mobilclient.memo.model.authentication.Registration" />
         <variable
             name="fragment"
             type="hu.mobilclient.memo.fragments.RegistrationFragment" />

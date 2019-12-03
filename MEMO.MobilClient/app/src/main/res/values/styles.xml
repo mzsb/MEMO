@@ -8,7 +8,6 @@
         <item name="android:textViewStyle">@style/TextView</item>
         <item name="android:textColorHint">@color/primary_light</item>
         <item name="android:editTextColor">@color/primary_light</item>
-        <item name="android:fontFamily">@font/aldrich</item>
         <item name="colorControlNormal">@color/primary_light</item>
         <item name="colorControlActivated">@color/primary_light</item>
         <item name="android:textCursorDrawable">@drawable/cursor</item>
@@ -24,6 +23,13 @@
         <item name="android:textSelectHandleRight">@drawable/ic_selecthand_right_accent_48dp</item>
         <item name="android:backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <style name="ColorPickerDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@drawable/bg_rounded_blue_1</item>
+        <item name="android:windowBackground">#00000000</item>
+        <item name="buttonStyle">@style/AppButtonBlue</item>
+        <item name="android:textViewStyle">@style/TextView</item>
     </style>
 
     <style name="AccentSwitch" parent="">

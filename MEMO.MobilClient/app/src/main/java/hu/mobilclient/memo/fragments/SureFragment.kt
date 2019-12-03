@@ -15,7 +15,7 @@ import hu.mobilclient.memo.R
 import hu.mobilclient.memo.databinding.FragmentSureBinding
 import hu.mobilclient.memo.helpers.Constants
 
-class SureFragment(var Message: String = Constants.EMPTYSTRING,
+class SureFragment(var Message: String = Constants.EMPTY_STRING,
                    private val OkCallback: ()->Unit) : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

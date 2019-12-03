@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <import type="hu.mobilclient.memo.model.enums.AttributeType"/>
+        <variable
+            name="value"
+            type="hu.mobilclient.memo.model.memoapi.AttributeValue" />
+    </data>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginStart="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textColor="@color/primary_dark"
+            android:text="@{value.attribute.name}"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textColor="@color/primary_dark"
+            android:visibility="@{value.attribute.type == AttributeType.CHECKBOX ? View.GONE : View.VISIBLE}"
+            android:text="@{@string/dd + ` `}"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textColor="@color/primary_dark"
+            android:visibility="@{value.attribute.type == AttributeType.CHECKBOX ? View.GONE : View.VISIBLE}"
+            android:text="@{value.value}"/>
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:buttonTint="@color/primary_dark"
+            android:clickable="false"
+            android:visibility="@{value.attribute.type == AttributeType.CHECKBOX ? View.VISIBLE : View.GONE}"
+            android:checked="@{value.IsChecked}"/>
+
+    </LinearLayout>
+</layout>

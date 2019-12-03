@@ -1,8 +1,7 @@
 package hu.mobilclient.memo.filters
 
 import android.annotation.SuppressLint
-import android.view.View
-import android.widget.AdapterView
+import android.text.Editable
 import android.widget.CompoundButton
 import android.widget.RadioGroup
 import androidx.databinding.ObservableBoolean
@@ -12,16 +11,16 @@ import hu.mobilclient.memo.App
 import hu.mobilclient.memo.R
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
-import hu.mobilclient.memo.model.User
+import hu.mobilclient.memo.model.memoapi.User
 import java.text.SimpleDateFormat
 
-class UserFilter(var UserName: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                 var MinDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                 var MaxDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                 var MinTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                 var MaxTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                 var TotalUserCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
-                 var TotalDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTYSTRING),
+class UserFilter(var UserName: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                 var MinDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                 var MaxDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                 var MinTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                 var MaxTranslationCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                 var TotalUserCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
+                 var TotalDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
                  var All: ObservableBoolean = ObservableBoolean(false),
                  var SortByUserName: ObservableBoolean = ObservableBoolean(true),
                  var SortByTranslation: ObservableBoolean = ObservableBoolean(false),
@@ -42,23 +41,23 @@ class UserFilter(var UserName: ObservableField<String> = ObservableField(Constan
     companion object{
         fun loadFilter() : UserFilter {
             return Gson().fromJson<UserFilter>(App.instance.getSharedPreferences(Constants.FILTER, 0)
-                    .getString(Constants.USERFILTER, null), UserFilter::class.java) ?: UserFilter()
+                    .getString(Constants.USER_FILTER, null), UserFilter::class.java) ?: UserFilter()
         }
 
         fun clearFilter(){
             App.instance.getSharedPreferences(Constants.FILTER, 0).edit()
-                    .putString(Constants.USERFILTER, "")
+                    .putString(Constants.USER_FILTER, "")
                     .apply()
         }
     }
 
     fun resetSearch(){
-        UserName.set(Constants.EMPTYSTRING)
+        UserName.set(Constants.EMPTY_STRING)
     }
 
     fun resetFilter(){
-        MinDictionaryCount.set(Constants.EMPTYSTRING)
-        MaxDictionaryCount.set(Constants.EMPTYSTRING)
+        MinDictionaryCount.set(Constants.EMPTY_STRING)
+        MaxDictionaryCount.set(Constants.EMPTY_STRING)
         All.set(false)
         SortByUserName.set(true)
         SortByTranslation.set(false)
@@ -69,7 +68,7 @@ class UserFilter(var UserName: ObservableField<String> = ObservableField(Constan
 
     private fun saveFilter(){
         App.instance.getSharedPreferences(Constants.FILTER, 0).edit()
-                .putString(Constants.USERFILTER, Gson().toJson(this))
+                .putString(Constants.USER_FILTER, Gson().toJson(this))
                 .apply()
     }
 
@@ -89,7 +88,7 @@ class UserFilter(var UserName: ObservableField<String> = ObservableField(Constan
     }
 
     inner class FilterTextWatcher : OnceRunTextWatcher() {
-        override val onceAfterTextChanged: () -> Unit = {
+        override val onceAfterTextChanged: (p0: Editable?) -> Unit = {
             useFilter()
         }
     }
