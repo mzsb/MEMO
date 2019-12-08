@@ -13,6 +13,7 @@ import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
 import hu.mobilclient.memo.model.memoapi.Translation
 import java.text.SimpleDateFormat
+import java.util.*
 
 
 class TranslationFilter(var Original: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
@@ -97,11 +98,9 @@ class TranslationFilter(var Original: ObservableField<String> = ObservableField(
     private fun sortAndPrivate(translations: List<Translation>): List<Translation>{
         var sortedTranslations = translations
 
-        val dateFormat = SimpleDateFormat(App.instance.getString(R.string.date_format))
-
         if(SortByCreationDate.get()) {
-            sortedTranslations = if(IsDescending.get()) sortedTranslations.sortedByDescending { dateFormat.parse(it.CreationDate) }
-                                                    else sortedTranslations.sortedBy { dateFormat.parse(it.CreationDate) }
+            sortedTranslations = if(IsDescending.get()) sortedTranslations.sortedByDescending { it.CreationDate }
+                                                    else sortedTranslations.sortedBy { it.CreationDate }
         }
         if(SortByOriginal.get()) {
             sortedTranslations = if(IsDescending.get()) sortedTranslations.sortedByDescending { it.Original }
@@ -116,7 +115,7 @@ class TranslationFilter(var Original: ObservableField<String> = ObservableField(
     }
 
     fun setTotalTranslationCount(translations : List<Translation>){
-        TotalTranslationCount.set((if(translations.count() > 1) translations.count() - 2  else 0).toString())
+        TotalTranslationCount.set(translations.filter { it.Id != UUID(0,0) }.count().toString())
     }
 
     fun setTotalAttributeValueCount(translations : List<Translation>){

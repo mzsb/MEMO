@@ -177,7 +177,7 @@ class AttributeFragment(private var Attribute: Attribute = Attribute()) : Dialog
                             }, {
                                 EmotionToast.showSad(getString(R.string.attribute_delete_fail))
                             })
-                        }).show(requireActivity().supportFragmentManager, "TAG")
+                        }).show(requireActivity().supportFragmentManager, Constants.SURE_FRAGMENT_TAG)
             }
             else{
                 Attribute.AttributeParameters.clear()

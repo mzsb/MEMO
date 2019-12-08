@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/refresh"
+        android:id="@+id/fullscreen"
         android:checkableBehavior="single"
         app:showAsAction="always"
-        android:icon="@drawable/ic_restart_48dp"
+        android:icon="@drawable/ic_fullscreen_36dp"
         android:title=""/>
 </menu>

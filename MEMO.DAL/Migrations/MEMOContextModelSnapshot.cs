@@ -158,12 +158,12 @@ namespace MEMO.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("4e3b1224-1a04-4ab5-8686-5783e0cc4dcc"),
+                            Id = new Guid("a8ef4f71-4c44-4cff-94aa-a06fd698fcb6"),
                             LanguageCode = "hu"
                         },
                         new
                         {
-                            Id = new Guid("f2cadeef-4c9c-4f24-8a11-6747fa34f5f2"),
+                            Id = new Guid("fa508639-e0c5-4785-9c32-13f6928ad3dd"),
                             LanguageCode = "en"
                         });
                 });
@@ -273,9 +273,6 @@ namespace MEMO.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("DictionaryId")
                         .HasColumnType("uniqueidentifier");
 
@@ -325,15 +322,15 @@ namespace MEMO.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("591d3fa7-d5af-4359-b080-9bf4b00d77a6"),
-                            ConcurrencyStamp = "8f38dc7a-97df-4900-ba0f-b1b2fdc394e0",
+                            Id = new Guid("63adce33-66b4-4c38-a491-b5254682a0e7"),
+                            ConcurrencyStamp = "6b566b39-855d-4ac1-a268-e440c063778d",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = new Guid("2deab827-b5f6-4a5c-8215-043957128e61"),
-                            ConcurrencyStamp = "39f90123-0bd9-43b8-88ee-ec3f1d983c89",
+                            Id = new Guid("a2bc9eca-1172-4d35-8d11-229c896466a9"),
+                            ConcurrencyStamp = "c263e9bc-3ad5-4c7a-862c-a0943e6616a3",
                             Name = "User",
                             NormalizedName = "USER"
                         });

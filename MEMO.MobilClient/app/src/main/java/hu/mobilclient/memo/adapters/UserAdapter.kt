@@ -34,8 +34,7 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val filterPosition = Constants.ZERO
 
     private val displayedUsers = ArrayList<User>()
-    private val allUsers = ArrayList<User>()
-    private val ownUsers = ArrayList<User>()
+
     private var userFilter = UserFilter.loadFilter()
 
     lateinit var itemLongClickListener: OnUserClickedListener
@@ -185,41 +184,27 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         this.beforeInit = beforeInit
         this.afterInit = afterInit
         userFilter.useFilter = ::useFilter
-        reset()
         when {
-            userFilter.All.get() ->
-                if(!allUsers.any()){
-                    beforeInit()
-                    serviceManager.user.get({allUsers ->
-                        this.allUsers.addAll(allUsers)
-                        this.allUsers.remove(this.allUsers.single{ it.Id == App.currentUser.Id })
-                        setUsers(allUsers)
-                        ownUsers.clear()
-                        afterInit()
-                    },{
-                        EmotionToast.showSad(App.instance.getString(R.string.unable_to_load_all_user))
-                        onError()
-                    })
-                }
-                else{
+            userFilter.All.get() -> {
+                beforeInit()
+                serviceManager.user.get({allUsers ->
                     setUsers(allUsers)
-                }
-            !userFilter.All.get() ->
-                if(!ownUsers.any()){
-                    beforeInit()
-                    serviceManager.user.getViewersByUserId(userId,{ ownUsers ->
-                        this.ownUsers.addAll(ownUsers)
-                        setUsers(ownUsers)
-                        allUsers.clear()
-                        afterInit()
-                    },{
-                        EmotionToast.showSad(App.instance.getString(R.string.unable_to_load_users))
-                        onError()
-                    })
-                }
-                else{
+                    afterInit()
+                },{
+                    EmotionToast.showSad(App.instance.getString(R.string.unable_to_load_all_user))
+                    onError()
+                })
+            }
+            !userFilter.All.get() -> {
+                beforeInit()
+                serviceManager.user.getViewersByUserId(userId,{ ownUsers ->
                     setUsers(ownUsers)
-                }
+                    afterInit()
+                },{
+                    EmotionToast.showSad(App.instance.getString(R.string.unable_to_load_users))
+                    onError()
+                })
+            }
         }
     }
 
@@ -228,11 +213,6 @@ class UserAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         displayedUsers.addAll(0, userFilter.filter(Users))
         displayedUsers.add(filterPosition, User())
         notifyDataSetChanged()
-    }
-
-    private fun reset(){
-        ownUsers.clear()
-        allUsers.clear()
     }
 
     inner class UserViewHolder(itemView: View, val binding: UserListItemBinding) : RecyclerView.ViewHolder(itemView)

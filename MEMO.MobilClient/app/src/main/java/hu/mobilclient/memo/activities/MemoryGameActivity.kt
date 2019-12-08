@@ -36,6 +36,7 @@ class MemoryGameActivity : NetworkActivityBase(), MemoryCardAdapter.OnEndListene
     private val memoryCards = ArrayList<MemoryCard>()
     private lateinit var controlsConstraintLayout: ConstraintLayout
     private lateinit var dictionariesSpinner: Spinner
+    private var selectedDictionaryId = UUID(0,0)
     private lateinit var progressBar: ProgressBar
     private lateinit var backButton: ImageView
     private var isGameLoaded = false
@@ -70,11 +71,17 @@ class MemoryGameActivity : NetworkActivityBase(), MemoryCardAdapter.OnEndListene
             Thread {
                 PracticeDatabase.getInstance(this@MemoryGameActivity).memoryCardDao().deleteMemoryCards()
                 PracticeDatabase.getInstance(this@MemoryGameActivity).memoryCardDao().insertMemoryCards(memoryCards.toEntity())
+                if(selectedDictionaryId != UUID(0,0)) {
+                    getSharedPreferences(Constants.MEMORYGAME_DATA, 0).edit()
+                            .putString(Constants.DICTIONARYID, selectedDictionaryId.toString())
+                            .apply()
+                }
             }.start()
         }
         else{
             Thread {
                 PracticeDatabase.getInstance(this@MemoryGameActivity).memoryCardDao().deleteMemoryCards()
+                getSharedPreferences(Constants.MEMORYGAME_DATA, 0).edit().clear().apply()
             }.start()
         }
     }
@@ -98,8 +105,9 @@ class MemoryGameActivity : NetworkActivityBase(), MemoryCardAdapter.OnEndListene
                         }
                         serviceManager.translation.getByDictionaryId(dictionaries[position].Id,
                                 callback = { translations ->
+                                    selectedDictionaryId = dictionaries[position].Id
                                     memoryCards.clear()
-                                    translations.map { translation ->
+                                    translations.forEach { translation ->
                                         memoryCards.add(MemoryCard(
                                                 TranslationId = translation.Id,
                                                 Value = translation.Original,
@@ -111,6 +119,9 @@ class MemoryGameActivity : NetworkActivityBase(), MemoryCardAdapter.OnEndListene
                                                 IsFound = false,
                                                 IsFlipped = ObservableBoolean(false)))
                                     }
+                                    val shuffled = memoryCards.shuffled()
+                                    memoryCards.clear()
+                                    memoryCards.addAll(shuffled)
                                     adapter.initializeAdapter(memoryCards)
                                     progressBar.vanish()
                                     controlsConstraintLayout.popUp()

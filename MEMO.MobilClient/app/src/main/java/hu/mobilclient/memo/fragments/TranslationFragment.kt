@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.library.baseAdapters.BR
@@ -50,6 +51,7 @@ class TranslationFragment(private var Translation: Translation = Translation(),
 
     private lateinit var translationTranslatedEditText: EditText
     private lateinit var translationOriginalEditText: EditText
+    private lateinit var attributesTextView: TextView
     private lateinit var dictionariesSpinner : Spinner
     private lateinit var colorPickerDialog: androidx.appcompat.app.AlertDialog
 
@@ -104,13 +106,20 @@ class TranslationFragment(private var Translation: Translation = Translation(),
 
         translationTranslatedEditText = view.fg_translation_et_translated
         translationOriginalEditText = view.fg_translation_et_original
+        attributesTextView = view.fg_translation_tv_attributes
 
         val recyclerView = view.fg_translation_rv_attributes
         recyclerView.layoutManager = GridLayoutManager(context, 1)
         recyclerView.adapter = adapter
 
         serviceManager.attribute.getByUserId(App.currentUser.Id,{ attributes ->
-            adapter.initializeAdapter(Translation.AttributeValues, attributes)
+            if(attributes.isEmpty()){
+                attributesTextView.visibility = View.GONE
+            }
+            else {
+                attributesTextView.visibility = View.VISIBLE
+                adapter.initializeAdapter(Translation.AttributeValues, attributes)
+            }
         },{
             EmotionToast.showSad(App.instance.getString(R.string.unable_load_all_attributes))
         })
@@ -252,52 +261,52 @@ class TranslationFragment(private var Translation: Translation = Translation(),
                                  },{
                                      EmotionToast.showSad(getString(R.string.translation_delete_fail))
                                  })
-                             }).show(requireActivity().supportFragmentManager, "TAG")
+                             }).show(requireActivity().supportFragmentManager, Constants.SURE_FRAGMENT_TAG)
             }
             else{
                 if (isValid() && adapter.isValid()) {
-                        Translation.AttributeValues.clear()
-                        Translation.AttributeValues.addAll(adapter.getValues())
+                    Translation.AttributeValues.clear()
+                    Translation.AttributeValues.addAll(adapter.getValues())
 
-                        if(Translation.translationNotEquals(originalTranslation)) {
-                            for (attributeValue in Translation.AttributeValues) {
-                                attributeValue.AttributeId = attributeValue.Attribute?.Id
-                                attributeValue.Attribute = null
-                            }
-                            serviceManager.translation.update(Translation, {
-                                (activity as NavigationActivity).onTranslationUpdated(Translation.Id)
-                                dismiss()
-                                EmotionToast.showSuccess()
-                            }, {
-                                EmotionToast.showSad(getString(R.string.translation_update_fail))
-                            })
+                    if(Translation.translationNotEquals(originalTranslation)) {
+                        for (attributeValue in Translation.AttributeValues) {
+                            attributeValue.AttributeId = attributeValue.Attribute?.Id
+                            attributeValue.Attribute = null
                         }
-                        else{
-                            EmotionToast.showHelp(getString(R.string.no_changes))
-                        }
+                        serviceManager.translation.update(Translation, {
+                            (activity as NavigationActivity).onTranslationUpdated(Translation.Id)
+                            dismiss()
+                            EmotionToast.showSuccess()
+                        }, {
+                            EmotionToast.showSad(getString(R.string.translation_update_fail))
+                        })
+                    }
+                    else{
+                        EmotionToast.showHelp(getString(R.string.no_changes))
+                    }
                 }
             }
         } else {
             if(isValid() && adapter.isValid()) {
-                    Translation.AttributeValues.clear()
-                    Translation.AttributeValues.addAll(adapter.getValues())
-                    for (attributeValue in Translation.AttributeValues){
-                        attributeValue.AttributeId = attributeValue.Attribute?.Id
-                        attributeValue.Attribute = null
+                Translation.AttributeValues.clear()
+                Translation.AttributeValues.addAll(adapter.getValues())
+                for (attributeValue in Translation.AttributeValues){
+                    attributeValue.AttributeId = attributeValue.Attribute?.Id
+                    attributeValue.Attribute = null
+                }
+                Translation.DictionaryId = Dictionary.Id
+                serviceManager.translation.insert(Translation, { translation ->
+                    if(FromLogin){
+                        activity.finish()
                     }
-                    Translation.DictionaryId = Dictionary.Id
-                    serviceManager.translation.insert(Translation, { translation ->
-                        if(FromLogin){
-                            activity.finish()
-                        }
-                        else{
-                            (activity as NavigationActivity).onTranslationCreated(translation.Id)
-                        }
-                        dismiss()
-                        EmotionToast.showSuccess(getString(R.string.translation_create_success))
-                    },{
-                        EmotionToast.showSad(getString(R.string.translation_create_fail))
-                    })
+                    else{
+                        (activity as NavigationActivity).onTranslationCreated(translation.Id)
+                    }
+                    dismiss()
+                    EmotionToast.showSuccess(getString(R.string.translation_create_success))
+                },{
+                    EmotionToast.showSad(getString(R.string.translation_create_fail))
+                })
             }
         }
     }

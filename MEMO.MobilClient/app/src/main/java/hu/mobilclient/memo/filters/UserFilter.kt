@@ -13,6 +13,7 @@ import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
 import hu.mobilclient.memo.model.memoapi.User
 import java.text.SimpleDateFormat
+import java.util.*
 
 class UserFilter(var UserName: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
                  var MinDictionaryCount: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
@@ -126,8 +127,6 @@ class UserFilter(var UserName: ObservableField<String> = ObservableField(Constan
     private fun sortAndPrivate(Users: List<User>): List<User>{
         var sortedUsers = Users
 
-        val dateFormat = SimpleDateFormat(App.instance.getString(R.string.date_format))
-
         if(SortByUserName.get()) {
             sortedUsers = if(IsDescending.get()) sortedUsers.sortedByDescending { it.UserName }
             else sortedUsers.sortedBy { it.UserName }
@@ -141,14 +140,14 @@ class UserFilter(var UserName: ObservableField<String> = ObservableField(Constan
             else sortedUsers.sortedBy { it.DictionaryCount }
         }
         if(SortByCreationDate.get()) {
-            sortedUsers = if(IsDescending.get()) sortedUsers.sortedByDescending { dateFormat.parse(it.CreationDate) }
-            else sortedUsers.sortedBy { dateFormat.parse(it.CreationDate) }
+            sortedUsers = if(IsDescending.get()) sortedUsers.sortedByDescending { it.CreationDate }
+            else sortedUsers.sortedBy { it.CreationDate }
         }
         return sortedUsers
     }
 
     fun setTotalUserCount(users: List<User>){
-        TotalUserCount.set((users.count() - 1).toString())
+        TotalUserCount.set(users.filter { it.Id != UUID(0,0) }.count().toString())
     }
 
     fun setTotalDictionaryCount(users: List<User>){

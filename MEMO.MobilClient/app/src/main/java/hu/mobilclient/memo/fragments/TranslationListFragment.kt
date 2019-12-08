@@ -20,6 +20,7 @@ import hu.mobilclient.memo.adapters.TranslationAdapter
 import hu.mobilclient.memo.databinding.FragmentTranslationListBinding
 import hu.mobilclient.memo.databinding.SpinnerItemDictionaryAccentBinding
 import hu.mobilclient.memo.fragments.bases.NavigationFragmentBase
+import hu.mobilclient.memo.fragments.interfaces.IFullscreenHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeCreationHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeDeletionHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeUpdateHandler
@@ -50,7 +51,8 @@ class TranslationListFragment: NavigationFragmentBase(),
                                ISelectedDictionaryHolder,
                                IAttributeCreationHandler,
                                IAttributeUpdateHandler,
-                               IAttributeDeletionHandler {
+                               IAttributeDeletionHandler,
+                               IFullscreenHandler {
 
     private val adapter: TranslationAdapter = TranslationAdapter()
 
@@ -64,7 +66,9 @@ class TranslationListFragment: NavigationFragmentBase(),
     private lateinit var progressBar: ProgressBar
     private lateinit var recyclerView: RecyclerView
     private lateinit var fabMenu: LinearLayout
+    private lateinit var dictionaryHolderLinearLayout: LinearLayout
     private lateinit var dictionarySpinner: Spinner
+    private lateinit var normalScreenButton: ImageView
 
     private lateinit var popUp: Animation
     private lateinit var vanish: Animation
@@ -90,7 +94,10 @@ class TranslationListFragment: NavigationFragmentBase(),
         recyclerView = view.fg_translation_list_rv
         progressBar = view.fg_translation_list_pb
 
+        dictionaryHolderLinearLayout = view.fg_translation_list_ll_dictionary_holder
         dictionarySpinner = view.fg_translation_list_sp_dictionary
+
+        normalScreenButton = view.fg_translation_list_iv_normal_screen
 
         fabMenu = requireActivity().ac_navigation_ll_fab_menu
 
@@ -162,7 +169,7 @@ class TranslationListFragment: NavigationFragmentBase(),
         var onEnd = false
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-            if(Dictionary.get()!!.isOwn()) {
+            if(Dictionary.get()!!.isOwn() && !adapter.isFullscreen) {
                 if (!recyclerView.canScrollVertically(1)) {
                     if (!onEnd) {
                         fabMenu.startAnimation(vanish)
@@ -198,7 +205,7 @@ class TranslationListFragment: NavigationFragmentBase(),
             progressBar.visibility = View.GONE
             recyclerView.startAnimation(popUp)
             recyclerView.visibility = View.VISIBLE
-            if(isCurrentPage) {
+            if(isCurrentPage && !adapter.isFullscreen) {
                 fabMenu.startAnimation(popUp)
                 fabMenu.visibility = View.VISIBLE
             }
@@ -207,7 +214,9 @@ class TranslationListFragment: NavigationFragmentBase(),
         })
     }
 
-    override fun update() {
+    fun normalScreenClick(view: View) = activity.onNotFullscreen()
+
+    override fun update() = ifInitialized {
         getDictionaries{
             if(dictionaries.any {it.Id == Dictionary.get()!!.Id}) {
                 dictionarySpinner.setSelection(dictionaries.indexOf(dictionaries.single { it.Id == Dictionary.get()!!.Id }))
@@ -223,7 +232,7 @@ class TranslationListFragment: NavigationFragmentBase(),
 
     override fun onNewTranslationClicked(translationId: UUID) = activity.onTranslationCreated(translationId)
 
-    override fun onDictionaryCreated(dictionaryId: UUID) {
+    override fun onDictionaryCreated(dictionaryId: UUID) = ifInitialized {
         getDictionaries {
             Dictionary.set(dictionaries.single { it.Id == dictionaryId})
             dictionarySpinner.setSelection(dictionaries.indexOf(Dictionary.get()))
@@ -231,14 +240,14 @@ class TranslationListFragment: NavigationFragmentBase(),
         }
     }
 
-    override fun onDictionaryUpdated(dictionaryId: UUID) {
+    override fun onDictionaryUpdated(dictionaryId: UUID)  = ifInitialized {
         getDictionaries {
             Dictionary.set(dictionaries.single { it.Id == dictionaryId})
             dictionarySpinner.setSelection(dictionaries.indexOf(Dictionary.get()))
         }
     }
 
-    override fun onDictionaryDeleted(dictionaryId: UUID) {
+    override fun onDictionaryDeleted(dictionaryId: UUID) = ifInitialized {
         if(Dictionary.get()?.Id == dictionaryId){
             getDictionaries{
                 if(dictionaries.isNotEmpty()){
@@ -256,7 +265,7 @@ class TranslationListFragment: NavigationFragmentBase(),
         }
     }
 
-    override fun onDictionarySelected(dictionaryId: UUID) {
+    override fun onDictionarySelected(dictionaryId: UUID) = ifInitialized {
         IsPublic.set(false)
 
         val afterInit = {
@@ -267,7 +276,7 @@ class TranslationListFragment: NavigationFragmentBase(),
 
         if (App.isAdmin()) {
             if (dictionaries.none { it.Id == dictionaryId }) {
-                serviceManager.dictionary?.get({ allDictionary ->
+                serviceManager.dictionary.get({ allDictionary ->
                     this.dictionaries.clear()
                     this.dictionaries.addAll(allDictionary)
                     dictionarySpinner.adapter = BindableArrayAdapter<Dictionary, SpinnerItemDictionaryAccentBinding>(App.instance, R.layout.spinner_item_dictionary_accent, allDictionary)
@@ -313,4 +322,18 @@ class TranslationListFragment: NavigationFragmentBase(),
     override fun onAttributeUpdated(attributeId: UUID) = update()
 
     override fun onAttributeDeleted(attributeId: UUID) = update()
+
+    override fun onFullscreen() = ifInitialized {
+        dictionaryHolderLinearLayout.visibility = View.GONE
+        adapter.isFullscreen = true
+        normalScreenButton.visibility = View.VISIBLE
+        initializeAdapter()
+    }
+
+    override fun onNotFullscreen() = ifInitialized {
+        dictionaryHolderLinearLayout.visibility = View.VISIBLE
+        adapter.isFullscreen = false
+        normalScreenButton.visibility = View.GONE
+        initializeAdapter()
+    }
 }

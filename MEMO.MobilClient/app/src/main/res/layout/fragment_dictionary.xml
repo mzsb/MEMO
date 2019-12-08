@@ -167,8 +167,7 @@
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_drop_down_white_24dp"
-                    android:visibility="@{fragment.isEnabled ? View.VISIBLE : View.GONE}"/>
+                    android:src="@drawable/ic_drop_down_white_24dp"/>
 
             </LinearLayout>
 

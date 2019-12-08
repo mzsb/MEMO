@@ -91,7 +91,9 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary()) : Di
         val viewerCountTextView = view.fg_dictionary_tv_viewer_count
         viewerCountTextView.text = Dictionary.ViewerCount.toString()
 
-        if(isEnabled && Dictionary.Viewers.any()) {
+        val viewersHiderButton = view.fg_dictionary_iv_viewers_hider
+
+        if(App.isCurrent(Dictionary.Owner.Id) && Dictionary.Viewers.any()) {
 
             val viewersHolderLinerLayout = fg_dictionary_lv_viewers_holder
 
@@ -108,13 +110,17 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary()) : Di
                 viewerTextView.layoutParams = params
                 viewersHolderLinerLayout.addView(viewerTextView)
             }
+
+            viewersHiderButton.visibility = View.VISIBLE
+
+            viewersHiderButton.setOnClickListener {
+                IsViewersVisible.set(!IsViewersVisible.get())
+
+                (it as ImageView).setImageResource(if (IsViewersVisible.get()) R.drawable.ic_drop_up_white_24dp else R.drawable.ic_drop_down_white_24dp)
+            }
         }
-
-        val descriptionHiderButton = view.fg_dictionary_iv_viewers_hider
-        descriptionHiderButton.setOnClickListener {
-            IsViewersVisible.set(!IsViewersVisible.get())
-
-            (it as ImageView).setImageResource(if (IsViewersVisible.get()) R.drawable.ic_drop_up_white_24dp else R.drawable.ic_drop_down_white_24dp)
+        else{
+            viewersHiderButton.visibility = View.GONE
         }
 
         initializeLanguageSpinners(view)
@@ -128,6 +134,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary()) : Di
 
     private fun Dictionary.copy(rightDictionary: Dictionary){
         Name = rightDictionary.Name
+        Description = rightDictionary.Description
         Destination = rightDictionary.Destination
         Source = rightDictionary.Source
         IsPublic = rightDictionary.IsPublic
@@ -136,6 +143,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary()) : Di
 
     private fun Dictionary.dictionaryEquals(rightDictionary: Dictionary) =
             Name == rightDictionary.Name &&
+            Description == rightDictionary.Description &&
             Destination.Code == rightDictionary.Destination.Code &&
             Source.Code == rightDictionary.Source.Code &&
             IsPublic == rightDictionary.IsPublic &&
@@ -208,7 +216,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary()) : Di
                                      dismiss() },{
                                      EmotionToast.showSad(getString(R.string.dictionary_delete_fail))
                                  })
-                             }).show(requireActivity().supportFragmentManager, "TAG")
+                             }).show(requireActivity().supportFragmentManager, Constants.SURE_FRAGMENT_TAG)
             }
             else{
                 if(isEnabled) {
@@ -254,7 +262,7 @@ class DictionaryFragment(private var Dictionary: Dictionary = Dictionary()) : Di
                                         },{
                                             EmotionToast.showSad(getString(R.string.dictionary_unsubscribe_fail))
                                         })
-                                    }).show(requireActivity().supportFragmentManager, "TAG")
+                                    }).show(requireActivity().supportFragmentManager, Constants.SURE_FRAGMENT_TAG)
                         }
                         else{
                             dismiss()

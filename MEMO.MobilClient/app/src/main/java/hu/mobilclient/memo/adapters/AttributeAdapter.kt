@@ -44,8 +44,6 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val filterPosition = Constants.ZERO
 
     private val displayedAttributes = ArrayList<Attribute>()
-    private val allAttributes = ArrayList<Attribute>()
-    private val ownAttributes = ArrayList<Attribute>()
     private var attributeFilter = AttributeFilter.loadFilter()
 
     lateinit var itemLongClickListener: OnAttributeClickedListener
@@ -238,40 +236,27 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         this.beforeInit = beforeInit
         this.afterInit = afterInit
         attributeFilter.useFilter = ::useFilter
-        reset()
         when {
-            attributeFilter.All.get() ->
-                if(!allAttributes.any()){
-                    beforeInit()
-                    serviceManager.attribute.get({allAttributes ->
-                        this.allAttributes.addAll(allAttributes)
-                        setAttributes(allAttributes)
-                        ownAttributes.clear()
-                        afterInit()
-                    },{
-                        EmotionToast.showSad(App.instance.getString(R.string.unable_load_all_attributes))
-                        onError()
-                    })
-                }
-                else{
+            attributeFilter.All.get() -> {
+                beforeInit()
+                serviceManager.attribute.get({allAttributes ->
                     setAttributes(allAttributes)
-                }
-            !attributeFilter.All.get() ->
-                if(!ownAttributes.any()){
-                    beforeInit()
-                    serviceManager.attribute.getByUserId(userId,{ ownAttributes ->
-                        this.ownAttributes.addAll(ownAttributes)
-                        setAttributes(ownAttributes)
-                        allAttributes.clear()
-                        afterInit()
-                    },{
-                        EmotionToast.showSad(App.instance.getString(R.string.unable_load_own_attributes))
-                        onError()
-                    })
-                }
-                else{
+                    afterInit()
+                },{
+                    EmotionToast.showSad(App.instance.getString(R.string.unable_load_all_attributes))
+                    onError()
+                })
+            }
+            !attributeFilter.All.get() -> {
+                beforeInit()
+                serviceManager.attribute.getByUserId(userId,{ ownAttributes ->
                     setAttributes(ownAttributes)
-                }
+                    afterInit()
+                },{
+                    EmotionToast.showSad(App.instance.getString(R.string.unable_load_own_attributes))
+                    onError()
+                })
+            }
         }
     }
 
@@ -280,11 +265,6 @@ class AttributeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         displayedAttributes.addAll(0, attributeFilter.filter(attributes))
         displayedAttributes.add(filterPosition, Attribute())
         notifyDataSetChanged()
-    }
-
-    private fun reset(){
-        ownAttributes.clear()
-        allAttributes.clear()
     }
 
     inner class AttributeViewHolder(itemView: View, val binding: AttributeListItemBinding, var parametersVisibility : Boolean = false) : RecyclerView.ViewHolder(itemView)

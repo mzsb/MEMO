@@ -31,6 +31,8 @@ class App : Application() {
 
         private val mHandler: Handler = Handler()
 
+        const val AZURE_CONNECTION_BASE_URL = "https://memoapi.azurewebsites.net/api/"
+
         var currentUser: User = User()
 
         fun getCurrentUserId() = currentUser.Id
@@ -38,6 +40,13 @@ class App : Application() {
         fun isAdmin() = currentUser.Role == Constants.ADMIN
 
         fun isCurrent(userId : UUID) = currentUser.Id == userId
+
+        enum class UsageMode{
+            tester,
+            developer
+        }
+
+        var usageMode = UsageMode.developer
 
         fun runOnUiThread(runnable: Runnable) {
             if (Thread.currentThread() === Looper.getMainLooper().thread) {
@@ -65,12 +74,15 @@ class App : Application() {
     }
 
     fun setNetworkData(){
-        ApiService.ServerIP = getSharedPreferences(Constants.NETWORK_DATA, 0)
-                                .getString(Constants.IP, ApiService.DEFAULTSERVERIP) ?: ApiService.DEFAULTSERVERIP
+        if(usageMode == UsageMode.developer) {
+            ApiService.ServerIP = getSharedPreferences(Constants.NETWORK_DATA, 0)
+                    .getString(Constants.IP, ApiService.DEFAULTSERVERIP)
+                    ?: ApiService.DEFAULTSERVERIP
 
-        ApiService.ServerPort = getSharedPreferences(Constants.NETWORK_DATA, 0)
-                .getString(Constants.PORT, ApiService.DEFAULTSERVERPORT) ?: ApiService.DEFAULTSERVERPORT
-
+            ApiService.ServerPort = getSharedPreferences(Constants.NETWORK_DATA, 0)
+                    .getString(Constants.PORT, ApiService.DEFAULTSERVERPORT)
+                    ?: ApiService.DEFAULTSERVERPORT
+        }
         apiService = createApiService()
     }
 
@@ -79,8 +91,14 @@ class App : Application() {
     }
 
     private fun provideRetrofit(): Retrofit {
+
+        val baseURL = when(usageMode){
+            UsageMode.tester -> AZURE_CONNECTION_BASE_URL
+            UsageMode.developer -> ApiService.BaseURL
+        }
+
         retrofit = Retrofit.Builder()
-                .baseUrl(ApiService.BaseURL)
+                .baseUrl(baseURL)
                 .client(provideOkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(Gson()))
                 .build()

@@ -101,6 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/ac_login_tv_registration"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -110,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:text="Kapcsolódás a szerverhez"/>
+                android:text="@string/connecting_to_server"/>
 
             <ProgressBar
                 android:layout_width="50dp"

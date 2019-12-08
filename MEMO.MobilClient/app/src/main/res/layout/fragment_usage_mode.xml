@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="fragment"
+            type="hu.mobilclient.memo.fragments.UsageModeFragment" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_rounded_blue_1"
+        android:padding="15dp">
+
+        <TextView
+            android:id="@+id/fg_usage_mode_tv_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="@string/the_app"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <RadioGroup
+            android:id="@+id/fg_usage_mode_rg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onCheckedChanged="@{fragment::onSelectionChanged}"
+            app:layout_constraintTop_toBottomOf="@id/fg_usage_mode_tv_app"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <RadioButton
+                android:id="@+id/fg_usage_mode_rb_developer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:checked="true"
+                android:hint="@string/as_developer" />
+
+            <RadioButton
+                android:id="@+id/fg_usage_mode_rb_tester"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:hint="@string/as_tester" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/fg_usage_mode_tv_use"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="3dp"
+            android:text="@string/use_as"
+            app:layout_constraintStart_toEndOf="@id/fg_usage_mode_rg"
+            app:layout_constraintBottom_toBottomOf="@id/fg_usage_mode_rg"/>
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/AppButton"
+            android:id="@+id/fg_usage_mode_bt_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:onClick="@{fragment::nextClick}"
+            android:layout_gravity="end"
+            android:text="@string/next"
+            app:layout_constraintTop_toBottomOf="@id/fg_usage_mode_tv_use"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,14 +1,11 @@
 package hu.mobilclient.memo.activities
 
-
-import android.R.id
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.LinearLayout
 import androidx.core.view.GravityCompat
 import androidx.core.view.children
 import androidx.drawerlayout.widget.DrawerLayout
@@ -29,6 +26,7 @@ import hu.mobilclient.memo.fragments.DictionaryFragment
 import hu.mobilclient.memo.fragments.TranslationFragment
 import hu.mobilclient.memo.fragments.TranslationListFragment
 import hu.mobilclient.memo.fragments.bases.NavigationFragmentBase
+import hu.mobilclient.memo.fragments.interfaces.IFullscreenHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeCreationHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeDeletionHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeUpdateHandler
@@ -42,7 +40,6 @@ import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.helpers.IdHolder
 import hu.mobilclient.memo.model.memoapi.Dictionary
-import hu.mobilclient.memo.model.enums.LanguageCode
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.content_navigation.*
@@ -64,7 +61,8 @@ class NavigationActivity : NetworkActivityBase(),
                            IAttributeUpdateHandler,
                            IAttributeDeletionHandler,
                            IUserUpdateHandler,
-                           IUserDeletionHandler {
+                           IUserDeletionHandler,
+                           IFullscreenHandler {
 
     private lateinit var idHolder : IdHolder<UUID>
     private lateinit var navigationViewPager : ViewPager
@@ -75,11 +73,13 @@ class NavigationActivity : NetworkActivityBase(),
 
     private var isFabMenuOpen = false
     private var isFastAccess = false
+    private var isFullscreen = false
 
     private lateinit var fabOpen: Animation
     private lateinit var fabClose: Animation
     private lateinit var fabRotateOpen: Animation
     private lateinit var fabRotateClose: Animation
+    private lateinit var fabMenu: LinearLayout
 
     private var dictionaryFragment: DictionaryFragment? = null
     private var attributeFragment: AttributeFragment? = null
@@ -110,7 +110,8 @@ class NavigationActivity : NetworkActivityBase(),
             navigationViewPager.adapter = NavigationPagerAdapter(supportFragmentManager)
             viewPagerAdapter = (navigationViewPager.adapter as NavigationPagerAdapter)
 
-            val fabMenu = ac_navigation_ll_fab_menu
+            fabMenu = ac_navigation_ll_fab_menu
+
             fabMenu.setOnClickListener {
                 val fabCreate = fab_create
                 if(isFabMenuOpen){
@@ -133,6 +134,9 @@ class NavigationActivity : NetworkActivityBase(),
                 override fun onPageSelected(position: Int) {
                     navigationView.menu.getItem(position).isChecked = true
                     supportActionBar?.title = getPageName(position)
+                    if(isFullscreen) {
+                        onNotFullscreen()
+                    }
                 }
             })
 
@@ -146,6 +150,7 @@ class NavigationActivity : NetworkActivityBase(),
             idHolder = IdHolder(invalidKeys)
 
             supportActionBar?.title = getPageName(NavigationPagerAdapter.TRANSLATION_LIST_PAGE_POSITION)
+
         },errorCallback = {
             EmotionToast.showSad(getString(R.string.unable_load_user))
             logout()
@@ -159,13 +164,8 @@ class NavigationActivity : NetworkActivityBase(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
-            id.home -> drawerLayout.openDrawer(GravityCompat.START)
-            R.id.refresh -> {
-                serviceManager.translation.translate("kutya", LanguageCode.HU.name, LanguageCode.EN.name,callback = {
-                    val i = it
-                    it
-                })
-            }
+            android.R.id.home -> drawerLayout.openDrawer(GravityCompat.START)
+            R.id.fullscreen -> onFullscreen()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -189,7 +189,7 @@ class NavigationActivity : NetworkActivityBase(),
         return true
     }
 
-    private fun logout(){
+    fun logout(){
         getSharedPreferences(Constants.AUTHENTICATION_DATA, 0).edit().clear().apply()
         startActivity(Intent(this, LoginActivity::class.java))
         DictionaryFilter.clearFilter()
@@ -218,14 +218,13 @@ class NavigationActivity : NetworkActivityBase(),
             navigationView.menu.removeItem(key)
         }
         idHolder.clear()
-        for (d in dictionaries) {
-            idHolder.putId(d.Id)
-            navigationView.menu.add(R.id.group_dictionaries, idHolder.getKey(d.Id), Menu.NONE, d.Name).isCheckable = true
+        for (dictionary in dictionaries) {
+            idHolder.putId(dictionary.Id)
+            navigationView.menu.add(R.id.group_dictionaries, idHolder.getKey(dictionary.Id), Menu.NONE, dictionary.Name).isCheckable = true
         }
     }
 
     fun createClick(view: View){
-        val fabMenu = ac_navigation_ll_fab_menu
         val fabCreate = fab_create
         val fabCreateDictionary = fab_create_dictionary
         val fabCreateTranslation = fab_create_translation
@@ -278,19 +277,33 @@ class NavigationActivity : NetworkActivityBase(),
     }
 
     fun createTranslationClick(view: View){
-        if(App.currentUser.DictionaryCount.toInt() != 0) {
+        val initializeTranslationFragment = {
             val fragment = translationFragment ?: TranslationFragment()
             translationFragment = fragment
-            viewPagerAdapter.forEachOnFragments {navigationFragment ->
-                if(navigationFragment is ISelectedDictionaryHolder && navigationFragment is TranslationListFragment){
+            viewPagerAdapter.forEachOnFragments { navigationFragment ->
+                if (navigationFragment is ISelectedDictionaryHolder && navigationFragment is TranslationListFragment) {
                     fragment.setDictionarySpinnerSelection(navigationFragment.getSelectedDictionaryId())
                 }
             }
             fragment.show(supportFragmentManager, Constants.TRANSLATION_FRAGMENT_TAG)
             fab_create.callOnClick()
         }
+
+        if(App.currentUser.DictionaryCount.toInt() == 0){
+            serviceManager.user.get(App.currentUser.Id,{ user ->
+                App.currentUser = user
+                if(App.currentUser.DictionaryCount.toInt() != 0) {
+                    initializeTranslationFragment()
+                }
+                else{
+                    EmotionToast.showHelp(getString(R.string.create_dictionary_first))
+                }
+            },{
+                getString(R.string.unable_load_user)
+            })
+        }
         else{
-            EmotionToast.showHelp(getString(R.string.create_dictionary_first))
+            initializeTranslationFragment()
         }
     }
 
@@ -404,6 +417,29 @@ class NavigationActivity : NetworkActivityBase(),
                 navigationFragment.onUserDeleted(userId)
             }
         }
-        logout()
+    }
+
+    override fun onFullscreen() {
+        isFullscreen = true
+        navigationViewPager.setCurrentItem(NavigationPagerAdapter.TRANSLATION_LIST_PAGE_POSITION, true)
+        fabMenu.visibility = View.GONE
+        toolbar.visibility = View.GONE
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IFullscreenHandler){
+                navigationFragment.onFullscreen()
+            }
+        }
+    }
+
+    override fun onNotFullscreen() {
+        fabMenu.visibility = View.VISIBLE
+        toolbar.visibility = View.VISIBLE
+        viewPagerAdapter.forEachOnFragments {navigationFragment ->
+            if(navigationFragment is IFullscreenHandler){
+                navigationFragment.onNotFullscreen()
+            }
+        }
+
+        isFullscreen = false
     }
 }

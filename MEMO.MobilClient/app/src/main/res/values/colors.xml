@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#3F51B5</color>
-    <color name="primary_dark">#303F9F</color>
+    <color name="primary">#2D3B86</color>
+    <color name="primary_dark">#191E69</color>
     <color name="primary_light">#ECECFC</color>
     <color name="accent">#FF9800</color>
     <color name="primary_text">#212121</color>
@@ -9,6 +9,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
 
+    <color name="translation_default">#303F9F</color>
     <color name="green">#1B793A</color>
     <color name="red">#FF0020</color>
     <color name="blue">#072B9B</color>

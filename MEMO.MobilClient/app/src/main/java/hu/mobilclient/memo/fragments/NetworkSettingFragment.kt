@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
+import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableField
@@ -19,12 +21,15 @@ import hu.mobilclient.memo.databinding.FragmentNetworkSettingsBinding
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.network.ApiService
+import kotlinx.android.synthetic.main.fragment_network_settings.*
 import kotlinx.android.synthetic.main.fragment_network_settings.view.*
 
 
-class NetworkSettingFragment : DialogFragment() {
+class NetworkSettingFragment(val ifUsageModeInvalidated: ()->Unit = {}) : DialogFragment() {
 
+    private lateinit var baseURLLinearLayout: LinearLayout
     private val settings: NetworkSettings = NetworkSettings()
+    var InvalidateUsageMode: Boolean = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -38,6 +43,11 @@ class NetworkSettingFragment : DialogFragment() {
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        baseURLLinearLayout = binding.root.fg_network_settings_ll_base_url
+        if(App.usageMode == App.Companion.UsageMode.tester){
+            baseURLLinearLayout.visibility = View.GONE
+        }
+
         return binding.root
     }
 
@@ -46,8 +56,21 @@ class NetworkSettingFragment : DialogFragment() {
     fun saveClick(view: View){
         (activity as NetworkActivityBase).serviceManager.connection.setConnectionData(ip = settings.Ip.get(), port = settings.Port.get())
 
-        EmotionToast.showSuccess()
         dismiss()
+
+        if(InvalidateUsageMode){
+            App.instance.getSharedPreferences(Constants.USAGEMODE_DATA, 0)
+                    .edit()
+                    .clear()
+                    .apply()
+
+            ifUsageModeInvalidated()
+        }
+        else{
+            EmotionToast.showSuccess()
+        }
+
+        InvalidateUsageMode = false
     }
 
     fun resetClick(view: View){

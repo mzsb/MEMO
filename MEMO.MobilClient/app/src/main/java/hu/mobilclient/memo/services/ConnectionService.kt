@@ -8,6 +8,7 @@ import android.os.Build
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.annotations.SerializedName
 import hu.mobilclient.memo.App
@@ -35,15 +36,26 @@ class ConnectionService(val activity: Activity, private val errorCallback: (Stri
 
     fun connect(ifConnected: () -> Unit = {}, ifNotConnected: () -> Unit = {}){
         if(isNetworkAvailable()) {
-            if (!isEmulator()) {
-                connect("https://${defaultIp}:${defaultPort}/api/connection",
+            if (!isEmulator() || App.usageMode == App.Companion.UsageMode.tester) {
+                activity.ac_login_ll_network_progress.visibility = View.VISIBLE
+                val baseURL = when(App.usageMode){
+                    App.Companion.UsageMode.tester -> "${App.AZURE_CONNECTION_BASE_URL}connection"
+                    App.Companion.UsageMode.developer -> "https://${defaultIp}:${defaultPort}/api/connection"
+                }
+                connect(baseURL,
                         callback = {
-                            activity.ac_login_ll_network_progress.visibility = View.GONE;
+                            activity.ac_login_ll_network_progress.visibility = View.GONE
                             ifConnected()
                         },
                         errorCallback = {
-                            scanNetwork(ifConnected,
-                                    ifNotConnected)
+                            if(App.usageMode == App.Companion.UsageMode.developer) {
+                                scanNetwork(ifConnected,
+                                        ifNotConnected)
+                            }
+                            else{
+                                EmotionToast.showError(it)
+                                activity.ac_login_ll_network_progress.visibility = View.GONE
+                            }
                         })
             } else {
                 setConnectionData(ApiService.DEFAULTSERVERIP,ApiService.DEFAULTSERVERPORT)

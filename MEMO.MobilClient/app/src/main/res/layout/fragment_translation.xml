@@ -72,7 +72,7 @@
                             android:hint="@string/original"
                             android:inputType="textImeMultiLine"
                             android:text="@={translation.original}"
-                            android:textColor="@{translation.Color == @color/primary_dark ? @color/primary_light : translation.Color}"
+                            android:textColor="@{translation.Color == @color/translation_default ? @color/primary_light : translation.Color}"
                             android:textSize="18sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -90,7 +90,7 @@
                             android:hint="@string/translated"
                             android:inputType="textImeMultiLine"
                             android:text="@={translation.translated}"
-                            android:textColor="@{translation.Color == @color/primary_dark ? @color/primary_light : translation.Color}"
+                            android:textColor="@{translation.Color == @color/translation_default ? @color/primary_light : translation.Color}"
                             android:textSize="18sp" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -157,6 +157,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/fg_translation_tv_attributes"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"

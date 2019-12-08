@@ -22,7 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="-5dp">
+            android:layout_marginTop="-5dp"
+            android:layout_marginBottom="15dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -44,8 +45,10 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
+            android:id="@+id/fg_network_settings_ll_base_url"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-10dp"
             android:layout_marginBottom="15dp"
             android:orientation="horizontal">
 
@@ -94,6 +97,27 @@
                     android:textSize="18sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/invalidate_usage_mode"
+                android:textColor="@color/primary_light"
+                android:textSize="18sp" />
+
+            <CheckBox
+                android:id="@+id/fg_network_settings_cb_invalidate_usage_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@={fragment.InvalidateUsageMode}"/>
 
         </LinearLayout>
 

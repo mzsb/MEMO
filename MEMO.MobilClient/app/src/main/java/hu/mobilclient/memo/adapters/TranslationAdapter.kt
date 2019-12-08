@@ -44,11 +44,11 @@ class TranslationAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
 
     private val displayedTranslation = ArrayList<Translation>()
-    private val translations = ArrayList<Translation>()
 
     private var translationFilter = TranslationFilter.loadFilter()
 
     lateinit var itemClickListener: OnTranslationClickedListener
+    var isFullscreen = false
 
     private val filterOpen: Animation = AnimationUtils.loadAnimation(App.instance, R.anim.filter_open)
     private val searchOpen: Animation = AnimationUtils.loadAnimation(App.instance, R.anim.search_open)
@@ -84,17 +84,20 @@ class TranslationAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if(dictionary.Id != UUID(0,0) && App.isCurrent(dictionary.Owner.Id)){
-                    when(position) {
-                        filterPosition -> TYPE_FILTER
-                        newTranslationPosition -> TYPE_NEW_TRANSLATION
-                        else -> TYPE_TRANSLATION
-                    }
-                }
-                else{
-                    when(position) {
-                        filterPosition -> TYPE_FILTER
-                        else -> TYPE_TRANSLATION
+        return  if(isFullscreen){
+                    TYPE_TRANSLATION
+                } else {
+                    if (dictionary.Id != UUID(0, 0) && App.isCurrent(dictionary.Owner.Id)) {
+                        when (position) {
+                            filterPosition -> TYPE_FILTER
+                            newTranslationPosition -> TYPE_NEW_TRANSLATION
+                            else -> TYPE_TRANSLATION
+                        }
+                    } else {
+                        when (position) {
+                            filterPosition -> TYPE_FILTER
+                            else -> TYPE_TRANSLATION
+                        }
                     }
                 }
         }
@@ -303,10 +306,8 @@ class TranslationAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         this.afterInit = afterInit
         this.onError = onError
         translationFilter.useFilter = ::useFilter
-        reset()
         beforeInit()
         serviceManager.translation.getByDictionaryId(dictionary.Id, { dictionaryTranslation ->
-            translations.addAll(dictionaryTranslation)
             setTranslations(dictionaryTranslation)
             afterInit()
         }, {
@@ -318,15 +319,13 @@ class TranslationAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private fun setTranslations(translations: List<Translation>) {
         displayedTranslation.clear()
         displayedTranslation.addAll(0, translationFilter.filter(translations))
-        displayedTranslation.add(filterPosition, Translation())
-        if(dictionary.Id != UUID(0,0) && App.isCurrent(dictionary.Owner.Id)) {
-            displayedTranslation.add(newTranslationPosition + 1, Translation())
+        if(!isFullscreen) {
+            displayedTranslation.add(filterPosition, Translation())
+            if (dictionary.Id != UUID(0, 0) && App.isCurrent(dictionary.Owner.Id)) {
+                displayedTranslation.add(newTranslationPosition + 1, Translation())
+            }
         }
         notifyDataSetChanged()
-    }
-
-    private fun reset(){
-        translations.clear()
     }
 
     inner class TranslationViewHolder(itemView: View, val binding: TranslationListItemBinding, var attributeValuesVisibility : Boolean = false) : RecyclerView.ViewHolder(itemView)

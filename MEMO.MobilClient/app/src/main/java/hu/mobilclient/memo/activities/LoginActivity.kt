@@ -16,6 +16,7 @@ import hu.mobilclient.memo.databinding.ActivityLoginBinding
 import hu.mobilclient.memo.fragments.NetworkSettingFragment
 import hu.mobilclient.memo.fragments.RegistrationFragment
 import hu.mobilclient.memo.fragments.TranslationFragment
+import hu.mobilclient.memo.fragments.UsageModeFragment
 import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.EmotionToast
 import hu.mobilclient.memo.model.authentication.Login
@@ -26,7 +27,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : NetworkActivityBase() {
 
-    private val login = Login(UserName = "User1", Password = "123456")
+    private val login = Login()
     private var checkLoginError = false
     private var registrationFragment: RegistrationFragment? = null
     private var networkFragment: NetworkSettingFragment? = null
@@ -37,9 +38,31 @@ class LoginActivity : NetworkActivityBase() {
 
         val binding: ActivityLoginBinding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
-        serviceManager.connection.connect(::autoLogin) { checkLoginError = true}
+        setUsageMode()
 
         binding.setVariable(BR.login, login)
+    }
+
+    private fun setUsageMode(){
+        val usageMode = getSharedPreferences(Constants.USAGEMODE_DATA, 0).getString(Constants.USAGEMODE, null)
+        if(usageMode.isNullOrEmpty()){
+            UsageModeFragment {
+                connect()
+            }.show(supportFragmentManager, Constants.USAGE_MODE_FRAGMENT_TAG)
+        }
+        else{
+            when (usageMode) {
+                App.Companion.UsageMode.developer.toString() -> App.usageMode = App.Companion.UsageMode.developer
+                App.Companion.UsageMode.tester.toString() -> App.usageMode = App.Companion.UsageMode.tester
+            }
+            connect()
+        }
+    }
+
+    private fun connect(){
+        App.instance.setNetworkData()
+        serviceManager.invalidateApiService()
+        serviceManager.connection.connect(::autoLogin) { checkLoginError = true}
     }
 
     private fun autoLogin(){
@@ -63,7 +86,7 @@ class LoginActivity : NetworkActivityBase() {
     }
 
     fun settingsClick(view: View){
-        val fragment = networkFragment?: NetworkSettingFragment()
+        val fragment = networkFragment?: NetworkSettingFragment(ifUsageModeInvalidated = ::setUsageMode)
         networkFragment = fragment
         fragment.show(supportFragmentManager, Constants.NETWORK_SETTINGS_FRAGMENT_TAG)
     }
@@ -96,17 +119,23 @@ class LoginActivity : NetworkActivityBase() {
         App.instance.refreshToken(tokenHolder.Token)
 
         if(intent.action.equals(Intent.ACTION_SEND) || intent.action.equals(Intent.ACTION_PROCESS_TEXT)){
-            serviceManager.user.get(tokenHolder.UserId, callback = {
-                App.currentUser = it
+            serviceManager.user.get(tokenHolder.UserId, callback = { user ->
+                if(user.DictionaryCount.toInt() != 0) {
+                    App.currentUser = user
 
-                val stringExtra = intent.getCharSequenceExtra( if(intent.action.equals(Intent.ACTION_SEND))
-                                                                          Intent.EXTRA_TEXT
-                                                                      else
-                                                                          Intent.EXTRA_PROCESS_TEXT)?.toString()
-                                                                      ?: Constants.EMPTY_STRING
+                    val stringExtra = intent.getCharSequenceExtra(if (intent.action.equals(Intent.ACTION_SEND))
+                        Intent.EXTRA_TEXT
+                    else
+                        Intent.EXTRA_PROCESS_TEXT)?.toString()
+                            ?: Constants.EMPTY_STRING
 
-                TranslationFragment(Translation(Translated = stringExtra),
-                                                FromLogin = true).show(supportFragmentManager, Constants.TRANSLATION_FRAGMENT_TAG)
+                    TranslationFragment(Translation(Translated = stringExtra),
+                            FromLogin = true).show(supportFragmentManager, Constants.TRANSLATION_FRAGMENT_TAG)
+                }
+                else {
+                    EmotionToast.showHelp(getString(R.string.create_dictionary_first))
+                    finish()
+                }
             })
         }
         else {

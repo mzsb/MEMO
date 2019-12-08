@@ -10,11 +10,15 @@ namespace MEMO.DAL.Entities
     public class Dictionary : IAuditable
     {
         public Guid Id { get; set; }
+
         [MaxLength(20)]
         public string Name { get; set; }
+
         [MaxLength(250)]
         public string Description { get; set; }
+
         public bool IsPublic { get; set; }
+
         public bool IsFastAccessible { get; set; }
 
         [NotMapped]

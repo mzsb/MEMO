@@ -10,7 +10,9 @@ namespace MEMO.WebAPI
     {
         public static void Main(string[] args)
         {
+            #if DEBUG
             args = args.URLConfiguration();
+            #endif
 
             var webHost = CreateWebHostBuilder(args).Build();
             using (var scope = webHost.Services.CreateScope())

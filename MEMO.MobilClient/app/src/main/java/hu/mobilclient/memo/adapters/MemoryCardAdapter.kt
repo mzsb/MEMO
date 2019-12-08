@@ -131,7 +131,7 @@ class MemoryCardAdapter  : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun initializeAdapter(memoryCards: List<MemoryCard>){
         reset()
-        this.memoryCards.addAll(memoryCards.shuffled())
+        this.memoryCards.addAll(memoryCards)
         notifyDataSetChanged()
     }
 

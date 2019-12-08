@@ -17,6 +17,7 @@ namespace MEMO.DTO
 
         [Required(ErrorMessage = "Attribute name is required", AllowEmptyStrings = false), MaxLength(20)]
         public string Name { get; set; }
+
         public AttributeType Type { get; set; }
 
         public int AttributeValuesCount { get; set; }

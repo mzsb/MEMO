@@ -102,7 +102,7 @@ class DictionaryListFragment : NavigationFragmentBase(),
         })
     }
 
-    override fun update(){
+    override fun update() = ifInitialized {
         initializeAdapter()
     }
 

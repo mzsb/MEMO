@@ -13,9 +13,11 @@ namespace MEMO.DAL.Entities
         public string Value { get; set; }
 
         public Guid TranslationId { get; set; }
+
         public Translation Translation { get; set; }
 
         public Guid AttributeId { get; set; }
+
         public Attribute Attribute { get; set; }
     }
 }

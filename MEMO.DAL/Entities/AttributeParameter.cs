@@ -13,6 +13,7 @@ namespace MEMO.DAL.Entities
         public string Value { get; set; }
 
         public Guid AttributeId { get; set; }
+
         public Attribute Attribute { get; set; }
     }
 }

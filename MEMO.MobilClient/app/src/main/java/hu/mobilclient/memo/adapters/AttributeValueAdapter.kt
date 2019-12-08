@@ -167,15 +167,12 @@ class AttributeValueAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 addEditText = valueEditText
                 controlButton.setImageResource(R.drawable.ic_add_accent_48dp)
                 controlButton.setOnClickListener {
-                    if (attributeValue.Attribute?.Type == AttributeType.TEXT && valueEditText.isNotEmpty() && !valueEditText.tooLong(Constants.ATTRIBUTE_PARAMETER_VALUE_MAX_LENGTH, App.instance.getString(R.string.parameter_value_too_long, Constants.ATTRIBUTE_PARAMETER_VALUE_MAX_LENGTH)) ||
-                        attributeValue.Attribute?.Type != AttributeType.TEXT){
-                        val newParameter = AttributeValue().copy(attributeValue)
-                        displayedAttributeValues.add(displayedAttributeValues.size - 1, newParameter)
-                        attributeValues.add(newParameter)
-                        attributeValue.Value = Constants.EMPTY_STRING
-                        valueEditTexts.clear()
-                        notifyDataSetChanged()
-                    }
+                    val newParameter = AttributeValue().copy(attributeValue)
+                    displayedAttributeValues.add(displayedAttributeValues.size - 1, newParameter)
+                    attributeValues.add(newParameter)
+                    attributeValue.Value = Constants.EMPTY_STRING
+                    valueEditTexts.clear()
+                    notifyDataSetChanged()
                 }
             }
             else {

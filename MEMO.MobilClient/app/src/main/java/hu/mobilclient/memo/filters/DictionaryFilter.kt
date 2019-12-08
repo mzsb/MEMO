@@ -15,6 +15,7 @@ import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
 import hu.mobilclient.memo.model.memoapi.Dictionary
 import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -206,15 +207,13 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
     private fun sortAndPrivate(dictionaries: List<Dictionary>): List<Dictionary>{
         var sortedDictionaries = dictionaries
 
-        val dateFormat = SimpleDateFormat(App.instance.getString(R.string.date_format))
-
         if(OnlyPrivate.get()) {
             sortedDictionaries = sortedDictionaries.filter { !it.IsPublic }
         }
 
         if(SortByDate.get()) {
-            sortedDictionaries = if(IsDescending.get()) sortedDictionaries.sortedByDescending { dateFormat.parse(it.CreationDate) }
-                                                    else sortedDictionaries.sortedBy { dateFormat.parse(it.CreationDate) }
+            sortedDictionaries = if(IsDescending.get()) sortedDictionaries.sortedByDescending { it.CreationDate }
+                                                    else sortedDictionaries.sortedBy { it.CreationDate }
         }
         if(SortByDictionaryName.get()) {
             sortedDictionaries = if(IsDescending.get()) sortedDictionaries.sortedByDescending { it.Name }
@@ -236,7 +235,7 @@ class DictionaryFilter(var DictionaryName: ObservableField<String> = ObservableF
     }
 
     fun setTotalDictionaryCount(dictionaries : List<Dictionary>){
-        TotalDictionaryCount.set((dictionaries.count() - 1).toString())
+        TotalDictionaryCount.set(dictionaries.filter { it.Id != UUID(0,0) }.count().toString())
     }
 
     fun setTotalTranslationCount(dictionaries : List<Dictionary>){

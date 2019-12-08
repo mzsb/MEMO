@@ -12,7 +12,7 @@
         android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:background="@color/primary_dark"
+        android:background="@color/primary"
         android:orientation="horizontal">
 
         <ImageView

@@ -7,8 +7,13 @@ object Constants {
     const val USER_FRAGMENT_TAG = "userFragment"
     const val REGISTRATION_FRAGMENT_TAG = "registrationFragment"
     const val NETWORK_SETTINGS_FRAGMENT_TAG = "networkSettingsFragment"
+    const val SURE_FRAGMENT_TAG = "sureFragment"
+    const val USAGE_MODE_FRAGMENT_TAG = "usageModeFragment"
     const val USERID = "userId"
+    const val DICTIONARYID = "dictionaryId"
     const val AUTHENTICATION_DATA = "authData"
+    const val USAGEMODE_DATA = "usageModeData"
+    const val USAGEMODE = "usageMode"
     const val TOKEN = "token"
     const val EMPTY_STRING = ""
     const val ZERO = 0
@@ -34,4 +39,5 @@ object Constants {
     const val USER_PASSWORD_MAX_LENGTH = 20
     const val USER_PASSWORD_MIN_LENGTH = 6
     const val COLORPICKERDIALOG_DENSITY = 12
+    const val MEMORYGAME_DATA = "memoryGameData"
 }

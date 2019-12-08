@@ -114,7 +114,7 @@ class UserFragment(private var User: User = User()) : DialogFragment() {
                                 }, {
                                     EmotionToast.showSad(getString(R.string.user_delete_fail))
                                 })
-                            }).show(requireActivity().supportFragmentManager, "TAG")
+                            }).show(requireActivity().supportFragmentManager, Constants.SURE_FRAGMENT_TAG)
                 } else {
                     if(!User.userEquals(originalUser)) {
                         if (isValid()) {

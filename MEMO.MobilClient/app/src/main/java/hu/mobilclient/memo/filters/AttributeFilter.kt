@@ -15,6 +15,7 @@ import hu.mobilclient.memo.helpers.Constants
 import hu.mobilclient.memo.helpers.OnceRunTextWatcher
 import hu.mobilclient.memo.model.memoapi.Attribute
 import hu.mobilclient.memo.model.enums.AttributeType
+import java.util.*
 import kotlin.collections.ArrayList
 
 class AttributeFilter(var AttributeName: ObservableField<String> = ObservableField(Constants.EMPTY_STRING),
@@ -180,7 +181,7 @@ class AttributeFilter(var AttributeName: ObservableField<String> = ObservableFie
     }
 
     fun setTotalAttributeCount(attributes: List<Attribute>){
-        TotalAttributeCount.set((attributes.count() - 1).toString())
+        TotalAttributeCount.set(attributes.filter { it.Id != UUID(0,0) }.count().toString())
     }
 
     fun setTotalValueCount(attributes: List<Attribute>){

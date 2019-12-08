@@ -10,14 +10,19 @@ namespace MEMO.DAL.Entities
     public class Translation : IAuditable
     {
         public Guid Id { get; set; }
+
         [MaxLength(30)]
         public string Original { get; set; }
+
         [MaxLength(30)]
         public string Translated { get; set; }
+
         public int Color { get; set; }
 
         public Guid DictionaryId { get; set; }
+
         public Dictionary Dictionary { get; set; }
+
         public DateTime CreationDate { get; set; }
 
         [NotMapped]

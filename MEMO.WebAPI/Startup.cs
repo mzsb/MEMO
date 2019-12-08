@@ -44,143 +44,148 @@ namespace MEMO.WebAPI
         {
             #region DbContext
 
+            #if DEBUG
             services.AddDbContext<MEMOContext>(o => 
                 o.UseSqlServer(Configuration.GetConnectionString("LocalConnection")));
-            
+            #else
+            services.AddDbContext<MEMOContext>(o => 
+                o.UseSqlServer(Configuration.GetConnectionString("AzureConnection")));
+            #endif
+
             #endregion
 
             #region Identity
 
-            services.AddIdentity<User, IdentityRole<Guid>>(o => 
-            {
-                o.Password.RequireDigit = false;
-                o.Password.RequireLowercase = false;
-                o.Password.RequireUppercase = false;
-                o.Password.RequireNonAlphanumeric = false;
-                o.Password.RequiredLength = 6;
-            })
-            .AddEntityFrameworkStores<MEMOContext>()
-            .AddDefaultTokenProviders();
+                        services.AddIdentity<User, IdentityRole<Guid>>(o => 
+                        {
+                            o.Password.RequireDigit = false;
+                            o.Password.RequireLowercase = false;
+                            o.Password.RequireUppercase = false;
+                            o.Password.RequireNonAlphanumeric = false;
+                            o.Password.RequiredLength = 6;
+                        })
+                        .AddEntityFrameworkStores<MEMOContext>()
+                        .AddDefaultTokenProviders();
 
-            string secret = Configuration.GetValue<string>("AppSettings:Secret");
+                        string secret = Configuration.GetValue<string>("AppSettings:Secret");
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.SaveToken = true;
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateLifetime = true,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
-                    #if(DEBUG)
-                    ,ClockSkew = TimeSpan.Zero
-                    #endif
-                };
-            });
+                        services.AddAuthentication(options =>
+                        {
+                            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        })
+                        .AddJwtBearer(options =>
+                        {
+                            options.SaveToken = true;
+                            options.RequireHttpsMetadata = false;
+                            options.TokenValidationParameters = new TokenValidationParameters()
+                            {
+                                ValidateLifetime = true,
+                                ValidateIssuer = false,
+                                ValidateAudience = false,
+                                ValidateIssuerSigningKey = true,
+                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+            #if (DEBUG)
+                                ,ClockSkew = TimeSpan.Zero
+            #endif
+                            };
+                        });
 
             #endregion
 
             #region ProblemDetails
 
-            services.AddProblemDetails(options =>
-            {
-                options.IncludeExceptionDetails = ctx => false;
-                options.Map<TranslationException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                options.Map<EntityInsertException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                options.Map<EntityUpdateException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                options.Map<EntityDeleteException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                options.Map<AuthorizationException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                options.Map<EntityNotFoundException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                options.Map<LoginFailedException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
-                options.Map<RegistrationFailedException>(ex =>
-                    new ProblemDetails
-                    {
-                        Title = ex.Name,
-                        Detail = ex.Message,
-                        Status = StatusCodes.Status404NotFound
-                    });
+                        services.AddProblemDetails(options =>
+                        {
+                            options.IncludeExceptionDetails = ctx => false;
+                            options.Map<TranslationException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
+                            options.Map<EntityInsertException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
+                            options.Map<EntityUpdateException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
+                            options.Map<EntityDeleteException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
+                            options.Map<AuthorizationException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
+                            options.Map<EntityNotFoundException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
+                            options.Map<LoginFailedException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
+                            options.Map<RegistrationFailedException>(ex =>
+                                new ProblemDetails
+                                {
+                                    Title = ex.Name,
+                                    Detail = ex.Message,
+                                    Status = StatusCodes.Status404NotFound
+                                });
 
-            });
+                        });
 
             #endregion
 
             #region ModelServices
 
-            services.AddTransient<IAuthenticationService, AuthenticationService>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IDictionaryService, DictionaryService>();
-            services.AddTransient<ITranslationService, TranslationService>();
-            services.AddTransient<ILanguageService, LanguageService>();
-            services.AddTransient<IAttributeService, AttributeService>();
+                        services.AddTransient<IAuthenticationService, AuthenticationService>();
+                        services.AddTransient<IUserService, UserService>();
+                        services.AddTransient<IDictionaryService, DictionaryService>();
+                        services.AddTransient<ITranslationService, TranslationService>();
+                        services.AddTransient<ILanguageService, LanguageService>();
+                        services.AddTransient<IAttributeService, AttributeService>();
 
             #endregion
 
             #region Singletons
 
-            services.AddSingleton(AutoMapperConfig.Configure());
+                        services.AddSingleton(AutoMapperConfig.Configure());
 
-            var tokenManager = new TokenManager(secret);
-            services.AddSingleton(tokenManager);
-            services.AddSingleton(new AuthorizationManager(tokenManager));
+                        var tokenManager = new TokenManager(secret);
+                        services.AddSingleton(tokenManager);
+                        services.AddSingleton(new AuthorizationManager(tokenManager));
 
             #endregion
 
             #region MVC
 
-            services.AddControllers();
+                        services.AddControllers();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                             .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+                        services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                                         .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
             #endregion
         }

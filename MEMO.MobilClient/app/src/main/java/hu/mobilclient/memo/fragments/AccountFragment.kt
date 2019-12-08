@@ -34,6 +34,7 @@ import hu.mobilclient.memo.model.memoapi.Attribute
 import hu.mobilclient.memo.model.memoapi.Dictionary
 import hu.mobilclient.memo.model.memoapi.User
 import hu.mobilclient.memo.activities.MemoryGameActivity
+import hu.mobilclient.memo.data.PracticeDatabase
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeCreationHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeDeletionHandler
 import hu.mobilclient.memo.fragments.interfaces.attribute.IAttributeUpdateHandler
@@ -41,6 +42,7 @@ import hu.mobilclient.memo.fragments.interfaces.dictionary.IDictionaryCreationHa
 import hu.mobilclient.memo.fragments.interfaces.dictionary.IDictionaryDeletionHandler
 import hu.mobilclient.memo.fragments.interfaces.user.IUserUpdateHandler
 import hu.mobilclient.memo.model.enums.PracticeType
+import hu.mobilclient.memo.network.ApiService
 import kotlinx.android.synthetic.main.fab_menu.*
 import kotlinx.android.synthetic.main.fragment_account.view.*
 import java.util.*
@@ -181,8 +183,11 @@ class AccountFragment: NavigationFragmentBase(),
         attributesRecyclerView.adapter = attributeAdapter
 
         userDataProgressBar.visibility = View.GONE
+
         IsUserDataLoaded.set(true)
         user.set(App.currentUser)
+        originalUserName = user.get()!!.UserName
+        originalEmail = user.get()!!.Email
         initializeAttributeAdapter()
         initializeUserAdapter()
         initializePractice()
@@ -201,6 +206,8 @@ class AccountFragment: NavigationFragmentBase(),
         serviceManager.user.get(App.getCurrentUserId(), { user ->
             App.currentUser = user
             this.user.set(user)
+            originalUserName = user.UserName
+            originalEmail = user.Email
             userDataProgressBar.visibility = View.GONE
             IsUserDataLoaded.set(true)
         }, {
@@ -234,6 +241,40 @@ class AccountFragment: NavigationFragmentBase(),
         IsUpdateEmail.set(!IsUpdateEmail.get())
     }
 
+    fun updateClick(view: View){
+        if(IsDelete.get()){
+            SureFragment(Message = getString(R.string.account_delete_message),
+                    OkCallback = {
+                        serviceManager.user.delete(user.get()!!.Id,{
+                            activity.onUserDeleted(user.get()!!.Id)
+                            activity.logout()
+                        }, {
+                            EmotionToast.showSad(getString(R.string.account_delete_fail))
+                        })
+                    }).show(requireActivity().supportFragmentManager, Constants.SURE_FRAGMENT_TAG)
+        }
+        else {
+            if(user.get()!!.UserName == originalUserName && user.get()!!.Email == originalEmail ){
+                EmotionToast.showHelp(getString(R.string.no_changes))
+            }
+            else {
+                if (isValid()) {
+                    emailEditText.isEnabled = false
+                    userNameEditText.isEnabled = false
+                    serviceManager.user.update(user.get()!!, {
+                        activity.onUserUpdated(user.get()!!.Id)
+                        EmotionToast.showSuccess()
+                    }, {
+                        emailEditText.isEnabled = true
+                        userNameEditText.isEnabled = true
+                        view.isEnabled = true
+                        EmotionToast.showError(getString(R.string.account_update_fail))
+                    })
+                }
+            }
+        }
+    }
+
     fun practiceClick(view: View){
         if(user.get()!!.DictionaryCount.toInt() != Constants.ZERO || user.get()!!.ViewedDictionaryCount.toInt() != Constants.ZERO) {
             when (practiceTypeSpinner.selectedItem) {
@@ -244,34 +285,6 @@ class AccountFragment: NavigationFragmentBase(),
         }
         else{
             EmotionToast.showHelp(getString(R.string.create_or_view_one_dictionary))
-        }
-    }
-
-    fun updateClick(view: View){
-        if(IsDelete.get()){
-            SureFragment(Message = getString(R.string.account_delete_message),
-                    OkCallback = {
-                        serviceManager.user.delete(user.get()!!.Id,{
-                            activity.onUserDeleted(user.get()!!.Id)
-                        }, {
-                            EmotionToast.showSad(getString(R.string.account_delete_fail))
-                        })
-                    }).show(requireActivity().supportFragmentManager, "TAG")
-        }
-        else {
-            if (isValid()) {
-                emailEditText.isEnabled = false
-                userNameEditText.isEnabled = false
-                serviceManager.user.update(user.get()!!,{
-                    activity.onUserUpdated(user.get()!!.Id)
-                    EmotionToast.showSuccess()
-                }, {
-                    emailEditText.isEnabled = true
-                    userNameEditText.isEnabled = true
-                    view.isEnabled = true
-                    EmotionToast.showError(getString(R.string.account_update_fail))
-                })
-            }
         }
     }
 
@@ -348,7 +361,7 @@ class AccountFragment: NavigationFragmentBase(),
         })
     }
 
-    override fun update() {
+    override fun update() = ifInitialized {
         initializeUserData()
         initializeAttributeAdapter()
         initializeUserAdapter()
@@ -367,23 +380,34 @@ class AccountFragment: NavigationFragmentBase(),
         return true
     }
 
-    override fun onDictionaryDeleted(dictionaryId: UUID) {
+    override fun onDictionaryDeleted(dictionaryId: UUID) = ifInitialized {
+        initializeUserData()
+        initializeUserAdapter()
+
+        val savedDictionaryId = UUID.fromString(
+                activity.getSharedPreferences(Constants.MEMORYGAME_DATA, 0)
+                        .getString(Constants.DICTIONARYID, UUID(0,0).toString()))
+
+        if(savedDictionaryId == dictionaryId){
+            Thread {
+                PracticeDatabase.getInstance(activity).memoryCardDao().deleteMemoryCards()
+                activity.getSharedPreferences(Constants.MEMORYGAME_DATA, 0).edit().clear().apply()
+            }.start()
+        }
+    }
+
+    override fun onDictionaryCreated(dictionaryId: UUID) = ifInitialized {
         initializeUserData()
         initializeUserAdapter()
     }
 
-    override fun onDictionaryCreated(dictionaryId: UUID) {
-        initializeUserData()
-        initializeUserAdapter()
-    }
+    override fun onAttributeCreated(attributeId: UUID) = ifInitialized { initializeAttributeAdapter() }
 
-    override fun onAttributeCreated(attributeId: UUID) = initializeAttributeAdapter()
+    override fun onAttributeUpdated(attributeId: UUID) = ifInitialized { initializeAttributeAdapter() }
 
-    override fun onAttributeUpdated(attributeId: UUID) = initializeAttributeAdapter()
+    override fun onAttributeDeleted(attributeId: UUID) = ifInitialized { initializeAttributeAdapter() }
 
-    override fun onAttributeDeleted(attributeId: UUID) = initializeAttributeAdapter()
-
-    override fun onUserUpdated(userId: UUID) {
+    override fun onUserUpdated(userId: UUID) = ifInitialized {
         emailEditText.isEnabled = true
         userNameEditText.isEnabled = true
         IsUpdateEmail.set(false)

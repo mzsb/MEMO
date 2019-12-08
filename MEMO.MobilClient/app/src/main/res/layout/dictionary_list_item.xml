@@ -36,19 +36,18 @@
                     android:id="@+id/fg_dictionary_list_tv_user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="-10dp"
+                    android:layout_marginBottom="-7dp"
                     android:layout_marginStart="2dp"
                     android:textSize="18sp"
-                    android:textColor="@color/primary_dark"
+                    android:textColor="@color/primary"
                     android:text="@{dictionary.owner.userName}" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="35sp"
+                    android:textSize="30sp"
                     android:layout_marginTop="3dp"
-                    android:layout_marginBottom="-3dp"
-                    android:textColor="@color/primary_dark"
+                    android:textColor="@color/primary"
                     android:text="@{dictionary.name}"/>
 
                 <LinearLayout
@@ -60,14 +59,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/primary_dark"
+                        android:textColor="@color/primary"
                         android:textSize="20sp"
                         android:text="@string/phrases_dd"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/primary_dark"
+                        android:textColor="@color/primary"
                         android:textSize="20sp"
                         android:text="@{` ` + dictionary.translationCount}"/>
 
@@ -82,14 +81,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/primary_dark"
+                        android:textColor="@color/primary"
                         android:textSize="20sp"
                         android:text="@string/viewers_users_dd"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/primary_dark"
+                        android:textColor="@color/primary"
                         android:textSize="20sp"
                         android:text="@{` ` + dictionary.viewerCount}"/>
 
@@ -117,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textColor="@color/primary_dark"
+                    android:textColor="@color/primary"
                     android:text="@{dictionary.isPublic ? @string/Public : @string/Private}"
                     android:textSize="16sp"
                     android:textAlignment="center"/>
@@ -126,7 +125,7 @@
                     android:id="@+id/fg_dictionary_list_tv_creation_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/primary_dark"
+                    android:textColor="@color/primary"
                     android:layout_marginTop="2dp"
                     android:textSize="16sp"
                     android:textAlignment="center"
@@ -150,7 +149,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="@color/primary_dark"
+                android:textColor="@color/primary"
                 android:text="@string/description" />
 
             <ImageView
@@ -165,7 +164,7 @@
             android:id="@+id/fg_dictionary_list_tv_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/primary_dark"
+            android:textColor="@color/primary"
             android:textSize="20sp"
             android:layout_marginTop="-8dp"
             android:layout_marginStart="5dp"

@@ -101,8 +101,8 @@
     <string name="update_dictionary">Szótár módosítása</string>
     <string name="create_dictionary">Szótár létrehozása</string>
     <string name="type_dd">Típus:</string>
-    <string name="parameters">Paraméterek</string>
-    <string name="parameters_dd">Paraméterek:</string>
+    <string name="parameters">Értékkészlet</string>
+    <string name="parameters_dd">Értékkészlet:</string>
     <string name="type">Típus</string>
     <string name="attribute_name">Attribútum név</string>
     <string name="all">Összes</string>
@@ -169,11 +169,17 @@
     <string name="memorygame">Memóriajáték</string>
     <string name="start">Kezdés</string>
     <string name="unable_to_load_dictionary">A szótár betöltése sikertelen</string>
-    <string name="create_or_view_one_dictionary">Előbb hozz létre vagy figyelj legalább egy szótárat</string>
+    <string name="create_or_view_one_dictionary">Előbb hozz létre vagy használj legalább egy szótárat</string>
     <string name="empty_dictionary">A szótár üres</string>
     <string name="create_dictionary_first">Előbb hozz létre szótárat</string>
     <string name="unable_to_translate">A fordítás sikertelen</string>
     <string name="choose_color">Válassz színt</string>
     <string name="choose">Választ</string>
-    <string name="separator">-</string>
+    <string name="next">Tovább</string>
+    <string name="as_developer">fejlesztői</string>
+    <string name="as_tester">tesztelői</string>
+    <string name="the_app">Az alkalmazást</string>
+    <string name="use_as">módban használom</string>
+    <string name="invalidate_usage_mode">Használatimód érvénytelenítése</string>
+    <string name="connecting_to_server">Kapcsolódás a szerverhez</string>
 </resources>

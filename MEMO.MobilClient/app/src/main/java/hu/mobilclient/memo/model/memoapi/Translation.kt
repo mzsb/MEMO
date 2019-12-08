@@ -15,5 +15,5 @@ class Translation(@SerializedName("id")var Id: UUID = UUID(0,0),
                   @SerializedName("dictionaryId") var DictionaryId: UUID? = null,
                   @SerializedName("attributeValues") var AttributeValues: MutableList<AttributeValue> = ArrayList(),
                   @SerializedName("attributeValueCount")var AttributeValueCount: Int = Constants.ZERO,
-                  @SerializedName("color")var Color: Int = ContextCompat.getColor(App.instance, R.color.primary_dark),
+                  @SerializedName("color")var Color: Int = ContextCompat.getColor(App.instance, R.color.translation_default),
                   @SerializedName("creationDate") override var CreationDate: String = Constants.EMPTY_STRING) : IAuditable

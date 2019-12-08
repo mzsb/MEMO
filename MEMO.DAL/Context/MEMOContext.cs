@@ -96,7 +96,7 @@ namespace MEMO.DAL.Context
 
         private void SetCreationDate()
         {
-            foreach (var e in this.ChangeTracker.Entries<IAuditable>())
+            foreach (var e in ChangeTracker.Entries<IAuditable>())
             {
                 if (e.State.Equals(EntityState.Added))
                 {
