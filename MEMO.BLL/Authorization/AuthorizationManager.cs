@@ -14,7 +14,7 @@ namespace MEMO.BLL.Authorization
             _tokenManager = tokenManager;
         }
 
-        public bool authorizeByUserId(Guid userId, string token) 
+        public bool AuthorizeByUserId(Guid userId, string token) 
         {
             return _tokenManager.DecodeUserId(token) == userId.ToString() ||
                    _tokenManager.DecodeUserRole(token) == "Administrator";

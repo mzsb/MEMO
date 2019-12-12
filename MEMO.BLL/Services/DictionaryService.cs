@@ -81,7 +81,7 @@ namespace MEMO.BLL.Services
                                                     .Select(ud => ud.User.Id)
                                                     .SingleOrDefault();
 
-            if (_authorizationManager.authorizeByUserId(userId, Token))
+            if (_authorizationManager.AuthorizeByUserId(userId, Token))
             {
                 foreach (var ud in dictionary.UserDictionaries)
                 {
@@ -116,7 +116,7 @@ namespace MEMO.BLL.Services
                                                         .Select(ud => ud.UserId)
                                                         .SingleOrDefaultAsync();
 
-            if (_authorizationManager.authorizeByUserId(userId, Token))
+            if (_authorizationManager.AuthorizeByUserId(userId, Token))
             {
                 foreach (var ud in _context.UserDictionaries.Where(tm => tm.DictionaryId == dictionary.Id))
                 {
@@ -160,7 +160,7 @@ namespace MEMO.BLL.Services
                                                                 ?? throw new EntityNotFoundException(typeof(Dictionary));
 
 
-            if (_authorizationManager.authorizeByUserId(userDictionary.UserId, Token))
+            if (_authorizationManager.AuthorizeByUserId(userDictionary.UserId, Token))
             {
                 _context.Remove(userDictionary.Dictionary);
 
@@ -266,7 +266,7 @@ namespace MEMO.BLL.Services
 
         public async Task<IEnumerable<Dictionary>> GetFastAccessibleAsync(Guid id)
         {
-            if (_authorizationManager.authorizeByUserId(id, Token))
+            if (_authorizationManager.AuthorizeByUserId(id, Token))
             {
                 return await _context.UserDictionaries.Where(ud => ud.Type == UserType.owner &&
                                                                ud.UserId == id &&
@@ -299,7 +299,7 @@ namespace MEMO.BLL.Services
                 throw new EntityUpdateException(typeof(Dictionary));
             }
 
-            if (_authorizationManager.authorizeByUserId(user.Id, Token))
+            if (_authorizationManager.AuthorizeByUserId(user.Id, Token))
             {
                 _context.UserDictionaries.Add(new UserDictionary
                 {
@@ -333,7 +333,7 @@ namespace MEMO.BLL.Services
                 throw new EntityInsertException(typeof(UserDictionary),"Az entitás már létezik");
             }
 
-            if (_authorizationManager.authorizeByUserId(user.Id, Token))
+            if (_authorizationManager.AuthorizeByUserId(user.Id, Token))
             {
                 var userDictionary = await _context.UserDictionaries
                                                    .SingleOrDefaultAsync(ud => ud.UserId == user.Id &&

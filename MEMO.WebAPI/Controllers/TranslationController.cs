@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace MEMO.WebAPI.Controllers
 {
-    [Authorize(Roles = "Administrator,User")]
     [Route("api/[Controller]")]
     public class TranslationController : ControllerBase
     {

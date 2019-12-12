@@ -24,7 +24,7 @@ namespace MEMO.BLL.Services
         private WebClient _webClient = new WebClient { Encoding = System.Text.Encoding.UTF8 };
 
         public TranslationService(MEMOContext context,
-                                 AuthorizationManager authorizationManager)
+                                  AuthorizationManager authorizationManager)
         {
             _context = context;
             _authorizationManager = authorizationManager;
@@ -64,7 +64,7 @@ namespace MEMO.BLL.Services
                                                         .Select(ud => ud.UserId)
                                                         .SingleOrDefaultAsync();
 
-            if (_authorizationManager.authorizeByUserId(userId, Token))
+            if (_authorizationManager.AuthorizeByUserId(userId, Token))
             {
                 var inserted = _context.Add(translation).Entity;
 
@@ -94,7 +94,7 @@ namespace MEMO.BLL.Services
                                                         .Select(ud => ud.UserId)
                                                         .SingleOrDefaultAsync();
 
-            if (_authorizationManager.authorizeByUserId(userId, Token))
+            if (_authorizationManager.AuthorizeByUserId(userId, Token))
             {
                 foreach (var av in _context.AttributeValues.Where(av => av.TranslationId == translation.Id))
                 {
@@ -140,7 +140,7 @@ namespace MEMO.BLL.Services
                                                         .Select(ud => ud.UserId)
                                                         .SingleOrDefaultAsync();
 
-            if (_authorizationManager.authorizeByUserId(userId, Token))
+            if (_authorizationManager.AuthorizeByUserId(userId, Token))
             {
                 _context.Remove(translation);
 

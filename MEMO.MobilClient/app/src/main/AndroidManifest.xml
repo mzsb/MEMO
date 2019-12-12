@@ -17,15 +17,18 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.MemoryGameActivity"
-                  android:screenOrientation="landscape"/>
+                  android:screenOrientation="landscape"
+                  android:launchMode= "singleInstance"/>
         <activity
             android:name=".activities.NavigationActivity"
             android:label="@string/title_activity_navigation"
             android:screenOrientation="portrait"
+            android:launchMode= "singleInstance"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.LoginActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode= "singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

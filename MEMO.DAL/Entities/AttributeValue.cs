@@ -9,7 +9,7 @@ namespace MEMO.DAL.Entities
     {
         public Guid Id { get; set; }
 
-        [MaxLength(30)]
+        [MaxLength(70)]
         public string Value { get; set; }
 
         public Guid TranslationId { get; set; }

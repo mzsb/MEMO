@@ -99,7 +99,7 @@ namespace MEMO.BLL.Services
 
         public async Task UpdateAsync(User user)
         {
-            if (_authorizationManager.authorizeByUserId(user.Id, Token))
+            if (_authorizationManager.AuthorizeByUserId(user.Id, Token))
             {
                 var identityUser = await _userManager.FindByIdAsync(user.Id.ToString()) 
                                                      ?? throw new EntityNotFoundException(typeof(User));
@@ -123,7 +123,7 @@ namespace MEMO.BLL.Services
 
         public async Task DeleteAsync(Guid id)
         {
-            if (_authorizationManager.authorizeByUserId(id, Token))
+            if (_authorizationManager.AuthorizeByUserId(id, Token))
             {
                 foreach (var attribute in _context.Attributes.Where(a => a.UserId == id))
                 {

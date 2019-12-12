@@ -44,13 +44,8 @@ namespace MEMO.WebAPI
         {
             #region DbContext
 
-            #if DEBUG
             services.AddDbContext<MEMOContext>(o => 
                 o.UseSqlServer(Configuration.GetConnectionString("LocalConnection")));
-            #else
-            services.AddDbContext<MEMOContext>(o => 
-                o.UseSqlServer(Configuration.GetConnectionString("AzureConnection")));
-            #endif
 
             #endregion
 

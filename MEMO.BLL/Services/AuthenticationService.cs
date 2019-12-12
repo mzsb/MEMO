@@ -17,7 +17,8 @@ namespace MEMO.BLL.Services
         private readonly UserManager<User> _userManager;
         private readonly TokenManager _tokenManager;
 
-        public AuthenticationService(UserManager<User> userManager, TokenManager tokenManager)
+        public AuthenticationService(UserManager<User> userManager, 
+                                     TokenManager tokenManager)
         {
             _userManager = userManager;
             _tokenManager = tokenManager;

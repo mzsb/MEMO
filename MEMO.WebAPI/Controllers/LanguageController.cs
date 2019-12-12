@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace MEMO.WebAPI.Controllers
 {
-    [Authorize(Roles = "Administrator,User")]
     [Route("api/[Controller]")]
     public class LanguageController : ControllerBase
     {
@@ -22,6 +21,7 @@ namespace MEMO.WebAPI.Controllers
             _mapper = mapper;
         }
 
+        [Authorize(Roles = "Administrator,User")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LanguageDto>>> GetAsync()
         {

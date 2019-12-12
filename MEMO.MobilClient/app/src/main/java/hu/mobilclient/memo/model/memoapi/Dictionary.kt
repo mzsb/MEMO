@@ -28,12 +28,7 @@ class Dictionary(@SerializedName("id")var Id: UUID = UUID(0,0),
 
     fun isOwn(): Boolean{
         val userId = Owner.Id
-        return if(userId != null) {
-            App.isCurrent(userId)
-        }
-        else{
-            false
-        }
+        return App.isCurrent(userId)
     }
 
     val icon: Drawable

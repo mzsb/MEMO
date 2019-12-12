@@ -59,7 +59,7 @@ namespace MEMO.BLL.Services
 
         public async Task<Attribute> InsertAsync(Attribute attribute)
         {
-            if (_authorizationManager.authorizeByUserId(attribute.User.Id, Token))
+            if (_authorizationManager.AuthorizeByUserId(attribute.User.Id, Token))
             {
                 attribute.User = await _userManager.FindByIdAsync(attribute.User.Id.ToString()) ?? throw new EntityNotFoundException(typeof(User));
 
@@ -88,7 +88,7 @@ namespace MEMO.BLL.Services
         {
             var user = await _userManager.FindByIdAsync(attribute.User.Id.ToString()) ?? throw new EntityNotFoundException(typeof(User));
 
-            if (_authorizationManager.authorizeByUserId(user.Id, Token))
+            if (_authorizationManager.AuthorizeByUserId(user.Id, Token))
             {
                 attribute.User = user;
 
@@ -149,7 +149,7 @@ namespace MEMO.BLL.Services
         {
             var attribute = (await _context.Attributes.SingleOrDefaultAsync(a => a.Id == id));
 
-            if (_authorizationManager.authorizeByUserId(attribute.UserId, Token))
+            if (_authorizationManager.AuthorizeByUserId(attribute.UserId, Token))
             {
                 _context.Remove(attribute);
 

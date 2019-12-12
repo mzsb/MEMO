@@ -62,7 +62,7 @@ class LoginActivity : NetworkActivityBase() {
     private fun connect(){
         App.instance.setNetworkData()
         serviceManager.invalidateApiService()
-        serviceManager.connection.connect(::autoLogin) { checkLoginError = true}
+        serviceManager.connection.connect(::autoLogin) { checkLoginError = true }
     }
 
     private fun autoLogin(){
